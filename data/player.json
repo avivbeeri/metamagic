@@ -1,0 +1,23 @@
+{
+  "stats": {
+    "hpMax": 10,
+    "hp": 10,
+    "piety": 5,
+    "pietyMax": 5
+  },
+  "equipment": {
+    "WEAPON": "dagger",
+    "ARMOR": "leather armor"
+  },
+  "inventory": [
+    [ "dagger", 1 ],
+    [ "leather armor", 1 ],
+    [ "book", 1 ],
+    [ "fireball", 1 ],
+    [ "lightning", 1 ],
+    [ "blink", 1 ],
+    [ "slow", 1 ],
+    [ "confusion", 1 ],
+    [ "test", 1 ]
+  ]
+}

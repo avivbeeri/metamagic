@@ -1,0 +1,288 @@
+{
+  "book": {
+    "id": "book",
+    "kind": "book",
+    "consumable": false,
+    "name": "Holy Book",
+    "description": "Your book of holy scriptures and rites."
+  },
+  "test": {
+    "id": "test",
+    "kind": "scroll",
+    "description": "A combo meal of effects",
+    "slot": null,
+    "consumable": false,
+    "name": "Staff of effects",
+    "default": "use",
+    "effects": [ 
+      [ "push", { "target": "area", "distance": 2 } ],
+      [ "directDamage", { "damage": 1, "target": "area" } ]
+    ],
+    "actions": {
+      "use": {
+        "action": "itemEffect",
+        "needEntity": false,
+        "range": 8,
+        "area": 1
+      }
+    }   
+  },
+  "blink": {
+    "id": "blink",
+    "kind": "scroll",
+    "description": "Transports the user... somewhere.",
+    "slot": null,
+    "consumable": true,
+    "name": "Blink Scroll",
+    "default": "use",
+    "effects": [ 
+      [ "blink" ]
+    ],
+    "actions": {
+      "use": {
+        "action": "itemEffect"
+      }
+    }   
+  },
+  "slow": {
+    "id": "slow",
+    "kind": "potion",
+    "slot": null,
+    "consumable": true,
+    "name": "Slow Potion",
+    "description": "A thick substance that slows down those covered in it.",
+    "default": "throw",
+    "effects": [ 
+      [ "applyModifier", { "modifier": { "id": "slow", "duration": 5, "positive": true, "mult": { "spd": -0.5 } } } ]
+    ],
+    "actions": {
+      "drink": { 
+        "action": "itemEffect",
+        "target": "self"
+      },
+      "throw": {
+        "action": "itemEffect", 
+        "target": "area",
+        "needEntity": false,
+        "range": 8,
+        "area": 1
+      }
+    }   
+  },
+  "potion": {
+    "id": "potion",
+    "kind": "potion",
+    "slot": null,
+    "consumable": true,
+    "name": "Health Potion",
+    "description": "Drink this to feel a little better.",
+    "default": "drink",
+    "effects": [ 
+      [ "heal", { "amount": 0.3 } ]
+    ],
+    "actions": {
+      "drink": {
+        "action": "itemEffect"
+      }
+    }   
+  },
+  "lightning": {
+    "id": "lightning",
+    "kind": "scroll",
+    "slot": null,
+    "consumable": true,
+    "name": "Lightning Scroll",
+    "description": "Strike a bolt of lightning at the nearest enemy.",
+    "default": "use",
+    "effects": [
+      ["directDamage", { "damage": 3 } ]
+    ],
+    "actions": {
+      "use": {
+        "action": "itemEffect", 
+        "target": "nearest",
+        "range": 0,
+        "area": 8
+      }
+    }   
+  },
+  "confusion": {
+    "id": "confusion",
+    "kind": "scroll",
+    "slot": null,
+    "consumable": true,
+    "name": "Confusion Scroll",
+    "description": "Weave a fog of confusion over a target, muddling it's motivations.",
+    "default": "use",
+    "effects": [
+      ["applyCondition", { "condition": {
+        "id": "confusion",
+        "duration": 5,
+        "curable": true
+      } } ]
+    ],
+    "actions": {
+      "use": {
+        "action": "itemEffect", 
+        "target": "area",
+        "needEntity": true,
+        "range": 8,
+        "area": 0
+      }
+    }   
+  },
+  "fireball": {
+    "id": "fireball",
+    "kind": "scroll",
+    "slot": null,
+    "consumable": true,
+    "name": "Fireball Scroll",
+    "description": "Conjures a ball of fire at the chosen location, burning all within to a crisp.",
+    "default": "use",
+    "effects": [
+      [ "directDamage", { "damage": 5 } ]
+    ],
+    "actions": {
+      "use": {
+        "action": "itemEffect", 
+        "target": "area",
+        "needEntity": false,
+        "range": 8,
+        "area": 1
+      }
+    }   
+  },
+  "dagger": {
+    "id": "dagger",
+    "kind": "sword",
+    "slot": "WEAPON",
+    "consumable": false,
+    "name": "Dagger",
+    "description": "A small handheld blade.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "atk": 1
+          }
+        }
+      }
+    }   
+  },
+  "shortsword": {
+    "id": "shortsword",
+    "kind": "sword",
+    "slot": "WEAPON",
+    "consumable": false,
+    "name": "Shortsword",
+    "description": "A reasonable blade of length, easy enough to wield.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "atk": 2
+          }
+        }
+      }
+    }   
+  },
+  "longsword": {
+    "id": "longsword",
+    "kind": "sword",
+    "slot": "WEAPON",
+    "consumable": false,
+    "name": "Longsword",
+    "description": "A well balanced blade with a broad hilt.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "atk": 3
+          }
+        }
+      }
+    }   
+  },
+  "leather armor": {
+    "id": "leather armor",
+    "kind": "armor",
+    "slot": "ARMOR",
+    "consumable": false,
+    "name": "Leather Armor",
+    "description": "Lightweight armor made of thick leather.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "def": 1
+          }
+        }
+      }
+    }   
+  },
+  "chainmail": {
+    "id": "chainmail",
+    "kind": "armor",
+    "slot": "ARMOR",
+    "consumable": false,
+    "name": "Chainmail",
+    "description": "Medium-weight armor composed of thourands of iron rings.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "def": 2
+          }
+        }
+      }
+    }   
+  },
+  "platemail": {
+    "id": "platemail",
+    "kind": "armor",
+    "slot": "ARMOR",
+    "consumable": false,
+    "name": "Platemail",
+    "description": "Heavy armor, carefully crafted from sheets of steel.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "def": 3
+          }
+        }
+      }
+    }   
+  },
+  "buckler": {
+    "id": "buckler",
+    "kind": "shield",
+    "slot": "OFF_HAND",
+    "consumable": false,
+    "name": "Buckler",
+    "description": "A small shield which can be strapped to your arm.",
+    "default": "equip",
+    "actions": {
+      "equip": {
+        "action": "equipItem", 
+        "stats": {
+          "add": {
+            "def": 1
+          }
+        }
+      }
+    }   
+  }
+}

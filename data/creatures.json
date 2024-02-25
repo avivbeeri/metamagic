@@ -1,0 +1,97 @@
+{
+  "rat": {
+    "symbol": "r",
+    "kind": "rat",
+    "behaviours": [
+      [
+        "wander"
+      ]
+    ],
+    "name": "Rat",
+    "pronoun": "it",
+    "stats": {
+      "hp": 1,
+      "hpMax": 1
+    }
+  },
+  "demon": {
+    "symbol": "?",
+    "kind": "demon",
+    "behaviours": [
+      [
+        "boss"
+      ]
+    ],
+    "name": "????",
+    "conditions": [
+      [
+        "invulnerable",
+        null,
+        null
+      ]
+    ],
+    "pronoun": "they",
+    "boss": true,
+    "stats": {
+      "str": 3,
+      "hp": 5,
+      "hpMax": 5,
+      "dex": 2
+    },
+    "size": [
+      3,
+      3
+    ]
+  },
+  "statue": {
+    "symbol": "£",
+    "kind": "statue",
+    "behaviours": [
+      [
+        "statue"
+      ]
+    ],
+    "name": "Statue",
+    "pronoun": "it",
+    "stats": {
+      "def": 10
+    }
+  },
+  "hound": {
+    "symbol": "d",
+    "kind": "hound",
+    "behaviours": [
+      [
+        "seek",
+        7
+      ]
+    ],
+    "name": "Hound",
+    "pronoun": "it",
+    "stats": {
+      "hp": 4,
+      "hpMax": 4,
+      "atk": 2,
+      "dex": 2
+    }
+  },
+  "zombie": {
+    "symbol": "z",
+    "kind": "zombie",
+    "behaviours": [
+      [
+        "localSeek",
+        7
+      ]
+    ],
+    "name": "Zombie",
+    "pronoun": "it",
+    "stats": {
+      "hp": 2,
+      "spd": 0.5,
+      "hpMax": 2,
+      "atk": 3,
+      "dex": 1
+    }
+  }
+}

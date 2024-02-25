@@ -1,0 +1,13 @@
+{
+  "beforeBoss": [
+    ["????: Well well, you made it..."],
+    ["????: Yes, I've been expecting you."],
+    ["????: I scarcely remember if any of your kind have made it this far before."],
+    ["????: This ought to be amusing."]
+  ],
+  "freeBoss": [
+    ["????: Ha-ha-ha-ha ha! Free at last."],
+    ["????: Now My influence can truly spread..."],
+    ["????: ...starting with you!"]
+  ]
+}
