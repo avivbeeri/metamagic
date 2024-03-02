@@ -47,7 +47,6 @@ class Panel is Element {
   content() {}
   draw() {
     var off = offset
-    System.print("Offset: %(off), Position: %(pos)")
     Canvas.offset(off.x, off.y)
     content()
     super.draw()

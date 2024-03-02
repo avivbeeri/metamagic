@@ -1,5 +1,5 @@
 import "jukebox" for Jukebox
-import "dome" for Process, Log
+import "dome" for Process, Log, StringUtils
 import "graphics" for Canvas, Color
 import "input" for Keyboard, Mouse
 import "math" for Vec
@@ -37,6 +37,7 @@ import "./ui" for
 
 import "./generator" for WorldGenerator
 import "./combat" for AttackResult
+import "./spells" for SpellUtils
 
 class InventoryWindowState is SceneState {
   construct new() {
@@ -353,6 +354,9 @@ class CastState is ModalWindowState {
     _reader = TextInputReader.new()
     _reader.max = 23
     _reader.enable()
+    _spell = {}
+    _incantation = ""
+
   }
   onExit() {
     scene.removeElement(window)
@@ -365,12 +369,21 @@ class CastState is ModalWindowState {
     } else if (INPUT["confirm"].firing) {
       // calculate spell here from input
       var player = scene.world.getEntityByTag("player")
-      player.pushAction(Components.actions.cast.new().withArgs({}))
-      return PlayerInputState.new()
+      _spell = SpellUtils.parseSpell(_incantation)
+      if (_spell.valid) {
+        System.print(_spell)
+        player.pushAction(Components.actions.cast.new().withArgs({
+          "spell": _spell
+        }))
+        return PlayerInputState.new()
+      }
     }
     _reader.update()
     if (_reader.changed) {
       scene.process(TextInputEvent.new(_reader.text, _reader.pos))
+      _incantation = StringUtils.toLowercase(_reader.text)
+      System.print(_incantation)
+      // validate
     }
     return this
   }
@@ -682,7 +695,7 @@ class GameScene is Scene {
       if (Jukebox.playing) {
         Jukebox.stopMusic()
       } else {
-        Jukebox.playMusic("soundTrack")
+        // Jukebox.playMusic("soundTrack")
       }
     }
     super.update()

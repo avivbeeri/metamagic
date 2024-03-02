@@ -77,9 +77,7 @@ class Stateful {
   }
   construct new(data) {
     _data = {}
-    for (key in data.keys) {
-      _data[key] = data[key]
-    }
+    assign(data)
   }
 
   assign(other) {
@@ -1711,12 +1709,12 @@ class TextInputReader {
     }
 
     if (!Keyboard.compositionText && Keyboard["backspace"].justPressed && _text.count > 0) {
-      var codePoints = _text.codePoints
-      splitText(_pos - 1, null, _pos)
-      _pos = (_pos - 1).clamp(0, _text.count)
+      if (_pos > 0) {
+        splitText(_pos - 1, null, _pos)
+        _pos = (_pos - 1).clamp(0, _text.count)
+      }
     }
     if (!Keyboard.compositionText && Keyboard["delete"].justPressed && _text.count > 0) {
-      var codePoints = _text.codePoints
       splitText(_pos, null, _pos+1)
       _pos = (_pos).clamp(0, _text.count)
     }

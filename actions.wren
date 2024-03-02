@@ -25,6 +25,9 @@ class CastAction is Action {
   }
 
   perform() {
+    if (spell.target["origin"] == null) {
+      spell.target["origin"] = src.pos
+    }
     var targetGroup = TargetGroup.new(spell.target)
     var attackEvents = []
     var resultEvents = []

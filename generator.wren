@@ -15,6 +15,7 @@ import "parcel" for
   Config
 
 import "factory" for CreatureFactory, ItemFactory
+import "spells" for SpellUtils
 
 var GeneratorData = DataFile.load("floorData", "data/tiers.json")
 var TierData = GeneratorData["floors"]
@@ -129,6 +130,8 @@ class GeneratorUtils {
 
 class WorldGenerator {
   static create() {
+    SpellUtils.initializeLexicon()
+
     var world = World.new()
     world.generator = WorldGenerator
     world.systems.add(InventorySystem.new())
