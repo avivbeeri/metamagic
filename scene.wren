@@ -11,13 +11,15 @@ import "parcel" for
   World,
   Entity,
   Line,
-  DataFile
+  DataFile,
+  TextInputReader
 
 import "./palette" for INK
 import "./inputs" for VI_SCHEME as INPUT
 import "./messages" for MessageLog, Pronoun
-import "./ui/events" for TargetEvent, TargetBeginEvent, TargetEndEvent, HoverEvent
+import "./ui/events" for TargetEvent, TargetBeginEvent, TargetEndEvent, HoverEvent, TextInputEvent
 import "./ui/scene" for SceneState
+import "./ui/field" for Field
 import "./text" for TextSplitter
 
 import "./ui/renderer" for Renderer
@@ -328,6 +330,45 @@ class ModalWindowState is SceneState {
     return this
   }
 }
+class CastState is ModalWindowState {
+  construct new() {
+    super()
+  }
+
+  onEnter() {
+    _pane = scene.addElement(Pane.new(Vec.new(0, 0), Vec.new(Canvas.width, Canvas.height)))
+    var message = [
+      "What do you say?",
+      ""
+    ]
+
+    window = Dialog.new(message)
+    window.center = true
+    window.addElement(Field.new(Vec.new(4, 24)))
+    _reader = TextInputReader.new()
+    _reader.enable()
+  }
+  onExit() {
+    scene.removeElement(_pane)
+    _reader.disable()
+    super.onExit()
+  }
+  update() {
+    if (INPUT["reject"].firing) {
+      return PlayerInputState.new()
+    } else if (INPUT["confirm"].firing) {
+      // calculate spell here from input
+      var player = scene.world.getEntityByTag("player")
+      player.pushAction(Components.actions.cast.new().withArgs({}))
+      return PlayerInputState.new()
+    }
+    _reader.update()
+    if (_reader.changed) {
+      scene.process(TextInputEvent.new(_reader.text))
+    }
+    return this
+  }
+}
 class HelpState is ModalWindowState {
   construct new() {
     super()
@@ -336,7 +377,7 @@ class HelpState is ModalWindowState {
   onEnter() {
     var message = [
       "'Confirm' - Return, Space",
-      "'Reject' - Escape, Backspace, Delete",
+      "'Reject' - Escape",
       "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
       "    (Bump to attack)",
       "Rest - Space",
@@ -463,6 +504,9 @@ class PlayerInputState is SceneState {
     }
     if (INPUT["help"].firing) {
       return HelpState.new()
+    }
+    if (INPUT["cast"].firing) {
+      return CastState.new()
     }
 
     if (_world.complete) {

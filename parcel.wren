@@ -1651,6 +1651,7 @@ class Palette {
 class TextInputReader {
   construct new() {
     _enabled = false
+    _changed = false
     _text = ""
     _pos = 0
   }
@@ -1692,6 +1693,7 @@ class TextInputReader {
     if (!_enabled) {
       return
     }
+    var old = _text[0..-1]
 
     if (Keyboard["left"].justPressed) {
       _pos = (_pos - 1).clamp(0, _text.count)
@@ -1723,6 +1725,7 @@ class TextInputReader {
     if ((Keyboard["left ctrl"].down || Keyboard["right ctrl"].down) && Keyboard["v"].justPressed) {
       _text = _text + Clipboard.content
     }
+    _changed = old != _text
   }
 }
 
