@@ -4,7 +4,7 @@ var HoverEvent = Event.create("hover", ["target"])
 var TargetEvent = Event.create("target", ["pos"])
 var TargetBeginEvent = Event.create("targetBegin", ["pos", "range"])
 var TargetEndEvent = Event.create("targetEnd", [])
-var TextInputEvent = Event.create("textInput", [ "text" ])
+var TextInputEvent = Event.create("textInput", [ "text", "pos" ])
 
 /*
 class HoverEvent is Event {

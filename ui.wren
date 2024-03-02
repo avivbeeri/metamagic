@@ -15,7 +15,6 @@ import "groups" for Components
 import "./items" for Item, EquipmentSlot
 
 import "./palette" for INK
-import "./ui/pane" for Pane
 import "./ui/gauge" for Gauge
 import "./ui/events" for
   HoverEvent,

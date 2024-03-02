@@ -108,7 +108,8 @@ for (i in 0...KEY_SET_1.count) {
 
 var BASIC = InputScheme.new()
 // TODO: space can't be confirm during text entry
-BASIC.register("confirm", [ Keyboard["return"], Keyboard["space"] ])
+BASIC.register("confirm", [ Keyboard["return"] ])
+BASIC.register("easyConfirm", [ Keyboard["return"], Keyboard["space"] ])
 BASIC.register("reject", [ Keyboard["escape"] ])
 BASIC.register("exit", [ Keyboard["F12"] ])
 BASIC.register("cast", [ Keyboard["space"], Keyboard["keypad ."], Keyboard["keypad 5"] ])

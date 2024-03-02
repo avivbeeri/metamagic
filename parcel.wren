@@ -975,6 +975,10 @@ class Scene is Element {
     super()
   }
 
+  size { Vec.new(Canvas.width, Canvas.height) }
+  pos { Vec.new() }
+  offset { Vec.new() }
+
   game { _game }
   game=(v) { _game = v }
 }
@@ -1654,9 +1658,12 @@ class TextInputReader {
     _changed = false
     _text = ""
     _pos = 0
+    _max = null
   }
 
   pos { _pos }
+  max { _max }
+  max=(v) { _max = v }
   text { _text }
   changed { _changed }
   enabled { _enabled }
@@ -1694,17 +1701,13 @@ class TextInputReader {
       return
     }
     var old = _text[0..-1]
+    var oldPos = _pos
 
     if (Keyboard["left"].justPressed) {
       _pos = (_pos - 1).clamp(0, _text.count)
     }
     if (Keyboard["right"].justPressed) {
       _pos = (_pos + 1).clamp(0, _text.count)
-    }
-
-    if (Keyboard.text.count > 0) {
-      splitText(_pos, Keyboard.text, _pos)
-      _pos = _pos + Keyboard.text.count
     }
 
     if (!Keyboard.compositionText && Keyboard["backspace"].justPressed && _text.count > 0) {
@@ -1717,6 +1720,16 @@ class TextInputReader {
       splitText(_pos, null, _pos+1)
       _pos = (_pos).clamp(0, _text.count)
     }
+
+    if (_max && _text.count >= _max) {
+      return
+    }
+
+    if (Keyboard.text.count > 0) {
+      splitText(_pos, Keyboard.text, _pos)
+      _pos = _pos + Keyboard.text.count
+    }
+
     // TODO handle text region for CJK
 
     if ((Keyboard["left ctrl"].down || Keyboard["right ctrl"].down) && Keyboard["c"].justPressed) {
@@ -1725,7 +1738,7 @@ class TextInputReader {
     if ((Keyboard["left ctrl"].down || Keyboard["right ctrl"].down) && Keyboard["v"].justPressed) {
       _text = _text + Clipboard.content
     }
-    _changed = old != _text
+    _changed = old != _text || oldPos != _pos
   }
 }
 

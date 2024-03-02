@@ -39,7 +39,7 @@ class StartScene is Scene {
 
   update() {
     _t = _t + 1
-    if (INPUT["confirm"].firing || Mouse["left"].justPressed) {
+    if (INPUT["easyConfirm"].firing || Mouse["left"].justPressed) {
       _done = true
       game.push("game")
     }

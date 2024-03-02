@@ -1,30 +1,26 @@
 import "math" for Vec
 import "graphics" for Canvas
-import "./parcel" for Element
+import "./ui/panel" for Panel
 import "./ui/events" for TextInputEvent
 import "./text" for TextSplitter
 import "./palette" for INK
 
-class Field is Element {
+class Field is Panel {
   construct new(pos) {
     super()
+    this.pos = pos
     _text = ""
-    _pos = pos
     _cursorPos = 0
   }
   process(event) {
+    super.process(event)
     if (event is TextInputEvent) {
       _text = event.text
-      _cursorPos = event.text.count
+      _cursorPos = event.pos
     }
   }
-  update() {}
-  draw() {
-    var offset = Canvas.offset
-    Canvas.offset(parent.pos.x + _pos.x, parent.pos.y + _pos.y)
+  content() {
     Canvas.print(_text, 0, 0, INK["text"])
     Canvas.rectfill(_cursorPos * 8, 0, 8, 8, INK["textCursor"])
-    Canvas.offset(offset.x, offset.y)
-
   }
 }

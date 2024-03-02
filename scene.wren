@@ -23,6 +23,8 @@ import "./ui/field" for Field
 import "./text" for TextSplitter
 
 import "./ui/renderer" for Renderer
+import "./ui/label" for Label
+import "./ui/pane" for Pane
 import "./ui/dialog" for Dialog
 import "./ui" for
   HealthBar,
@@ -31,7 +33,6 @@ import "./ui" for
   LogViewer,
   HistoryViewer,
   HoverText,
-  Pane,
   HintText
 
 import "./generator" for WorldGenerator
@@ -336,20 +337,25 @@ class CastState is ModalWindowState {
   }
 
   onEnter() {
-    _pane = scene.addElement(Pane.new(Vec.new(0, 0), Vec.new(Canvas.width, Canvas.height)))
     var message = [
       "What do you say?",
       ""
     ]
 
+    /*
     window = Dialog.new(message)
     window.center = true
-    window.addElement(Field.new(Vec.new(4, 24)))
+    */
+    window = scene.addElement(Pane.new(Vec.new(Canvas.width / 4, 32)))
+    window.center()
+    window.addElement(Label.new(Vec.new(0, 0), "What do you say?"))
+    window.addElement(Field.new(Vec.new(4, 16)))
     _reader = TextInputReader.new()
+    _reader.max = 23
     _reader.enable()
   }
   onExit() {
-    scene.removeElement(_pane)
+    scene.removeElement(window)
     _reader.disable()
     super.onExit()
   }
@@ -364,7 +370,7 @@ class CastState is ModalWindowState {
     }
     _reader.update()
     if (_reader.changed) {
-      scene.process(TextInputEvent.new(_reader.text))
+      scene.process(TextInputEvent.new(_reader.text, _reader.pos))
     }
     return this
   }
@@ -376,7 +382,7 @@ class HelpState is ModalWindowState {
 
   onEnter() {
     var message = [
-      "'Confirm' - Return, Space",
+      "'Confirm' - Return",
       "'Reject' - Escape",
       "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
       "    (Bump to attack)",
@@ -446,7 +452,7 @@ class GameEndState is ModalWindowState {
     _restart = arg(1)
     _state = null
     if (!_restart) {
-      _pane = scene.addElement(Pane.new(Vec.new(0, 0), Vec.new(Canvas.width, Canvas.height)))
+      _pane = scene.addElement(Vec.new(Canvas.width, Canvas.height))
     }
     window = Dialog.new(_message)
   }
