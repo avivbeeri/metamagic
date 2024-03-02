@@ -53,6 +53,8 @@ INK.setPurpose("text", "white")
 INK.setPurpose("barText", "white")
 INK.setPurpose("barFilled", "purple")
 INK.setPurpose("barEmpty", "red")
+INK.setPurpose("manaBarFilled", "blue")
+INK.setPurpose("manaBarEmpty", "black")
 
 INK.setPurpose("blood", "red")
 

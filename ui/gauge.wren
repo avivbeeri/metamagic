@@ -15,7 +15,14 @@ class Gauge is Element {
     _maxValue = maxValue
     _targetValue = value
     _changing = false
+    _fg = INK["barFilled"]
+    _bg = INK["barEmpty"]
   }
+
+  fg { _fg }
+  fg=(v) { _fg = v }
+  bg { _bg }
+  bg=(v) { _bg = v }
 
   animateValues(value, maxValue) {
     _maxValue = maxValue
@@ -61,8 +68,8 @@ class Gauge is Element {
     var width = _segments
     var current = _value / _maxValue * width
 
-    Canvas.rectfill(0, 2, width * 16, 12, INK["barEmpty"])
-    Canvas.rectfill(0, 2, current * 16, 12, INK["barFilled"])
+    Canvas.rectfill(0, 2, width * 16, 12, _bg)
+    Canvas.rectfill(0, 2, current * 16, 12, _fg)
     Canvas.print("%(_label): %(_targetValue) / %(_maxValue)", 4, 4, INK["barText"])
 
     Canvas.offset(offset.x, offset.y)

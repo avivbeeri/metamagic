@@ -11,6 +11,8 @@ class Creature is BehaviourEntity {
     this["stats"] =  StatGroup.new({
       "hpMax": 1,
       "hp": 1,
+      "mp": 5,
+      "mpMax": 5,
       "spd": 1,
       "atk": 1,
       "def": 1,

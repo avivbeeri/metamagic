@@ -468,4 +468,54 @@ class HealthBar is Element {
     Canvas.offset(offset.x, offset.y)
   }
 }
+class ManaBar is Element {
+  construct new(pos, entity) {
+    super()
+    _pos = pos
+    _entity = entity
+  }
+
+  process(event) {
+    if (event is Components.events.cast && event.src.id == _entity.id) {
+      updateValue()
+    }
+    if (event is Components.events.recover && event.target.id == _entity.id) {
+      updateValue()
+    }
+  }
+
+  updateValue() {
+    var stats = _world.getEntityById(_entity)["stats"]
+    var value = stats.get("mp")
+    var max = stats.get("mpMax")
+    _gauge.animateValues(value, max)
+  }
+
+  onAdd() {
+    _world = parent.world
+    var stats = _world.getEntityById(_entity)["stats"]
+    _gauge = addElement(Gauge.new(_pos, "MP", stats["mp"], stats["mpMax"], 10))
+    _gauge.fg = INK["manaBarFilled"]
+    _gauge.bg = INK["manaBarEmpty"]
+  }
+
+  update() {
+    super.update()
+    if (!_world) {
+      _world = parent.world
+      var stats = _world.getEntityById(_entity)["stats"]
+      var value = stats.get("mp")
+      var max = stats.get("mpMax")
+      _gauge.maxValue = max
+      _gauge.value = value
+    }
+  }
+
+  draw() {
+    var offset = Canvas.offset
+    Canvas.offset(_pos.x,_pos.y)
+    super.draw()
+    Canvas.offset(offset.x, offset.y)
+  }
+}
 

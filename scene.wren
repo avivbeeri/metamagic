@@ -24,6 +24,7 @@ import "./ui/renderer" for Renderer
 import "./ui/dialog" for Dialog
 import "./ui" for
   HealthBar,
+  ManaBar,
   LineViewer,
   LogViewer,
   HistoryViewer,
@@ -498,8 +499,8 @@ class PlayerInputState is SceneState {
     if (INPUT["interact"].firing) {
       player.pushAction(Components.actions.interact.new())
     }
-    if (INPUT["rest"].firing) {
-      player.pushAction(Components.actions.rest.new())
+    if (INPUT["cast"].firing) {
+      player.pushAction(Components.actions.cast.new().withArgs({}))
     }
     if (INPUT["pickup"].firing) {
       player.pushAction(Components.actions.pickup.new())
@@ -526,6 +527,7 @@ class GameScene is Scene {
     _renderer = addElement(Renderer.new(Vec.new((Canvas.width - (32 * 16))/2, 16)))
     if (player) {
       addElement(HealthBar.new(Vec.new(4, 0), player.ref))
+      addElement(ManaBar.new(Vec.new(4, 12), player.ref))
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages))

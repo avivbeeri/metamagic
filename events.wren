@@ -16,6 +16,8 @@ var RestEvent = Event.create("rest", ["src"])
 var DescendEvent = Event.create("descend", [])
 var StoryEvent = Event.create("story", ["moment"])
 var HealEvent = Event.create("heal", ["target", "amount"])
+var RecoverEvent = Event.create("recover", ["target", "amount"])
+var CastEvent = Event.create("cast", ["src", "target", "spell"])
 var KillEvent = Event.create("kill", ["src", "target"])
 var AttackEvent = Event.create("attack", ["src", "target", "attack", "result", "damage"])
 

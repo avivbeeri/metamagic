@@ -135,8 +135,8 @@
   "floors": [
     { 
       "minFloor": 0,
-      "generator": "start",
-      "title": "The Chapel"
+      "generator": "test",
+      "title": "Library"
     },
     {
       "minFloor": 1,

@@ -52,6 +52,7 @@ class Item is Stateful {
     return Reflect.call(this, action, args)
   }
   use(args) { data["actions"]["use"]["action"].new().withArgs(args) }
+  eat(args) { data["actions"]["eat"]["action"].new().withArgs(args) }
   drink(args) { data["actions"]["drink"]["action"].new().withArgs(args) }
   throw(args) { data["actions"]["throw"]["action"].new().withArgs(args) }
   attack(args) { data["actions"]["attack"]["action"].new().withArgs(args) }

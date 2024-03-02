@@ -328,6 +328,7 @@ class BehaviourEntity is Entity {
 
 class State is Stateful {
   construct new() {
+    super()
     _events = Queue.new()
   }
   events { _events }
@@ -955,6 +956,7 @@ class Element {
     _elements.add(element)
     element.parent = this
     _elements.sort {|a, b| a.z < b.z}
+    element.onAdd()
     return element
   }
   removeSelf() {
@@ -965,6 +967,7 @@ class Element {
   removeElement(element) {
     _elements.remove(element)
   }
+  onAdd() {}
 }
 
 class Scene is Element {

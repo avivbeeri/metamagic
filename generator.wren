@@ -177,7 +177,8 @@ class WorldGenerator {
     var zone = null
     var data = GeneratorUtils.getFloorData(level)
     if (data["generator"] == "start") {
-      zone = StartRoomGenerator.generate(args)
+    } else if (data["generator"] == "test") {
+      zone = TestRoomGenerator.generate(args)
     } else if (data["generator"] == "basic") {
       zone = BasicZoneGenerator.generate(args)
     } else if (data["generator"] == "random") {
@@ -509,6 +510,39 @@ class BasicZoneGenerator {
   }
 }
 
+class TestRoomGenerator {
+  static generate(args) {
+    var map = TileMap8.new()
+    for (y in 0...32) {
+      for (x in 0...32) {
+        map[x,y] = Tile.new({
+          "blocking": true,
+          "solid": true,
+        })
+      }
+    }
+
+    var center = Vec.new(15, 15)
+    var range = 5
+    var room = RectangularRoom.new(8, 8, 16, 16)
+    for (pos in room.inner) {
+      map[pos] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": "maybe"
+      })
+    }
+
+    var level = args[0]
+    var zone = Zone.new(map)
+    zone["entities"] = []
+    zone["level"] = level
+    // zone.map[Vec.new(15, 13)]["stairs"] = "down"
+    zone["start"] = Vec.new(16, 16)
+
+    return zone
+  }
+}
 class StartRoomGenerator {
   static generate(args) {
     var map = TileMap8.new()

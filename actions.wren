@@ -2,135 +2,22 @@ import "math" for Vec
 import "collections" for HashMap
 import "parcel" for Action, ActionResult, MAX_TURN_SIZE, Line, RNG, TargetGroup, Reflect, Stateful
 import "./combat" for Damage, Condition, CombatProcessor, Modifier
+import "./spells" for Spell
 
-#!component(id="effect", group="action")
-class EffectAction is Action {
+#!component(id="cast", group="action")
+class CastAction is Action {
   construct new() {
     super()
   }
+  spell { _spell }
 
-  effects { data["effects"] }
-  target { data["target"] }
-
-  evaluate() {
-    return ActionResult.valid
-  }
-
-  perform() {
-    // Execute effects
-    for (effectData in effects) {
-      var args = {}
-      Stateful.assign(args, data)
-      if (effectData.count > 1) {
-        Stateful.assign(args, effectData[1])
-      }
-      var targetGroup = TargetGroup.new(args)
-      var effect = Reflect.get(Components.effects, effectData[0]).new(ctx, args)
-      effect["src"] = src
-      for (entity in targetGroup.entities(ctx, src)) {
-        effect["target"] = entity
-        effect.perform()
-        ctx.addEvents(effect.events)
-      }
-    }
-
-    return ActionResult.success
-  }
-}
-
-#!component(id="rest", group="action")
-class RestAction is Action {
-  construct new() {
-    super()
-  }
-  evaluate() {
-    return ActionResult.valid
-  }
-
-  perform() {
-    ctx.addEvent(Components.events.rest.new(src))
-    return ActionResult.success
-  }
-}
-
-#!component(id="areaAttack", group="action")
-class AreaAttackAction is Action {
-  construct new() {
-    super()
-  }
-
-  damage { data["damage"] }
-
-  evaluate() {
-    // TODO: check if origin is solid and visible
-    var target = TargetGroup.new(data)
-    return ActionResult.valid
-  }
-
-  perform() {
-    var target = TargetGroup.new(data)
-    var attackEvents = []
-    var resultEvents = []
-    for (entity in target.entities(ctx, src)) {
-      var effect = Components.effects.directDamage.new(ctx, {
-        "src": src,
-        "target": entity,
-        "damage": damage
-      })
-      effect.perform()
-      resultEvents.addAll(effect.events)
-    }
-    ctx.addEvents(attackEvents + resultEvents)
-    return ActionResult.success
-  }
-}
-
-#!component(id="strikeAttack", group="action")
-class StrikeAttackAction is Action {
-  construct new() {
-    super()
-  }
-  evaluate() {
-    var target = TargetGroup.new(data)
-    if (!ctx.entities().any{|other| other != src && other.occupies(src.pos) && other["conditions"]["unconscious"] }) {
-      return ActionResult.invalid
-    }
-
-    return ActionResult.valid
-  }
-
-  perform() {
-    var targets = ctx.getEntitiesAtPosition(src.pos)
-    for (target in targets) {
-      if (target == src) {
-        continue
-      }
-      var effect = Components.effects.meleeDamage.new(ctx, {
-        "target": target,
-        "src": src
-      })
-      effect.perform()
-      ctx.addEvents(effect.events)
-    }
-
-    return ActionResult.success
-  }
-}
-#!component(id="meleeAttack", group="action")
-class MeleeAttackAction is Action {
-  construct new(dir) {
-    super()
-    _dir = dir
-  }
   withArgs(args) {
-    _dir = args["dir"] || _dir
+    data["spell"] = args["spell"] || {}
+    _spell = Spell.new(data["spell"])
     return this
   }
   evaluate() {
-    if (!ctx.zone.map.neighbours(src.pos).contains(src.pos + _dir)) {
-      return ActionResult.invalid
-    }
-    if (!ctx.entities().any{|other| other.occupies(src.pos  + _dir) && other["solid"] }) {
+    if (src["stats"]["mp"] < spell.cost) {
       return ActionResult.invalid
     }
 
@@ -138,8 +25,15 @@ class MeleeAttackAction is Action {
   }
 
   perform() {
-    var targetPos = src.pos + _dir
-    var targets = ctx.getEntitiesAtPosition(targetPos)
+    var targetGroup = TargetGroup.new(spell.target)
+    var attackEvents = []
+    var resultEvents = []
+    var targets = targetGroup.entities(ctx, src)
+    for (target in targets) {
+    }
+    ctx.addEvent(Components.events.cast.new(src, targets, spell))
+    src["stats"].decrease("mp", spell.cost)
+    /*
     for (target in targets) {
       var effect = Components.effects.meleeDamage.new(ctx, {
         "target": target,
@@ -148,6 +42,7 @@ class MeleeAttackAction is Action {
       effect.perform()
       ctx.addEvents(effect.events)
     }
+    */
 
     return ActionResult.success
   }
@@ -197,6 +92,111 @@ class SimpleMoveAction is Action {
   }
 }
 
+#!component(id="effect", group="action")
+class EffectAction is Action {
+  construct new() {
+    super()
+  }
+
+  effects { data["effects"] }
+  target { data["target"] }
+
+  evaluate() {
+    return ActionResult.valid
+  }
+
+  perform() {
+    // Execute effects
+    for (effectData in effects) {
+      var args = {}
+      Stateful.assign(args, data)
+      if (effectData.count > 1) {
+        Stateful.assign(args, effectData[1])
+      }
+      var targetGroup = TargetGroup.new(args)
+      var effect = Reflect.get(Components.effects, effectData[0]).new(ctx, args)
+      effect["src"] = src
+      for (entity in targetGroup.entities(ctx, src)) {
+        effect["target"] = entity
+        effect.perform()
+        ctx.addEvents(effect.events)
+      }
+    }
+
+    return ActionResult.success
+  }
+}
+
+#!component(id="areaAttack", group="action")
+class AreaAttackAction is Action {
+  construct new() {
+    super()
+  }
+
+  damage { data["damage"] }
+
+  evaluate() {
+    // TODO: check if origin is solid and visible
+    var target = TargetGroup.new(data)
+    return ActionResult.valid
+  }
+
+  perform() {
+    var target = TargetGroup.new(data)
+    var attackEvents = []
+    var resultEvents = []
+    for (entity in target.entities(ctx, src)) {
+      var effect = Components.effects.directDamage.new(ctx, {
+        "src": src,
+        "target": entity,
+        "damage": damage
+      })
+      effect.perform()
+      resultEvents.addAll(effect.events)
+    }
+    ctx.addEvents(attackEvents + resultEvents)
+    return ActionResult.success
+  }
+}
+
+#!component(id="meleeAttack", group="action")
+class MeleeAttackAction is Action {
+  construct new(dir) {
+    super()
+    _dir = dir
+  }
+  withArgs(args) {
+    _dir = args["dir"] || _dir
+    return this
+  }
+  evaluate() {
+    if (!ctx.zone.map.neighbours(src.pos).contains(src.pos + _dir)) {
+      return ActionResult.invalid
+    }
+    if (!ctx.entities().any{|other| other.occupies(src.pos  + _dir) && other["solid"] }) {
+      return ActionResult.invalid
+    }
+
+    return ActionResult.valid
+  }
+
+  perform() {
+    var targetPos = src.pos + _dir
+    var targets = ctx.getEntitiesAtPosition(targetPos)
+    for (target in targets) {
+      var effect = Components.effects.meleeDamage.new(ctx, {
+        "target": target,
+        "src": src
+      })
+      effect.perform()
+      ctx.addEvents(effect.events)
+    }
+
+    return ActionResult.success
+  }
+}
+
+
 #!component(id="descend", group="action")
 class DescendAction is Action {
   construct new() {
@@ -240,9 +240,6 @@ class InteractAction is Action {
   }
   evaluate() {
     var tile = ctx.zone.map[src.pos]
-    if (ctx.entities().any{|other| other.occupies(src.pos) && other["conditions"]["unconscious"] }) {
-      return ActionResult.alternate(StrikeAttackAction.new())
-    }
     if (tile["items"] && !tile["items"].isEmpty) {
       return ActionResult.alternate(Components.actions.pickup.new())
     }
@@ -253,6 +250,8 @@ class InteractAction is Action {
     return ActionResult.invalid
   }
 }
+
+
 
 import "./entities" for Player
 import "./groups" for Components
