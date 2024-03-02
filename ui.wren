@@ -476,6 +476,9 @@ class ManaBar is Element {
   }
 
   process(event) {
+    if (event is Components.events.regen && event.target.id == _entity.id) {
+      updateValue()
+    }
     if (event is Components.events.cast && event.src.id == _entity.id) {
       updateValue()
     }

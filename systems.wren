@@ -4,6 +4,29 @@ import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra
 import "./entities" for Player
 import "combat" for Condition
 
+class ManaRegenSystem is GameSystem {
+  construct new() { super() }
+  process(ctx, event) {
+    if (event is Components.events.turn) {
+      for (entity in ctx.entities()) {
+        if (!entity.has("stats")) {
+          continue
+        }
+        var stats = entity["stats"]
+        if (!stats.has("mpMax")) {
+          continue
+        }
+        stats.increase("mpHidden", 1)
+        if (stats["mpHidden"] >= 5) {
+          stats.increase("mp", 1, "mpMax")
+          stats.set("mpHidden", 0)
+          ctx.addEvent(Components.events.regen.new(entity))
+        }
+      }
+    }
+  }
+}
+
 class ExperienceSystem is GameSystem {
   construct new() { super() }
   process(ctx, event) {
