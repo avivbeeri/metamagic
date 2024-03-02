@@ -117,68 +117,6 @@ class HoverText is Element {
   }
 }
 
-class CharacterViewer is Element {
-  construct new(pos, size) {
-    super()
-    _pos = pos
-    _size = size
-    _height = (size.y / 10).floor
-    _lines = null
-    _width = size.x
-    _viewer = addElement(LineViewer.new(pos + Vec.new(8, 8), _size, _height, _lines))
-  }
-
-  update() {
-    super.update()
-    _world = parent.world
-    if (!_lines) {
-      var player = _world.getEntityByTag("player")
-      _lines = []
-      _lines.add("--- Character Information ---")
-      _lines.add("")
-      _lines.add("Name: %(player.name)")
-      var hp = player["stats"]["hp"]
-      var hpMax = player["stats"]["hpMax"]
-      _lines.add("HP: %(hp)/%(hpMax)")
-      _lines.add("")
-
-      var str = player["stats"]["str"] + 10
-      var dex = player["stats"]["dex"] + 10
-      var atk = TextSplitter.leftPad(player["stats"]["atk"], 2)
-      var def = TextSplitter.leftPad(player["stats"]["def"], 2)
-      _lines.add("Strength: %(str)   Dexterity: %(dex)")
-      _lines.add("Attack:   %(atk)   Defence:   %(def)")
-
-      _lines.add("")
-      _lines.add("Conditions:")
-      if (!player["conditions"].isEmpty) {
-        for (condition in player["conditions"].keys) {
-          _lines.add("  %(condition)")
-        }
-      } else {
-        _lines.add("  None")
-      }
-
-      _width = (LineViewer.getWidth(_lines) + 2) * 8
-      _height = (_lines.count + 2) * 10
-      _size.x = _width
-      _size.y = _height
-
-      _viewer.lines = _lines
-    }
-  }
-  draw() {
-    var offset = Canvas.offset
-    Canvas.offset(_pos.x,_pos.y)
-
-    Canvas.rectfill(0, 0, _size.x, _size.y, INK["bg"])
-    Canvas.rect(0, 0, _size.x, _size.y, INK["border"])
-
-    Canvas.offset(offset.x, offset.y)
-    super.draw()
-  }
-}
-
 class HistoryViewer is Element {
   construct new(pos, size, log) {
     super()

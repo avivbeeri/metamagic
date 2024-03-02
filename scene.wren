@@ -28,7 +28,6 @@ import "./ui" for
   LineViewer,
   LogViewer,
   HistoryViewer,
-  CharacterViewer,
   HoverText,
   Pane,
   HintText
@@ -317,8 +316,6 @@ class ModalWindowState is SceneState {
     var border = 24
     if (windowType == "history") {
       window = HistoryViewer.new(Vec.new(border, border), Vec.new(Canvas.width - border*2, Canvas.height - border*2), scene.messages)
-    } else if (windowType == "character") {
-      window = CharacterViewer.new(Vec.new(border, border), Vec.new(Canvas.width - border*2, Canvas.height - border*2))
     }
   }
   onExit() {
@@ -351,7 +348,6 @@ class HelpState is ModalWindowState {
       "",
       "Other commands",
       "Inventory - 'i', then number to use/equip/unequip",
-      "Character Info - 't'",
       "Open Log - 'v'",
       "Drop from Inventory - 'r' then number"
     ]
@@ -439,9 +435,6 @@ class GameEndState is ModalWindowState {
     if (INPUT["log"].firing) {
       changeState(ModalWindowState.new().with("history"))
     }
-    if (INPUT["info"].firing) {
-      changeState(ModalWindowState.new().with("character"))
-    }
     if (INPUT["help"].firing) {
       changeState(HelpState.new())
     }
@@ -468,9 +461,6 @@ class PlayerInputState is SceneState {
     if (INPUT["log"].firing) {
       return ModalWindowState.new().with("history")
     }
-    if (INPUT["info"].firing) {
-      return ModalWindowState.new().with("character")
-    }
     if (INPUT["help"].firing) {
       return HelpState.new()
     }
@@ -489,9 +479,6 @@ class PlayerInputState is SceneState {
         player.pushAction(Components.actions.bump.new(DIR_EIGHT[i]))
       }
       i = i + 1
-    }
-    if (INPUT["strike"].firing) {
-      player.pushAction(Components.actions.strikeAttack.new())
     }
     if (INPUT["drop"].firing) {
       return InventoryWindowState.new().with("drop")

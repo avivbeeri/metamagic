@@ -33,7 +33,7 @@ class CastAction is Action {
     }
     ctx.addEvent(Components.events.cast.new(src, targets, spell))
     // Don't allow regen this turn
-    src["stats"].set("mpHidden", -1)
+    // src["stats"].decrease("mpHidden", 1)
     src["stats"].decrease("mp", spell.cost)
     /*
     for (target in targets) {
