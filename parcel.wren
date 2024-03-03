@@ -429,7 +429,7 @@ class TargetGroup is Stateful {
         var x = (origin.x + dx)
         var y = (origin.y + dy)
         var pos = Vec.new(x, y)
-        if (exclude.contains(pos)) {
+        if (exclude.contains(Vec.new(dx, dy))) {
           continue
         }
         if (needSight && !ctx.zone.map["visible"]) {

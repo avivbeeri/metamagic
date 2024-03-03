@@ -2,6 +2,7 @@ import "io" for FileSystem
 import "json" for Json
 import "./parcel" for Stateful, RNG
 import "collections" for Set
+import "math" for Vec
 
 class TokenCategory {
   static verb { "VERB" }
@@ -78,7 +79,8 @@ class Spell is Stateful {
       target = {
         "target": "area",
         "area": 1,
-        "origin": null
+        "origin": null,
+        "exclude": [ Vec.new(0, 0) ]
       }
     }
 

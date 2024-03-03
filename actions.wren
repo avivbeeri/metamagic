@@ -9,6 +9,7 @@ class CastAction is Action {
   construct new() {
     super()
   }
+
   spell { _spell }
 
   withArgs(args) {
@@ -32,7 +33,17 @@ class CastAction is Action {
     var attackEvents = []
     var resultEvents = []
     var targets = targetGroup.entities(ctx, src)
-    for (target in targets) {
+    for (effectData in spell.effects) {
+      var args = {}
+      if (effectData.count > 1) {
+        Stateful.assign(args, effectData[1])
+      }
+      var effect = Reflect.get(Components.effects, effectData[0]).new(ctx, args)
+      effect["src"] = src
+      for (target in targets) {
+        effect["target"] = target
+        effect.perform()
+      }
     }
     ctx.addEvent(Components.events.cast.new(src, targets, spell))
     // Don't allow regen this turn

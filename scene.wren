@@ -624,14 +624,14 @@ class GameScene is Scene {
         targetName = Pronoun.you.subject
       }
       if (event.result == AttackResult.invulnerable) {
-        _messages.add("%(srcName) attacked %(targetName) but it seems unaffected.", INK["orange"], true)
+        _messages.add("%(srcName) attacked the %(targetName) but it seems unaffected.", INK["orange"], true)
 
       } else if (event.result == AttackResult.blocked) {
-        _messages.add("%(srcName) hit %(targetName) but %(noun) wasn't powerful enough.", INK["orange"], true)
+        _messages.add("%(srcName) hit the %(targetName) but %(noun) wasn't powerful enough.", INK["orange"], true)
       } else if (event.src is Player && event.result == AttackResult.overkill) {
         _messages.add("%(targetName) is no more, by your hand.", INK["enemyAtk"], true)
       } else {
-        _messages.add("%(srcName) attacked %(targetName) for %(event.damage) damage.", INK["enemyAtk"], true)
+        _messages.add("%(srcName) attacked the %(targetName) for %(event.damage) damage.", INK["enemyAtk"], true)
       }
     }
     if (event is Components.events.lightning) {
