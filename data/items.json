@@ -8,12 +8,8 @@
     "description": "A hearty meal",
     "default": "eat",
     "effects": [ 
-      [ "hunger", { "amount": 1 } ]
     ],
     "actions": {
-      "eat": {
-        "action": "itemEffect"
-      }
     }   
   },
   "potion": {

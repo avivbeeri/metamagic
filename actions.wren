@@ -241,13 +241,19 @@ class PlayerBumpAction is Action {
     var tile = ctx.zone.map[src.pos]
     System.print(tile)
     if (tile["items"] && !tile["items"].isEmpty) {
-      return ActionResult.alternate(Components.actions.pickup.new())
+      var pickupAction = Components.actions.pickup.new().bind(src)
+      if (pickupAction.evaluate().succeeded) {
+        pickupAction.perform()
+      }
     }
     if (tile["stairs"] == "down") {
-      return ActionResult.alternate(DescendAction.new())
+      var descendAction = Components.actions.descend.new().bind(src)
+      if (descendAction.evaluate().succeeded) {
+        descendAction.perform()
+      }
     }
 
-    return moveResult
+    return ActionResult.success
   }
 }
 

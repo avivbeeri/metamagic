@@ -656,7 +656,11 @@ class GameScene is Scene {
     }
     if (event is Components.events.pickup) {
       var itemName = _world["items"][event.item]["name"]
-      _messages.add("%(event.src) picked up %(event.qty) %(itemName)", INK["text"], true)
+      if (event.qty == 1) {
+        _messages.add("%(event.src) picked up the %(itemName)", INK["text"], true)
+      } else {
+        _messages.add("%(event.src) picked up %(event.qty) %(itemName)", INK["text"], true)
+      }
     }
     if (event is Components.events.useItem) {
       var itemName = _world["items"][event.item]["name"]

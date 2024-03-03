@@ -150,7 +150,7 @@ class VisionSystem is GameSystem {
         }
       }
     }
-    var visibleList = Vision.new(map, player.pos, 8).compute()
+    var visibleList = Vision.new(map, player.pos, 16).compute()
     for (pos in visibleList) {
       map[pos]["visible"] = true
     }
