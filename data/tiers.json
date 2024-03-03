@@ -4,37 +4,17 @@
       "enemies": [
         [
           "rat",
-          0.4
-        ],
-        [
-          "zombie",
-          0.3
-        ],
-        [
-          "hound",
-          0.1
+          1.0
         ]
       ],
       "items": [
         [
-          "shortsword",
-          0.1
+          "food",
+          0.5
         ],
         [
           "potion",
-          0.2
-        ],
-        [
-          "slow",
-          0.1
-        ],
-        [
-          "confusion",
-          0.3
-        ],
-        [
-          "lightning",
-          0.3
+          0.5
         ]
       ]
     },
@@ -136,6 +116,7 @@
     { 
       "minFloor": 0,
       "generator": "test",
+      "tier": 1,
       "title": "Library"
     },
     {

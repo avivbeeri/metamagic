@@ -4,6 +4,7 @@
     "kind": "rat",
     "behaviours": [
       [
+        "randomWalk"
       ]
     ],
     "name": "Rat",

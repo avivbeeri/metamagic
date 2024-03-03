@@ -219,6 +219,38 @@ class DescendAction is Action {
   }
 }
 
+#!component(id="playerBump", group="action")
+class PlayerBumpAction is Action {
+  construct new(dir) {
+    super()
+    _dir = dir
+  }
+  withArgs(args) {
+    _dir = args["dir"] || _dir
+    return this
+  }
+  evaluate() {
+    _action = SimpleMoveAction.new(_dir).bind(src)
+    return _action.evaluate()
+  }
+  perform() {
+    var moveResult = _action.perform()
+    if (!moveResult.succeeded) {
+      return moveResult
+    }
+    var tile = ctx.zone.map[src.pos]
+    System.print(tile)
+    if (tile["items"] && !tile["items"].isEmpty) {
+      return ActionResult.alternate(Components.actions.pickup.new())
+    }
+    if (tile["stairs"] == "down") {
+      return ActionResult.alternate(DescendAction.new())
+    }
+
+    return moveResult
+  }
+}
+
 #!component(id="bump", group="action")
 class BumpAction is Action {
   construct new(dir) {
@@ -237,26 +269,6 @@ class BumpAction is Action {
     return ActionResult.alternate(SimpleMoveAction.new(_dir))
   }
 }
-
-#!component(id="interact", group="action")
-class InteractAction is Action {
-  construct new() {
-    super()
-  }
-  evaluate() {
-    var tile = ctx.zone.map[src.pos]
-    if (tile["items"] && !tile["items"].isEmpty) {
-      return ActionResult.alternate(Components.actions.pickup.new())
-    }
-    if (tile["stairs"] == "down") {
-      return ActionResult.alternate(DescendAction.new())
-    }
-
-    return ActionResult.invalid
-  }
-}
-
-
 
 import "./entities" for Player
 import "./groups" for Components

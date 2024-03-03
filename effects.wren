@@ -92,6 +92,23 @@ class DirectDamageEffect is Effect {
   }
 }
 
+// Restores <target> for <amount> (percentage of their total)
+#!component(id="restore", group="effect")
+class RestoreEffect is Effect {
+  construct new(ctx, args) {
+    super(ctx, args)
+  }
+
+  amount { data["amount"] }
+  target { data["target"] }
+
+  perform() {
+    var mpMax = target["stats"].get("mpMax")
+    var total = (amount * mpMax).ceil
+    var amount = target["stats"].increase("mp", total, "mpMax")
+    addEvent(Components.events.recover.new(target, amount))
+  }
+}
 // Heals <target> for <amount> (percentage of their total)
 #!component(id="heal", group="effect")
 class HealEffect is Effect {

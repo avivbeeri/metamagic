@@ -170,6 +170,7 @@ class AsciiRenderer is Element {
           Canvas.rectfill(x * 16, y * 16, 16, 16, bg)
           var color = INK["treasure"]
           var symbolMap = {
+            "food": ";",
             "potion": "!",
             "scroll": "~",
             "wand": "~",

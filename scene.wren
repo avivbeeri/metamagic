@@ -398,10 +398,8 @@ class HelpState is ModalWindowState {
       "'Confirm' - Return",
       "'Reject' - Escape",
       "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
-      "    (Bump to attack)",
       "Rest - Space",
       "",
-      "'Interact' - 'f', which can automatically do:",
       "Coup-de-grace - 'x'",
       "Pick-up item - 'g'",
       "Descend to the next floor - ','",
@@ -539,15 +537,12 @@ class PlayerInputState is SceneState {
     var i = 0
     for (input in INPUT.list("dir")) {
       if (input.firing) {
-        player.pushAction(Components.actions.bump.new(DIR_EIGHT[i]))
+        player.pushAction(Components.actions.playerBump.new(DIR_EIGHT[i]))
       }
       i = i + 1
     }
     if (INPUT["drop"].firing) {
       return InventoryWindowState.new().with("drop")
-    }
-    if (INPUT["interact"].firing) {
-      player.pushAction(Components.actions.interact.new())
     }
     if (INPUT["cast"].firing) {
       player.pushAction(Components.actions.cast.new().withArgs({}))

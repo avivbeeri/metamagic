@@ -128,7 +128,6 @@ BASIC.register("toggleTiles", [ Keyboard["tab"] ])
 BASIC.register("scrollUp", "north")
 BASIC.register("scrollDown", "south")
 BASIC.register("help", [ Keyboard["/"], Keyboard["?"] ])
-BASIC.register("interact", [ Keyboard["f"] ])
 
 var VI_SCHEME = BASIC.copy()
 for (i in 0...KEY_SET_1.count) {
