@@ -20,7 +20,8 @@ class CastAction is Action {
     return this
   }
   evaluate() {
-    if (src["stats"]["mp"] < spell.cost(src)) {
+    _cost = spell.cost(src)
+    if (src["stats"]["mp"] < _cost) {
       return ActionResult.invalid
     }
 
@@ -31,7 +32,6 @@ class CastAction is Action {
     if (target["origin"] == null) {
       target["origin"] = src.pos
     }
-    System.print(target)
     var targetGroup = TargetGroup.new(target)
     var attackEvents = []
     var resultEvents = []
@@ -49,19 +49,24 @@ class CastAction is Action {
       }
     }
     ctx.addEvent(Components.events.cast.new(src, targets, spell))
-    // Don't allow regen this turn
-    // src["stats"].decrease("mpHidden", 1)
-    src["stats"].decrease("mp", spell.cost(src))
-    /*
-    for (target in targets) {
-      var effect = Components.effects.meleeDamage.new(ctx, {
-        "target": target,
-        "src": src
-      })
-      effect.perform()
-      ctx.addEvents(effect.events)
+
+    // Update stats and do experience bookkeeping
+    src["stats"].decrease("mp", _cost)
+    if (src.has("proficiency")) {
+      var table = src["proficiency"]
+      for (word in spell.phrase.list) {
+        var entry = table[word.lexeme]
+        if (!entry) {
+          entry = table[word.lexeme] = {
+            "used": true,
+            "success": 0,
+            "discovered": false
+          }
+        } else {
+          entry["used"] = true
+        }
+      }
     }
-    */
 
     return ActionResult.success
   }

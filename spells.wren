@@ -23,6 +23,7 @@ class SpellToken {
   category { _category }
   lexeme { _lexeme }
   maxCost { _maxCost }
+  minCost { 1 }
 
   == (other) {
     return _lexeme == other.lexeme
@@ -114,17 +115,19 @@ class Spell is Stateful {
         var entry = caster["proficiency"][word.lexeme]
         if (!entry) {
           entry = caster["proficiency"][word.lexeme] = {
-            "used": true,
+            "used": false,
             "success": 0,
             "discovered": false
           }
         }
         var success = entry["success"]
-        cost = cost + (entry["discovered"] ? 0 : 2)
-        cost = cost + (word.maxCost - success).max(1)
-        System.print("%(word): %(entry)")
+        var wordCost = 0
+        wordCost = (entry["discovered"] ? 0 : 2)
+        wordCost = wordCost + (word.maxCost - success).max(word.minCost)
+        cost = cost + wordCost
+        System.print("%(word) [ %(wordCost) MP ]: %(entry)")
       }
-      System.print("Cost: %(cost)")
+      System.print("Cost: %(cost) MP")
       return cost
     }
 
