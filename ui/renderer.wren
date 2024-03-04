@@ -61,11 +61,8 @@ class AsciiRenderer is Element {
       addElement(Cursor.new(_pos, event.pos, event.area))
       var player = _world.getEntityByTag("player")
       if (player) {
-        addElement(MapZone.new(_pos, player.pos, event.range))
+        addElement(MapZone.new(_pos, player.pos, event.area, event.range))
       }
-    }
-    if (event is TargetEndEvent) {
-      System.print("TargetEnd")
     }
     super.process(event)
   }

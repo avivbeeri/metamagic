@@ -296,27 +296,27 @@ class LogViewer is Element {
 }
 
 class MapZone is Element {
-  construct new(pos, cursor, range) {
+  construct new(pos, cursor, area, range) {
     super()
     _pos = pos
     _cursor = cursor
+    _area = area
     _range = range
   }
 
   process(event) {
     if (event is TargetEndEvent) {
-      System.print("zone: removeSelf")
       removeSelf()
     }
   }
   draw() {
     var offset = Canvas.offset
     Canvas.offset(_pos.x,_pos.y)
-    var dist = _range
+    var dist = _range + _area
     var x = (_cursor.x - dist) * 16
     var y = (_cursor.y - dist) * 16
     var w = (dist * 2 + 1) * 16
-    Canvas.rectfill(x, y, w, w, INK["targetAreaBg"])
+    // Canvas.rectfill(x, y, w, w, INK["targetAreaBg"])
     Canvas.rect(x - 1, y - 1, w + 2, w + 2, INK["targetAreaBorder"])
 
     Canvas.offset(offset.x, offset.y)
@@ -335,7 +335,6 @@ class Cursor is Element {
     if (event is TargetEvent) {
       _cursor = event.pos
     } else if (event is TargetEndEvent) {
-      System.print("cursor: removeSelf")
       removeSelf()
     }
   }

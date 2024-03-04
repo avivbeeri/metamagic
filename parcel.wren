@@ -937,33 +937,34 @@ class Element {
   elements { _elements }
 
   update() {
-    for (element in _elements) {
+    var queue = elements[0..-1]
+    for (element in queue) {
       element.update()
     }
   }
   process(event) {
-    for (element in _elements) {
+    var queue = elements[0..-1]
+    for (element in queue) {
       element.process(event)
     }
   }
   draw() {
-    for (element in _elements) {
+    for (element in elements) {
       element.draw()
     }
   }
 
   addElement(element) {
-    element.z = _elements.count
-    _elements.add(element)
+    element.z = elements.count
+    elements.add(element)
     element.parent = this
-    _elements.sort {|a, b| a.z < b.z}
+    elements.sort {|a, b| a.z < b.z}
     element.onAdd()
     return element
   }
   removeSelf() {
-    if (_parent) {
-      System.print("remove %(this) from parent %(parent)")
-      _parent.removeElement(this)
+    if (parent) {
+      parent.removeElement(this)
     }
   }
   removeElement(element) {
