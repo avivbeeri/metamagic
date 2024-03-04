@@ -7,11 +7,12 @@
         "randomWalk"
       ]
     ],
+    "resistances": [ "FIRE" ],
     "name": "Rat",
     "pronoun": "it",
     "stats": {
-      "hp": 1,
-      "hpMax": 1
+      "hp": 2,
+      "hpMax": 2
     }
   }
 }

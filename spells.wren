@@ -3,6 +3,7 @@ import "json" for Json
 import "./parcel" for Stateful, RNG
 import "collections" for Set
 import "math" for Vec
+import "combat" for Damage, DamageType
 
 class TokenCategory {
   static verb { "VERB" }
@@ -24,6 +25,7 @@ class SpellToken {
   lexeme { _lexeme }
   maxCost { _maxCost }
   minCost { 1 }
+  toList { [ this ] }
 
   == (other) {
     return _lexeme == other.lexeme
@@ -48,11 +50,16 @@ class SpellWords {
   static self { SpellToken.new("SELF", TokenCategory.object, 2) }
   static close { SpellToken.new("CLOSE", TokenCategory.object, 3) }
   static far { SpellToken.new("FAR", TokenCategory.object, 3) }
+
+  static big { SpellToken.new("BIG", TokenCategory.modifier, 1) }
+  static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, 2) }
 }
 
 var BaseTable = {
-  SpellWords.close.lexeme: { "target": "area", "area": 1, "range": 0, "origin": null, "exclude": [ Vec.new(0,0) ]  },
-  SpellWords.far.lexeme: { "target": "area", "area": 1, "range": 4, "origin": null, "exclude": [], "needEntity": false  }
+  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": [ Vec.new(0,0) ]  },
+  SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": [], "needEntity": false  },
+  SpellWords.big.lexeme: { "area": 1 },
+  SpellWords.bigger.lexeme: { "area": 2 }
 }
 
 
@@ -71,6 +78,10 @@ var AllWords = [
   SpellWords.self,
   SpellWords.close,
   SpellWords.far,
+
+  // Modifiers
+  SpellWords.big,
+  SpellWords.bigger,
 ]
 
 class Spell is Stateful {
@@ -82,7 +93,7 @@ class Spell is Stateful {
 
     if (valid && phrase) {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-        effects.add([ "directDamage", { "damage": 1, "type": "FIRE" } ])
+        effects.add([ "damage", { "damage": Damage.new(2, DamageType.fire) } ])
       }
     }
 
@@ -137,9 +148,34 @@ class Spell is Stateful {
 
   target() {
     var result = {}
-    Stateful.assign(result, BaseTable[phrase.object.lexeme])
+    var object = phrase.object
+    var modifier = null
+    if (object is SpellFragment) {
+      modifier = object.modifier
+      object = object.atom
+
+    }
+    Stateful.assign(result, BaseTable[object.lexeme])
+    if (modifier) {
+      Stateful.assign(result, BaseTable[modifier.lexeme])
+      if (object == SpellWords.close) {
+        result["range"] = 0
+      }
+    }
     return result
   }
+}
+
+class SpellFragment {
+  construct new(atom, modifier) {
+    _atom = atom
+    _modifier = modifier
+  }
+
+  atom { _atom }
+  modifier { _modifier }
+  toString { "%(atom) %(modifier)"}
+  toList { [ atom, modifier ] }
 }
 
 class SpellPhrase {
@@ -149,13 +185,18 @@ class SpellPhrase {
     _object = object
   }
 
-  list { [ _verb, _subject, _object ]}
+  list {
+    var result = [ _verb ]
+    result.addAll(_subject.toList)
+    result.addAll(_object.toList)
+    return result
+  }
 
   verb { _verb }
   subject { _subject }
   object { _object }
   toString {
-    return "<%(_verb.lexeme) %(_subject.lexeme) %(_object.lexeme)>"
+    return "<%(_verb) %(_subject) %(_object)>"
   }
 }
 
@@ -190,19 +231,21 @@ class SpellParser {
       return null
     }
     var subject = previous()
+    /*
+    // TODO
+    if (match(TokenCategory.modifier)) {
+      subject = SpellFragment.new(subject, previous())
+    }
+    */
     if (!match(TokenCategory.object)) {
       _error = true
       return null
     }
     var object = previous()
 
-    /*
-    TODO: support modifiers
-    if (check(TokenCategory.modifier)) {
-      // modifying object?
-      advance()
+    if (match(TokenCategory.modifier)) {
+      object = SpellFragment.new(object, previous())
     }
-    */
 
     if (!isAtEnd()) {
       _error = true

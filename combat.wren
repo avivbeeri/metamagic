@@ -1,7 +1,7 @@
 import "math" for M
 import "parcel" for Action, ActionResult, Event, Stateful, RNG
 
-class Damage {
+class Damage is Stateful {
   static calculateLow(atk, def) {
     var o1 = atk * 2 - def
     var o2 = (atk * atk) / def
@@ -32,12 +32,14 @@ class Damage {
   }
 
   construct new(amount, type) {
-    _amount = amount
-    _type = type
+    super()
+    this["amount"] = amount
+    this["type"]  = type
   }
 
-  amount { _amount }
-  type { _type }
+  amount { this["amount"] || 0 }
+  type { this["type"] || DamageType.kinetic }
+  toString { "%(amount) %(type) damage" }
 }
 
 class AttackResult {
@@ -225,8 +227,10 @@ class Modifier {
 
 
 class CombatProcessor {
-  static calculate(src, target) { calculate(src, target, null) }
-  static calculate(src, target, damage) {
+
+ /*
+  static calculateMelee(src, target) { calculateMelee(src, target, null) }
+  static calculateMelee(src, target, damage) {
     var ctx = src.ctx
     var result = AttackResult.success
     if (target["conditions"].containsKey("invulnerable")) {
@@ -247,41 +251,58 @@ class CombatProcessor {
     }
 
     var kill = false
-    var killThreshold = target["stats"]["hpMax"] * 2
-    if (damage >= killThreshold || target["conditions"].containsKey("unconscious")) {
-      result = AttackResult.overkill
+    target["stats"].decrease("hp", damage)
+    if (target["stats"].get("hp") <= 0) {
       kill = true
       ctx.removeEntity(target)
-    } else {
-      target["stats"].decrease("hp", damage)
-      if (target["stats"].get("hp") <= 0) {
-        kill = true
-        ctx.removeEntity(target)
-      }
     }
     ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
     return kill
   }
-
-  static directDamage(src, target, damage) {
-    var ctx = target.ctx
+  */
+  static calculate(src, target) { calculate(src, target, null) }
+  static calculate(src, target, incoming) {
+    if (incoming is Damage) {
+      System.print(incoming)
+    }
+    var ctx = src.ctx
     var result = AttackResult.success
-    var kill = false
-    var killThreshold = target["stats"]["hpMax"] * 2
+    if (target["conditions"].containsKey("invulnerable")) {
+      ctx.addEvent(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
+      return [false, false, 0]
+    }
 
-    if (damage >= killThreshold || target["conditions"].containsKey("unconscious")) {
-      result = AttackResult.overkill
+    var targetStats = target["stats"]
+    var def = targetStats.get("def")
+
+    var damage = Damage.calculate(incoming.amount, def)
+    if (damage == 0) {
+      result = AttackResult.blocked
+    }
+    if (target.has("vulnerabilities")) {
+      if (target["vulnerabilities"].contains(incoming.type)) {
+        damage = damage * 2
+        System.print("vulnerable")
+      }
+    }
+    if (target.has("resistances")) {
+      System.print("resist maybe")
+
+      if (target["resistances"].contains(incoming.type)) {
+        damage = (damage / 2).floor.max(1)
+        System.print("resist")
+      }
+    }
+
+    var kill = false
+    target["stats"].decrease("hp", damage)
+    if (target["stats"].get("hp") <= 0) {
       kill = true
       ctx.removeEntity(target)
-    } else {
-      target["stats"].decrease("hp", damage)
-      if (target["stats"].get("hp") <= 0) {
-        kill = true
-        ctx.removeEntity(target)
-      }
     }
     ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
     return kill
   }
 }
+
 import "groups" for Components

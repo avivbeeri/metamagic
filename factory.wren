@@ -19,6 +19,8 @@ class CreatureFactory {
     creature["name"] = data["name"]
     creature["kind"] = data["kind"]
     creature["symbol"] = data["symbol"]
+    creature["resistances"] = data["resistances"]
+    creature["vulnerabilities"] = data["vulnerabilities"]
 
     creature.pos = position * 1
     creature.zone = zoneIndex

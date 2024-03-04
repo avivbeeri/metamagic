@@ -50,8 +50,9 @@ class PushEffect is Effect {
     ctx.addEvent(Components.events.move.new(target, origin))
   }
 }
-#!component(id="meleeDamage", group="effect")
-class MeleeDamageEffect is Effect {
+
+#!component(id="damage", group="effect")
+class DamageEffect is Effect {
   construct new(ctx, args) {
     super(ctx, args)
   }
@@ -62,7 +63,7 @@ class MeleeDamageEffect is Effect {
 
   perform() {
     var killEvents = []
-    var result = CombatProcessor.calculate(src, target)
+    var result = CombatProcessor.calculate(src, target, damage)
     if (result) {
       ctx.zone.map[target.pos]["blood"] = true
       killEvents.add(Components.events.kill.new(src, target))
@@ -71,24 +72,10 @@ class MeleeDamageEffect is Effect {
   }
 }
 
-#!component(id="directDamage", group="effect")
-class DirectDamageEffect is Effect {
+#!component(id="meleeDamage", group="effect")
+class MeleeDamageEffect is DamageEffect {
   construct new(ctx, args) {
     super(ctx, args)
-  }
-
-  damage { data["damage"] }
-  target { data["target"] }
-  src { data["src"] }
-
-  perform() {
-    var killEvents = []
-    var result = CombatProcessor.directDamage(src, target, damage)
-    if (result) {
-      ctx.zone.map[target.pos]["blood"] = true
-      killEvents.add(Components.events.kill.new(src, target))
-    }
-    addEvents(killEvents)
   }
 }
 
