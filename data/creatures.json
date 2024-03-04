@@ -11,8 +11,8 @@
     "name": "Rat",
     "pronoun": "it",
     "stats": {
-      "hp": 2,
-      "hpMax": 2
+      "hp": 3,
+      "hpMax": 3
     }
   }
 }
