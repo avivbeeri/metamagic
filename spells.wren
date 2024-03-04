@@ -64,24 +64,35 @@ var AllWords = [
   SpellWords.far,
 ]
 
+class SpellTarget {
+  static none { "NONE" }
+  static self { "SELF" }
+  static close { "CLOSE" }
+  static far { "FAR" }
+  static fromWord(word) {
+    if (word == SpellWords.close) {
+      return SpellTarget.close
+    }
+    if (word == SpellWords.self) {
+      return SpellTarget.self
+    }
+    if (word == SpellWords.far) {
+      return SpellTarget.far
+    }
+    return SpellTarget.none
+  }
+}
+
 class Spell is Stateful {
   static build(phrase) {
     System.print(phrase)
     var valid = phrase != null
-    var target = {}
+    var target = SpellTarget.fromWord(phrase.object)
     var effects = []
     var cost = 0
     if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-      effects.add([ "directDamage", { "damage": 1} ])
+      effects.add([ "directDamage", { "damage": 1 } ])
       cost = 3
-    }
-    if (phrase.object == SpellWords.close) {
-      target = {
-        "target": "area",
-        "area": 1,
-        "origin": null,
-        "exclude": [ Vec.new(0, 0) ]
-      }
     }
 
     return Spell.new({
@@ -101,9 +112,8 @@ class Spell is Stateful {
     }
   }
 
-  words { _words }
-  tokens { _tokens }
 
+  phrase { data["phrase"] }
   valid { data["valid"] }
   cost { data["cost"] || 0 }
   target { data["target"] }

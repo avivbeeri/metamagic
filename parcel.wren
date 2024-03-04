@@ -375,6 +375,9 @@ class Action is Stateful {
     super()
   }
   withArgs(args) {
+    if (!args is List) {
+      args = [ args ]
+    }
     for (entry in args) {
       if (!data.containsKey(entry.key)) {
         data[entry.key] = entry.value

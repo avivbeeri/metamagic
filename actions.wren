@@ -11,9 +11,11 @@ class CastAction is Action {
   }
 
   spell { _spell }
+  target { data["target"] }
 
   withArgs(args) {
     data["spell"] = args["spell"] || {}
+    data["target"] = args["target"] || {}
     _spell = Spell.new(data["spell"])
     return this
   }
@@ -26,10 +28,11 @@ class CastAction is Action {
   }
 
   perform() {
-    if (spell.target["origin"] == null) {
-      spell.target["origin"] = src.pos
+    if (target["origin"] == null) {
+      target["origin"] = src.pos
     }
-    var targetGroup = TargetGroup.new(spell.target)
+    System.print(target)
+    var targetGroup = TargetGroup.new(target)
     var attackEvents = []
     var resultEvents = []
     var targets = targetGroup.entities(ctx, src)
@@ -40,8 +43,8 @@ class CastAction is Action {
       }
       var effect = Reflect.get(Components.effects, effectData[0]).new(ctx, args)
       effect["src"] = src
-      for (target in targets) {
-        effect["target"] = target
+      for (entity in targets) {
+        effect["target"] = entity
         effect.perform()
       }
     }

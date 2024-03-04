@@ -37,7 +37,7 @@ import "./ui" for
 
 import "./generator" for WorldGenerator
 import "./combat" for AttackResult
-import "./spells" for SpellUtils
+import "./spells" for SpellUtils, SpellTarget, SpellWords
 
 class InventoryWindowState is SceneState {
   construct new() {
@@ -186,6 +186,125 @@ class InventoryWindowState is SceneState {
   }
 }
 
+class SpellQueryState is SceneState {
+  construct new() {
+    super()
+  }
+
+  onEnter() {
+    _spell = arg(0)
+    var player = scene.world.getEntityByTag("player")
+    _origin = player.pos
+    _cursorPos = player.pos
+    _hoverPos = null
+
+    // Compute spell target parameters
+    _targetQuery = {}
+    if (_spell.target == SpellTarget.close) {
+      _targetQuery = {
+        "target": "area",
+        "area": 1,
+        "range": 0,
+        "origin": player.pos,
+        "exclude": [ Vec.new(0, 0) ]
+      }
+    }
+    if (_spell.phrase.verb == SpellWords.conjure && _spell.target == SpellTarget.far) {
+      _targetQuery = {
+        "target": "area",
+        "area": 1,
+        "range": 8,
+        "needEntity": false,
+        "origin": player.pos
+      }
+    }
+    var query = _targetQuery
+    _range = query["range"]
+    _area = query["area"] || 0
+    _allowSolid = query.containsKey("allowSolid") ? query["allowSolid"] : false
+    _needEntity = query.containsKey("needEntity") ? query["needEntity"] : true
+    _needSight = query.containsKey("needSight") ? query["needSight"] : true
+    scene.process(TargetBeginEvent.new(_cursorPos, _area))
+  }
+  onExit() {
+    scene.process(TargetEndEvent.new())
+  }
+  process(event) {
+    if (event is HoverEvent &&
+        event.target &&
+        event.target is Entity &&
+        cursorValid(_origin, event.target.pos)) {
+      _hoverPos = event.target.pos
+    }
+  }
+  targetValid(origin, position) {
+      // check next
+    var map = scene.world.zone.map
+    if (!_allowSolid && map[position]["solid"]) {
+      return false
+    }
+    if (_needSight && map[position]["visible"] != true) {
+      return false
+    }
+    if (_range && Line.chebychev(position, origin) > _range) {
+      return false
+    }
+
+    if (_needEntity && scene.world.getEntitiesAtPosition(position).isEmpty) {
+      return false
+    }
+
+    return true
+  }
+  cursorValid(origin, position) {
+      // check next
+    var map = scene.world.zone.map
+    if (!_allowSolid && map[position]["solid"]) {
+      return false
+    }
+    if (_needSight && map[position]["visible"] != true) {
+      return false
+    }
+    if (_range && Line.chebychev(position, origin) > _range) {
+      return false
+    }
+
+    return true
+  }
+  update() {
+    if (INPUT["reject"].firing) {
+      return previous
+    }
+    if ((INPUT["confirm"].firing || Mouse["left"].justPressed) && targetValid(_origin, _cursorPos)) {
+      var player = scene.world.getEntityByTag("player")
+      _targetQuery["origin"] = _cursorPos
+      player.pushAction(Components.actions.cast.new().withArgs({ "spell": _spell, "target": _targetQuery }))
+      return PlayerInputState.new()
+    }
+
+    // TODO handle mouse targeting
+
+    var i = 0
+    var next = null
+    for (input in INPUT.list("dir")) {
+      if (input.firing) {
+        next = _cursorPos + DIR_EIGHT[i]
+      }
+      i = i + 1
+    }
+
+    if (_hoverPos) {
+      _cursorPos = _hoverPos
+      scene.process(TargetEvent.new(_cursorPos))
+    }
+    if (next && cursorValid(_origin, next)) {
+      _cursorPos = next
+      scene.process(TargetEvent.new(_cursorPos))
+    }
+
+    return this
+  }
+}
 class TargetQueryState is SceneState {
   construct new() {
     super()
@@ -338,15 +457,6 @@ class CastState is ModalWindowState {
   }
 
   onEnter() {
-    var message = [
-      "What do you say?",
-      ""
-    ]
-
-    /*
-    window = Dialog.new(message)
-    window.center = true
-    */
     window = scene.addElement(Pane.new(Vec.new(Canvas.width / 4, 32)))
     window.center()
     window.addElement(Label.new(Vec.new(0, 0), "What do you say?"))
@@ -371,11 +481,14 @@ class CastState is ModalWindowState {
       var player = scene.world.getEntityByTag("player")
       _spell = SpellUtils.parseSpell(_incantation)
       if (_spell.valid) {
-        System.print(_spell)
-        player.pushAction(Components.actions.cast.new().withArgs({
-          "spell": _spell
-        }))
-        return PlayerInputState.new()
+        if (_spell.target == SpellTarget.self) {
+          player.pushAction(Components.actions.cast.new().withArgs({
+            "spell": _spell
+          }))
+          return PlayerInputState.new()
+        } else {
+          return SpellQueryState.new().with([ _spell ])
+        }
       }
     }
     _reader.update()
