@@ -194,10 +194,10 @@ class SpellQueryState is SceneState {
 
   onEnter() {
     _ui = scene.addElement(Pane.new(Vec.new()))
-    _ui.sizeMode = SizeMode.auto
-    _ui.centerHorizontally()
-    _ui.pos.y = Canvas.height - 40
     _ui.addElement(Label.new(Vec.new(0, 0), "Targeting... Press Confirm to cast spell"))
+    _ui.sizeMode = SizeMode.auto
+    _ui.pos.y = Canvas.height - 7 * 10
+    _ui.centerHorizontally()
 
     _spell = arg(0)
     var player = scene.world.getEntityByTag("player")
@@ -220,7 +220,7 @@ class SpellQueryState is SceneState {
       _targetQuery = {
         "target": "area",
         "area": 1,
-        "range": 8,
+        "range": 4,
         "needEntity": false,
         "origin": player.pos
       }
@@ -231,7 +231,7 @@ class SpellQueryState is SceneState {
     _allowSolid = query.containsKey("allowSolid") ? query["allowSolid"] : false
     _needEntity = query.containsKey("needEntity") ? query["needEntity"] : true
     _needSight = query.containsKey("needSight") ? query["needSight"] : true
-    scene.process(TargetBeginEvent.new(_cursorPos, _area))
+    scene.process(TargetBeginEvent.new(_cursorPos, _area, _range))
   }
   onExit() {
     if (_ui) {
@@ -333,7 +333,7 @@ class TargetQueryState is SceneState {
     _allowSolid = query.containsKey("allowSolid") ? query["allowSolid"] : false
     _needEntity = query.containsKey("needEntity") ? query["needEntity"] : true
     _needSight = query.containsKey("needSight") ? query["needSight"] : true
-    scene.process(TargetBeginEvent.new(_cursorPos, _area))
+    scene.process(TargetBeginEvent.new(_cursorPos, _area, _range))
   }
   onExit() {
     scene.process(TargetEndEvent.new())
@@ -500,14 +500,17 @@ class CastState is ModalWindowState {
         } else {
           return SpellQueryState.new().with([ _spell ])
         }
+      } else {
+        _incantation = ""
+        _reader.clear()
+        _reader.enable()
+        scene.process(TextInputEvent.new(_reader.text, _reader.pos))
       }
     }
     _reader.update()
     if (_reader.changed) {
       scene.process(TextInputEvent.new(_reader.text, _reader.pos))
       _incantation = StringUtils.toLowercase(_reader.text)
-      System.print(_incantation)
-      // validate
     }
     return this
   }

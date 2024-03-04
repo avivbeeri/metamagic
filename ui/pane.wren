@@ -32,7 +32,7 @@ class Pane is Panel {
     Canvas.offset(offset.x, offset.y)
     Canvas.rectfill(-padding, -padding, size.x + padding * 2, size.y + padding * 2, INK["bg"])
     for (i in 0...(border)) {
-      var j = i + padding
+      var j = i + padding + 1
       Canvas.rect(-j, -j, size.x + 2 * j, size.y + 2 * j, INK["border"])
     }
     content()

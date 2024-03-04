@@ -2,7 +2,7 @@ import "parcel" for Event
 
 var HoverEvent = Event.create("hover", ["target"])
 var TargetEvent = Event.create("target", ["pos"])
-var TargetBeginEvent = Event.create("targetBegin", ["pos", "range"])
+var TargetBeginEvent = Event.create("targetBegin", ["pos", "area", "range"])
 var TargetEndEvent = Event.create("targetEnd", [])
 var TextInputEvent = Event.create("textInput", [ "text", "pos" ])
 

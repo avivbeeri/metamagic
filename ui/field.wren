@@ -35,7 +35,7 @@ class Field is Pane {
   content() {
     Canvas.rectfill(-padding, -padding, size.x + padding * 2, size.y + padding * 2, INK["fieldBg"])
     if (_text.count == 0 && _placeholder) {
-      Canvas.print(_placeholder, 8, 0, INK["textPlaceholder"])
+      Canvas.print(_placeholder, 16, 0, INK["textPlaceholder"])
     } else {
       Canvas.print(_text, 0, 0, INK["text"])
     }

@@ -941,9 +941,9 @@ class Element {
       element.update()
     }
   }
-  process(events) {
+  process(event) {
     for (element in _elements) {
-      element.process(events)
+      element.process(event)
     }
   }
   draw() {
@@ -961,8 +961,9 @@ class Element {
     return element
   }
   removeSelf() {
-    if (parent) {
-      parent.removeElement(this)
+    if (_parent) {
+      System.print("remove %(this) from parent %(parent)")
+      _parent.removeElement(this)
     }
   }
   removeElement(element) {

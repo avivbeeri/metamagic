@@ -87,12 +87,16 @@ class Spell is Stateful {
   static build(phrase) {
     System.print(phrase)
     var valid = phrase != null
-    var target = SpellTarget.fromWord(phrase.object)
+    var target = SpellTarget.none
     var effects = []
     var cost = 0
-    if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-      effects.add([ "directDamage", { "damage": 1 } ])
-      cost = 3
+
+    if (valid && phrase) {
+      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
+        effects.add([ "directDamage", { "damage": 1 } ])
+        cost = 3
+      }
+      target = SpellTarget.fromWord(phrase.object)
     }
 
     return Spell.new({

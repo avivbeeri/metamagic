@@ -12,10 +12,11 @@ import "./parcel" for
 import "./palette" for INK
 import "./ui/events" for
   HoverEvent,
-  TargetBeginEvent
+  TargetBeginEvent,
+  TargetEndEvent
 
 import "./items" for EquipmentSlot
-import "./ui" for Cursor
+import "./ui" for Cursor, MapZone
 
 var DEBUG = false
 
@@ -57,7 +58,14 @@ class AsciiRenderer is Element {
   }
   process(event) {
     if (event is TargetBeginEvent) {
-      addElement(Cursor.new(_pos, event.pos, event.range))
+      addElement(Cursor.new(_pos, event.pos, event.area))
+      var player = _world.getEntityByTag("player")
+      if (player) {
+        addElement(MapZone.new(_pos, player.pos, event.range))
+      }
+    }
+    if (event is TargetEndEvent) {
+      System.print("TargetEnd")
     }
     super.process(event)
   }
