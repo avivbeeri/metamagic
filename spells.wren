@@ -82,7 +82,7 @@ class Spell is Stateful {
 
     if (valid && phrase) {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-        effects.add([ "directDamage", { "damage": 1 } ])
+        effects.add([ "directDamage", { "damage": 1, "type": "FIRE" } ])
       }
     }
 

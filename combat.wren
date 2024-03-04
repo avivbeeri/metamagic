@@ -30,6 +30,14 @@ class Damage {
     var high = calculateHigh(atk, def)
     return RNG.float() < 0.3 ? low : high
   }
+
+  construct new(amount, type) {
+    _amount = amount
+    _type = type
+  }
+
+  amount { _amount }
+  type { _type }
 }
 
 class AttackResult {
@@ -41,29 +49,11 @@ class AttackResult {
   static invulnerable { "invulnerable" } // special blocked, it's invulnerable
 }
 
-class AttackType {
-  static melee { "basic" }
-
-  static verify(text) {
-    if (text == "basic") {
-      return text
-    }
-    Fiber.abort("unknown AttackType: %(text)")
-  }
-}
-
-class Attack {
-  construct new(damage, attackType) {
-    _damage = damage
-    _attackType = AttackType.verify(attackType)
-  }
-
-  damage { _damage }
-  attackType { _attackType }
-
-  static melee(entity) {
-    return Attack.new(entity["stats"].get("atk"), AttackType.melee)
-  }
+class DamageType {
+  static kinetic { "KINETIC" } // Punches, bludgeoning
+  static energy { "ENERGY" }
+  static fire { "FIRE" } // Fire that burns
+  static poison { "POISON" } // Fire that burns
 }
 
 class StatGroup {
