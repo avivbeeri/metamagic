@@ -49,7 +49,10 @@ INK.setPurpose("mainBg", "black")
 
 INK.setPurpose("welcome", "white")
 INK.setPurpose("text", "white")
-INK.setPurpose("textCursor", "burgandy")
+INK.setPurpose("textPlaceholder", "lilac")
+INK.setPurpose("textCursor", "red")
+
+INK.setPurpose("fieldBg", "purple")
 
 INK.setPurpose("barText", "white")
 INK.setPurpose("barFilled", "purple")

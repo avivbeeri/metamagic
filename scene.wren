@@ -25,6 +25,7 @@ import "./text" for TextSplitter
 import "./ui/renderer" for Renderer
 import "./ui/label" for Label
 import "./ui/pane" for Pane
+import "./ui/panel" for SizeMode
 import "./ui/dialog" for Dialog
 import "./ui" for
   HealthBar,
@@ -192,6 +193,12 @@ class SpellQueryState is SceneState {
   }
 
   onEnter() {
+    _ui = scene.addElement(Pane.new(Vec.new()))
+    _ui.sizeMode = SizeMode.auto
+    _ui.centerHorizontally()
+    _ui.pos.y = Canvas.height - 40
+    _ui.addElement(Label.new(Vec.new(0, 0), "Targeting... Press Confirm to cast spell"))
+
     _spell = arg(0)
     var player = scene.world.getEntityByTag("player")
     _origin = player.pos
@@ -227,6 +234,9 @@ class SpellQueryState is SceneState {
     scene.process(TargetBeginEvent.new(_cursorPos, _area))
   }
   onExit() {
+    if (_ui) {
+      scene.removeElement(_ui)
+    }
     scene.process(TargetEndEvent.new())
   }
   process(event) {
@@ -273,7 +283,7 @@ class SpellQueryState is SceneState {
   }
   update() {
     if (INPUT["reject"].firing) {
-      return previous
+      return PlayerInputState.new()
     }
     if ((INPUT["confirm"].firing || Mouse["left"].justPressed) && targetValid(_origin, _cursorPos)) {
       var player = scene.world.getEntityByTag("player")
@@ -460,7 +470,8 @@ class CastState is ModalWindowState {
     window = scene.addElement(Pane.new(Vec.new(Canvas.width / 4, 32)))
     window.center()
     window.addElement(Label.new(Vec.new(0, 0), "What do you say?"))
-    window.addElement(Field.new(Vec.new(4, 16)))
+    var field = window.addElement(Field.new(Vec.new(0, 12)))
+    field.placeholder = "<type incantation>"
     _reader = TextInputReader.new()
     _reader.max = 23
     _reader.enable()

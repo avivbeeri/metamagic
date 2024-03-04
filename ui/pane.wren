@@ -7,27 +7,33 @@ import "ui/panel" for Panel
 class Pane is Panel {
   construct new() {
     super()
+    init()
   }
   construct new(size) {
     super(size)
+    init()
   }
   construct new(size, pos) {
     super(size, pos)
+    init()
   }
 
-  /*
-  center() {
-    size = Vec.new(((width + 4) * 8).min(maxWidth), (2 + _message.count) * _height)
-    pos = (Vec.new(Canvas.width, Canvas.height) - size) / 2
+  init() {
+    _padding = 8
+    _border = 4
   }
-  */
+
+  padding { _padding }
+  padding=(v) { _padding = v }
+  border { _border }
+  border=(v) { _border = v }
 
   draw() {
-    var border = 4
     Canvas.offset(offset.x, offset.y)
-    Canvas.rectfill(0, 0, size.x, size.y, INK["bg"])
-    for (i in 1..border) {
-      Canvas.rect(-i, -i, size.x + 2 * i, size.y + 2 * i, INK["border"])
+    Canvas.rectfill(-padding, -padding, size.x + padding * 2, size.y + padding * 2, INK["bg"])
+    for (i in 0...(border)) {
+      var j = i + padding
+      Canvas.rect(-j, -j, size.x + 2 * j, size.y + 2 * j, INK["border"])
     }
     content()
     super.draw()
