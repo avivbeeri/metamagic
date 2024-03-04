@@ -20,7 +20,7 @@ class CastAction is Action {
     return this
   }
   evaluate() {
-    if (src["stats"]["mp"] < spell.cost) {
+    if (src["stats"]["mp"] < spell.cost(src)) {
       return ActionResult.invalid
     }
 
@@ -51,7 +51,7 @@ class CastAction is Action {
     ctx.addEvent(Components.events.cast.new(src, targets, spell))
     // Don't allow regen this turn
     // src["stats"].decrease("mpHidden", 1)
-    src["stats"].decrease("mp", spell.cost)
+    src["stats"].decrease("mp", spell.cost(src))
     /*
     for (target in targets) {
       var effect = Components.effects.meleeDamage.new(ctx, {

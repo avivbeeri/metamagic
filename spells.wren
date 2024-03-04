@@ -13,39 +13,47 @@ class TokenCategory {
 }
 
 class SpellToken {
-  construct new(lexeme, category) {
+  construct new(lexeme, category, maxCost) {
     _lexeme = lexeme
     _category = category
+    _maxCost = maxCost
   }
 
   toString { _lexeme }
   category { _category }
   lexeme { _lexeme }
+  maxCost { _maxCost }
 
   == (other) {
-    return _lexeme == other.lexeme && _category == other.category
+    return _lexeme == other.lexeme
   }
 
-  static errorToken(lexeme) { SpellToken.new(lexeme, TokenCategory.error)}
+  static errorToken(lexeme) { SpellToken.new(lexeme, TokenCategory.error, 0)}
 }
 
 class SpellWords {
   // verb
-  static conjure { SpellToken.new("CONJURE", TokenCategory.verb) }
+  static conjure { SpellToken.new("CONJURE", TokenCategory.verb, 2) }
 
-  static infuse { SpellToken.new("INFUSE", TokenCategory.verb) }
+  static infuse { SpellToken.new("INFUSE", TokenCategory.verb, 1) }
 
   //subject
-  static fire { SpellToken.new("FIRE", TokenCategory.subject) }
-  static earth { SpellToken.new("EARTH", TokenCategory.subject) }
-  static water { SpellToken.new("WATER", TokenCategory.subject) }
-  static air { SpellToken.new("AIR", TokenCategory.subject) }
+  static fire { SpellToken.new("FIRE", TokenCategory.subject, 3) }
+  static earth { SpellToken.new("EARTH", TokenCategory.subject, 3) }
+  static water { SpellToken.new("WATER", TokenCategory.subject, 3) }
+  static air { SpellToken.new("AIR", TokenCategory.subject, 3) }
 
   // object
-  static self { SpellToken.new("SELF", TokenCategory.object) }
-  static close { SpellToken.new("CLOSE", TokenCategory.object) }
-  static far { SpellToken.new("FAR", TokenCategory.object) }
+  static self { SpellToken.new("SELF", TokenCategory.object, 2) }
+  static close { SpellToken.new("CLOSE", TokenCategory.object, 3) }
+  static far { SpellToken.new("FAR", TokenCategory.object, 3) }
 }
+
+var BaseTable = {
+  SpellWords.close.lexeme: { "target": "area", "area": 1, "range": 0, "origin": null, "exclude": [ Vec.new(0,0) ]  },
+  SpellWords.far.lexeme: { "target": "area", "area": 1, "range": 4, "origin": null, "exclude": [], "needEntity": false  }
+}
+
 
 
 // The order of this matters. We shouldn't disturb it once we start shipping
@@ -64,49 +72,26 @@ var AllWords = [
   SpellWords.far,
 ]
 
-class SpellTarget {
-  static none { "NONE" }
-  static self { "SELF" }
-  static close { "CLOSE" }
-  static far { "FAR" }
-  static fromWord(word) {
-    if (word == SpellWords.close) {
-      return SpellTarget.close
-    }
-    if (word == SpellWords.self) {
-      return SpellTarget.self
-    }
-    if (word == SpellWords.far) {
-      return SpellTarget.far
-    }
-    return SpellTarget.none
-  }
-}
-
 class Spell is Stateful {
   static build(phrase) {
     System.print(phrase)
     var valid = phrase != null
-    var target = SpellTarget.none
     var effects = []
     var cost = 0
 
     if (valid && phrase) {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
         effects.add([ "directDamage", { "damage": 1 } ])
-        cost = 3
       }
-      target = SpellTarget.fromWord(phrase.object)
     }
 
     return Spell.new({
       "phrase": phrase,
       "valid": valid,
-      "cost": cost,
       "effects": effects,
-      "target": target
     })
   }
+
   construct new(data) {
     super(data)
     _tokens = data["tokens"]
@@ -119,9 +104,39 @@ class Spell is Stateful {
 
   phrase { data["phrase"] }
   valid { data["valid"] }
-  cost { data["cost"] || 0 }
-  target { data["target"] }
   effects { data["effects"] }
+
+  cost(caster) {
+    System.print("Calculating spell cost:")
+    if (caster.has("proficiency")) {
+      var cost = 0
+      for (word in phrase.list) {
+        var entry = caster["proficiency"][word.lexeme]
+        if (!entry) {
+          entry = caster["proficiency"][word.lexeme] = {
+            "used": true,
+            "success": 0,
+            "discovered": false
+          }
+        }
+        var success = entry["success"]
+        cost = cost + (entry["discovered"] ? 0 : 2)
+        cost = cost + (word.maxCost - success).max(1)
+        System.print("%(word): %(entry)")
+      }
+      System.print("Cost: %(cost)")
+      return cost
+    }
+
+    // figure out a default
+    return valid ? 3 : 0
+  }
+
+  target() {
+    var result = {}
+    Stateful.assign(result, BaseTable[phrase.object.lexeme])
+    return result
+  }
 }
 
 class SpellPhrase {
@@ -130,6 +145,8 @@ class SpellPhrase {
     _subject = subject
     _object = object
   }
+
+  list { [ _verb, _subject, _object ]}
 
   verb { _verb }
   subject { _subject }

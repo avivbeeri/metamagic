@@ -51,6 +51,7 @@ class Player is Creature {
     for (entry in PlayerData["inventory"]) {
       this["inventory"].add(InventoryEntry.new(entry[0], entry[1]))
     }
+    this["proficiency"] = {}
   }
 
   name { data["name"] || "Player" }

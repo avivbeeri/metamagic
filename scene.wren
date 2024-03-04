@@ -38,7 +38,7 @@ import "./ui" for
 
 import "./generator" for WorldGenerator
 import "./combat" for AttackResult
-import "./spells" for SpellUtils, SpellTarget, SpellWords
+import "./spells" for SpellUtils
 
 class InventoryWindowState is SceneState {
   construct new() {
@@ -206,26 +206,7 @@ class SpellQueryState is SceneState {
     _hoverPos = null
 
     // Compute spell target parameters
-    _targetQuery = {}
-    if (_spell.target == SpellTarget.close) {
-      _targetQuery = {
-        "target": "area",
-        "area": 1,
-        "range": 0,
-        "origin": player.pos,
-        "exclude": [ Vec.new(0, 0) ]
-      }
-    }
-    if (_spell.phrase.verb == SpellWords.conjure && _spell.target == SpellTarget.far) {
-      _targetQuery = {
-        "target": "area",
-        "area": 1,
-        "range": 4,
-        "needEntity": false,
-        "origin": player.pos
-      }
-    }
-    var query = _targetQuery
+    var query = _targetQuery = _spell.target()
     _range = query["range"]
     _area = query["area"] || 0
     _allowSolid = query.containsKey("allowSolid") ? query["allowSolid"] : false
@@ -492,7 +473,7 @@ class CastState is ModalWindowState {
       var player = scene.world.getEntityByTag("player")
       _spell = SpellUtils.parseSpell(_incantation)
       if (_spell.valid) {
-        if (_spell.target == SpellTarget.self) {
+        if (_spell.target()["target"] == "self") {
           player.pushAction(Components.actions.cast.new().withArgs({
             "spell": _spell
           }))
