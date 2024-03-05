@@ -112,6 +112,10 @@ class AsciiRenderer is Element {
         found = true
         top.process(HoverEvent.new("Grass"))
       }
+      if (!found && tile["water"]) {
+        found = true
+        top.process(HoverEvent.new("Water"))
+      }
     }
     if (!found) {
       top.process(HoverEvent.new(null))
@@ -138,6 +142,9 @@ class AsciiRenderer is Element {
         }
         if (map[x, y]["grass"]) {
           color = INK["grass"]
+        }
+        if (map[x, y]["water"]) {
+          color = INK["water"]
         }
         if (map[x, y]["visible"] == "maybe") {
           color = INK["obscured"]
@@ -174,6 +181,9 @@ class AsciiRenderer is Element {
           }
         } else if (map[x, y]["grass"]) {
           printSymbol("\"", x, y, color)
+        } else if (map[x, y]["water"]) {
+          printSymbolBg("~", x, y, INK["waterBg"])
+          printSymbol("~", x, y, color)
         } else {
           printSymbolBg(".", x, y, INK["floorStone"])
           printSymbol(".", x, y, color)

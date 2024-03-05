@@ -116,6 +116,13 @@ class SimpleMoveAction is Action {
     ctx.addEvent(Components.events.move.new(src, origin))
     return ActionResult.success
   }
+
+  cost() {
+    if (ctx.zone.map[src.pos]["water"]) {
+      return super.cost() * 1.5
+    }
+    return super.cost()
+  }
 }
 
 #!component(id="effect", group="action")
@@ -274,6 +281,10 @@ class PlayerBumpAction is Action {
     }
 
     return ActionResult.success
+  }
+
+  cost() {
+    return _action.cost()
   }
 }
 

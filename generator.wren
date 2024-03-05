@@ -23,19 +23,53 @@ var TierData = GeneratorData["floors"]
 var Distribution = GeneratorData["distribution"]
 
 class GeneratorUtils {
+  static spawnWater(zone, room) {
+    var valid = false
+    var attempts = 0
+    var position = null
+    while (!valid && attempts < 30) {
+      position = RNG.sample(room.inner)
+      valid = GeneratorUtils.isValidTileLocation(zone, position) && isTileFeature(zone, position)
+    }
+    if (!valid) {
+      return
+    }
+    var rate = 1.0
+    var decay = 0.95
+    var visited = [ position ]
+    var map = zone.map
+    map[position]["water"] = true
+    while (rate > 0.05) {
+      var pos = RNG.sample(visited)
+      var dir = RNG.sample(DIR_FOUR[0..-1])
+      var tile = map[pos]
+      valid = true
+
+      while (valid && tile["water"]) {
+        pos = pos + dir
+        tile = map[pos]
+        valid = GeneratorUtils.isValidTileLocation(zone, pos) && isTileFeature(zone, pos)
+      }
+      if (valid) {
+        map[pos]["water"] = true
+        visited.add(pos)
+      }
+      rate = rate * decay
+    }
+  }
   static spawnGrass(zone, room) {
     var valid = false
     var attempts = 0
     var position = null
     while (!valid && attempts < 30) {
       position = RNG.sample(room.inner)
-      valid = GeneratorUtils.isValidTileLocation(zone, position)
+      valid = GeneratorUtils.isValidTileLocation(zone, position) && isTileFeature(zone, position)
     }
     if (!valid) {
       return
     }
     var rate = 1.0
-    var decay = 0.7 + RNG.float() * 0.29
+    var decay = 0.8
     var list = [ position ]
     var visited = Set.new()
     var map = zone.map
@@ -43,9 +77,11 @@ class GeneratorUtils {
       var pos = RNG.sample(list)
       visited.add(pos)
       list.remove(pos)
-      map[pos]["grass"] = true
-      var neighbours = zone.map.neighbours(pos).where {|tile| zone.map.isFloor(tile) }
-      list.addAll(neighbours.where {|tile| !visited.contains(tile)})
+      if (GeneratorUtils.isValidTileLocation(zone, pos) && isTileFeature(zone, pos)) {
+        map[pos]["grass"] = true
+        var neighbours = zone.map.neighbours(pos).where {|tile| zone.map.isFloor(tile) }
+        list.addAll(neighbours.where {|tile| !visited.contains(tile)})
+      }
       rate = rate * decay
     }
   }
@@ -112,6 +148,10 @@ class GeneratorUtils {
     return result
   }
 
+  static isTileFeature(zone, position) {
+    var tile = zone.map[position]
+    return !tile["grass"] && !tile["water"]
+  }
   static isValidTileLocation(zone, position) {
     var tile = zone.map[position]
     return !tile["solid"] && !tile["stairs"] && !tile["altar"]
@@ -569,6 +609,7 @@ class TestRoomGenerator {
 
 
     GeneratorUtils.spawnGrass(zone, room)
+    GeneratorUtils.spawnWater(zone, room)
     zone["entities"] = []
     zone["level"] = level
     // zone.map[Vec.new(15, 13)]["stairs"] = "down"
