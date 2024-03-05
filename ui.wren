@@ -15,6 +15,9 @@ import "./items" for Item, EquipmentSlot
 
 import "./palette" for INK
 import "./ui/gauge" for Gauge
+import "./ui/pane" for Pane
+import "./ui/panel" for SizeMode
+import "./ui/label" for Label
 import "./ui/events" for
   HoverEvent,
   TargetEvent,
@@ -25,16 +28,21 @@ import "./inputs" for VI_SCHEME as INPUT
 import "./text" for TextSplitter
 
 
-class HintText is Element {
+class HintText is Pane {
   construct new(pos) {
     super()
-    _pos = pos
+    this.pos = pos
     _text = "press '/' for help"
+    addElement(Label.new(Vec.new(0, 0), _text))
     _t = 0
+    sizeMode = SizeMode.auto
+    centerHorizontally()
+    alignBottom()
   }
   construct new(pos, message) {
     _pos = pos
     _text = message
+    addElement(Label.new(Vec.new(0, 0), _text))
     _t = 0
   }
 
@@ -52,17 +60,10 @@ class HintText is Element {
     super.process(event)
   }
 
-  draw() {
-    var offset = Canvas.offset
-    Canvas.offset(_pos.x,_pos.y)
-
-    var left = -(_text.count * 4)
-
+  content() {
     if (_text) {
-      Canvas.print(_text, left, 0, INK["text"])
+      Canvas.print(_text, 0, 0, INK["text"])
     }
-
-    Canvas.offset(offset.x, offset.y)
   }
 }
 
@@ -442,6 +443,7 @@ class ManaBar is Element {
     _gauge = addElement(Gauge.new(_pos, "MP", stats["mp"], stats["mpMax"], 10))
     _gauge.fg = INK["manaBarFilled"]
     _gauge.bg = INK["manaBarEmpty"]
+    _gauge.mirror = true
   }
 
   update() {

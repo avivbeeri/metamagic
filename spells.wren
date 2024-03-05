@@ -249,7 +249,7 @@ class SpellParser {
 
     if (!isAtEnd()) {
       _error = true
-      return f
+      return null
     }
     return SpellPhrase.new(verb, subject, object)
   }
@@ -287,6 +287,13 @@ class SpellParser {
 
 class SpellUtils {
   static lexicon { __lexicon }
+  static getWordFromToken(token) {
+    var position = AllWords.indexOf(token)
+    if (position != -1) {
+      return __lexicon[position]
+    }
+    return "<???>"
+  }
   static initializeLexicon() {
     var location = FileSystem.prefPath("avivbeeri", "arcanist")
     var path = "%(location)lexicon.json"

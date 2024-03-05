@@ -7,26 +7,29 @@ import "ui/panel" for Panel
 class Pane is Panel {
   construct new() {
     super()
-    init()
   }
   construct new(size) {
     super(size)
-    init()
   }
   construct new(size, pos) {
     super(size, pos)
-    init()
   }
 
   init() {
-    _padding = 8
+    super.init()
     _border = 4
   }
-
-  padding { _padding }
-  padding=(v) { _padding = v }
   border { _border }
   border=(v) { _border = v }
+
+  alignRight() {
+    super.alignRight()
+    pos.x = pos.x - border
+  }
+  alignBottom() {
+    super.alignBottom()
+    pos.y = pos.y - border
+  }
 
   draw() {
     Canvas.offset(offset.x, offset.y)

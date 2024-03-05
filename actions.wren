@@ -258,7 +258,6 @@ class PlayerBumpAction is Action {
       return moveResult
     }
     var tile = ctx.zone.map[src.pos]
-    System.print(tile)
     if (tile["items"] && !tile["items"].isEmpty) {
       var pickupAction = Components.actions.pickup.new().bind(src)
       if (pickupAction.evaluate().succeeded) {

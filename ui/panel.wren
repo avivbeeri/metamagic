@@ -10,24 +10,48 @@ class SizeMode {
 class Panel is Element {
   construct new() {
     super()
-    _padding = 0
     _pos = Vec.new()
     _size = Vec.new()
-    _sizeMode = SizeMode.fixed
+    init()
   }
   construct new(size) {
     super()
     _size = size
     _pos = Vec.new()
+    init()
   }
   construct new(size, pos) {
     super()
     _pos = pos
     _size = size
+    init()
   }
 
+  init() {
+    _padding = 8
+    _sizeMode = SizeMode.fixed
+  }
+
+  padding { _padding }
+  padding=(v) { _padding = v }
   sizeMode { _sizeMode }
   sizeMode=(v) { _sizeMode = v }
+  addElement(element) {
+    super.addElement(element)
+    updateSize()
+    return element
+  }
+
+  alignRight() {
+    updateSize()
+    var parentSize = parent ? parent.size : Vec.new(Canvas.width, Canvas.height)
+    pos.x = (parentSize.x - size.x - padding)
+  }
+  alignBottom() {
+    updateSize()
+    var parentSize = parent ? parent.size : Vec.new(Canvas.width, Canvas.height)
+    pos.y = (parentSize.y - size.y - padding)
+  }
 
   centerHorizontally() {
     updateSize()
@@ -76,8 +100,8 @@ class Panel is Element {
       */
       var current = Vec.new()
       for (element in elements) {
-        current.x = current.x.max(element.size.x)
-        current.y = current.y.max(element.size.y)
+        current.x = current.x.max(element.pos.x + element.size.x)
+        current.y = current.y.max(element.pos.y + element.size.y)
       }
       _size = current
     }

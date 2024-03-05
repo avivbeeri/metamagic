@@ -64,6 +64,7 @@ INK.setPurpose("textCursor", "red")
 INK.setPurpose("fieldBg", "blue")
 
 INK.setPurpose("barText", "white")
+INK.setPurpose("barBorder", "gold")
 INK.setPurpose("barFilled", "red")
 INK.setPurpose("barEmpty", "burgandy")
 INK.setPurpose("manaBarFilled", "blue")

@@ -528,7 +528,7 @@ class TestRoomGenerator {
 
     var center = Vec.new(15, 15)
     var range = 5
-    var room = RectangularRoom.new(8, 8, 16, 16)
+    var room = RectangularRoom.new(0, 0, 32, 31)
     for (pos in room.inner) {
       map[pos] = Tile.new({
         "blocking": false,

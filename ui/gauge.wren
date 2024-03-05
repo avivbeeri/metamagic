@@ -5,6 +5,9 @@ import "./parcel" for
 import "./palette" for INK
 import "./ui/animation" for Animation
 
+
+var HEIGHT = 18
+var TEXT_OFFSET = (HEIGHT - 8) / 2
 class Gauge is Element {
   construct new(pos, label, value, maxValue, segments) {
     super()
@@ -17,12 +20,19 @@ class Gauge is Element {
     _changing = false
     _fg = INK["barFilled"]
     _bg = INK["barEmpty"]
+    _border = INK["barBorder"]
+    _mirror = false
   }
 
+
+  mirror { _mirror }
+  mirror=(v) { _mirror = v }
   fg { _fg }
   fg=(v) { _fg = v }
   bg { _bg }
   bg=(v) { _bg = v }
+  border { _border }
+  border=(v) { _border = v }
 
   animateValues(value, maxValue) {
     _maxValue = maxValue
@@ -68,9 +78,31 @@ class Gauge is Element {
     var width = _segments
     var current = _value / _maxValue * width
 
-    Canvas.rectfill(0, 2, width * 16, 12, _bg)
-    Canvas.rectfill(0, 2, current * 16, 12, _fg)
-    Canvas.print("%(_label): %(_targetValue) / %(_maxValue)", 4, 4, INK["barText"])
+    Canvas.rectfill(0, 0, width * 16, HEIGHT, _bg)
+    var text = "%(_label): %(_targetValue) / %(_maxValue)"
+    var textWidth = text.count * 8
+    if (!mirror) {
+      Canvas.rectfill(0, 0, current * 16, HEIGHT, _fg)
+      /*
+      for (i in 0...3) {
+        Canvas.rect(-i, -i, width * 16 + i * 2, HEIGHT + i * 2, border)
+      }
+      */
+      Canvas.print(text, 4, TEXT_OFFSET, INK["barText"])
+    } else {
+      text = "%(_targetValue) / %(_maxValue) :%(_label)"
+      var right = width * 16
+      Canvas.rectfill(right - current * 16, 0, current * 16, HEIGHT, _fg)
+      /*
+      for (i in 0...3) {
+        Canvas.rect(-i + right - current * 16, -i, width * 16 + i * 2, HEIGHT + i * 2, border)
+      }
+      */
+      Canvas.print(text, right - textWidth - 4, TEXT_OFFSET, INK["barText"])
+    }
+    for (i in 0...3) {
+      Canvas.rect(-i, -i, width * 16 + i * 2, HEIGHT + i * 2, border)
+    }
 
     Canvas.offset(offset.x, offset.y)
   }

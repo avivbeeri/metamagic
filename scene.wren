@@ -193,13 +193,24 @@ class SpellQueryState is SceneState {
   }
 
   onEnter() {
-    _ui = scene.addElement(Pane.new(Vec.new()))
-    _ui.addElement(Label.new(Vec.new(0, 0), "Targeting... Press Confirm to cast spell"))
-    _ui.sizeMode = SizeMode.auto
-    _ui.pos.y = Canvas.height - 7 * 10
-    _ui.centerHorizontally()
-
     _spell = arg(0)
+
+    _ui = scene.addElement(Pane.new(Vec.new()))
+    _ui.sizeMode = SizeMode.auto
+    var phrase = _spell.phrase.list
+    var incantation = _spell.phrase.list.map {|token| SpellUtils.getWordFromToken(token) }.join(" ")
+    var plainText = phrase.join(" ")
+    var lines = [
+      _ui.addElement(Label.new(Vec.new(0, 0), "Targeting...")),
+      _ui.addElement(Label.new(Vec.new(0, 12), "%(plainText)")),
+      _ui.addElement(Label.new(Vec.new(0, 20), "%(incantation)"))
+    ]
+
+    lines.each{|line| line.centerHorizontally() }
+
+    _ui.pos.y = 20
+    _ui.alignRight()
+
     var player = scene.world.getEntityByTag("player")
     _origin = player.pos
     _cursorPos = player.pos
@@ -677,10 +688,12 @@ class GameScene is Scene {
     var world = _world = WorldGenerator.create()
     var player = world.getEntityByTag("player")
     changeState(PlayerInputState.new())
-    _renderer = addElement(Renderer.new(Vec.new((Canvas.width - (32 * 16))/2, 16)))
+    _renderer = addElement(Renderer.new(Vec.new((Canvas.width - (32 * 16))/2, 26)))
+    // _renderer = addElement(Renderer.new(Vec.new(8, 28)))
     if (player) {
-      addElement(HealthBar.new(Vec.new(4, 0), player.ref))
-      addElement(ManaBar.new(Vec.new(4, 12), player.ref))
+      var left = Canvas.width / 2
+      addElement(HealthBar.new(Vec.new(left + 2, 4), player.ref))
+      addElement(ManaBar.new(Vec.new(left - 10 * 16 - 2, 4), player.ref))
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages))
