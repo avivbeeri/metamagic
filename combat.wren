@@ -260,7 +260,7 @@ class CombatProcessor {
     return kill
   }
   */
-  static calculate(src, target) { calculate(src, target, null) }
+  static calculate(src, target) { calculate(src, target, Damage.new(src["stats"].get("atk"), DamageType.kinetic)) }
   static calculate(src, target, incoming) {
     if (incoming is Damage) {
       System.print(incoming)

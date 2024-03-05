@@ -63,7 +63,12 @@ class DamageEffect is Effect {
 
   perform() {
     var killEvents = []
-    var result = CombatProcessor.calculate(src, target, damage)
+    var result
+    if (damage) {
+      result = CombatProcessor.calculate(src, target, damage)
+    } else {
+      result = CombatProcessor.calculate(src, target)
+    }
     if (result) {
       ctx.zone.map[target.pos]["blood"] = true
       killEvents.add(Components.events.kill.new(src, target))

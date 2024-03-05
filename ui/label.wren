@@ -12,7 +12,10 @@ class Label is Panel {
     super(size, pos)
   }
   text { _text }
-  text=(v) { _text = v }
+  text=(v) {
+    _text = v
+    size = Vec.new(_text.count * 8, 8)
+  }
 
   content() {
     Canvas.print(_text, 0, 0, INK["text"])

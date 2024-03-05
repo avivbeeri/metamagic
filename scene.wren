@@ -193,11 +193,16 @@ class SpellQueryState is SceneState {
   }
 
   onEnter() {
+    var player = scene.world.getEntityByTag("player")
     _spell = arg(0)
 
     _ui = scene.addElement(Pane.new(Vec.new()))
     _ui.sizeMode = SizeMode.auto
-    var phrase = _spell.phrase.list
+    var phrase = _spell.phrase.list.map {|token|
+      var proficiencyEntry = player["proficiency"][token.lexeme]
+      return proficiencyEntry["gameUsed"] ? token.lexeme : "???"
+    }
+
     var incantation = _spell.phrase.list.map {|token| SpellUtils.getWordFromToken(token) }.join(" ")
     var plainText = phrase.join(" ")
     var lines = [
@@ -211,7 +216,6 @@ class SpellQueryState is SceneState {
     _ui.pos.y = 20
     _ui.alignRight()
 
-    var player = scene.world.getEntityByTag("player")
     _origin = player.pos
     _cursorPos = player.pos
     _hoverPos = null
@@ -460,10 +464,17 @@ class CastState is ModalWindowState {
 
   onEnter() {
     window = scene.addElement(Pane.new(Vec.new(Canvas.width / 4, 32)))
-    window.center()
-    window.addElement(Label.new(Vec.new(0, 0), "What do you say?"))
-    var field = window.addElement(Field.new(Vec.new(0, 12)))
+    window.sizeMode = SizeMode.auto
+    var title = window.addElement(Label.new(Vec.new(0, 0), "Speak an incantation"))
+    _costLabel = window.addElement(Label.new(Vec.new(0, 28), "[ ??? MP ]"))
+    _phraseLabel = window.addElement(Label.new(Vec.new(0, 36), ""))
+    var field = window.addElement(Field.new(Vec.new(0, 14)))
     field.placeholder = "<type incantation>"
+
+    _costLabel.centerHorizontally()
+    _phraseLabel.centerHorizontally()
+    window.center()
+    title.centerHorizontally()
     _reader = TextInputReader.new()
     _reader.max = 23
     _reader.enable()
@@ -503,6 +514,25 @@ class CastState is ModalWindowState {
     if (_reader.changed) {
       scene.process(TextInputEvent.new(_reader.text, _reader.pos))
       _incantation = StringUtils.toLowercase(_reader.text)
+      var spell = SpellUtils.parseSpell(_incantation)
+      var player = scene.world.getEntityByTag("player")
+      if (spell.valid) {
+        _costLabel.text = "[ %(spell.cost(player)) MP ]"
+        _costLabel.centerHorizontally()
+      } else {
+        _costLabel.text = "[ ??? MP ]"
+      }
+      var phrase = spell.phrase.list.map {|token|
+        var proficiencyEntry = player["proficiency"][token.lexeme]
+        if (proficiencyEntry) {
+          return proficiencyEntry["gameUsed"] ? token.lexeme : "???"
+        }
+        return "???"
+      }.join(" ")
+      System.print(phrase)
+      _phraseLabel.text = phrase
+      _phraseLabel.centerHorizontally()
+      _costLabel.centerHorizontally()
     }
     return this
   }
@@ -732,6 +762,26 @@ class GameScene is Scene {
     }
     if (event is Components.events.changeZone && event.floor == 1) {
       _messages.add("Welcome to the dungeon.", INK["welcome"], false)
+    }
+    if (event is Components.events.cast) {
+      var srcName = event.src.name
+      var target = null
+      var targetName = null
+      if (event.target.count == 1) {
+        target = event.target[0]
+        targetName = event.target.name
+      }
+      if (event.src is Player) {
+        srcName = TextSplitter.capitalize(Pronoun.you.subject)
+      }
+      if (event.target is Player) {
+        targetName = Pronoun.you.subject
+      }
+      if (target) {
+        _messages.add("%(srcName) cast \"%(event.spell.incantation())\" at %(targetName)", INK["blue"], true)
+      } else {
+        _messages.add("%(srcName) cast \"%(event.spell.incantation())\"", INK["blue"], true)
+      }
     }
     if (event is Components.events.attack) {
       var srcName = event.src.name

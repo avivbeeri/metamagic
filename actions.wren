@@ -58,12 +58,14 @@ class CastAction is Action {
         var entry = table[word.lexeme]
         if (!entry) {
           entry = table[word.lexeme] = {
-            "used": true,
+            "floorUsed": true,
+            "gameUsed": true,
             "success": 0,
             "discovered": false
           }
         } else {
-          entry["used"] = true
+          entry["floorUsed"] = true
+          entry["gameUsed"] = true
         }
       }
     }

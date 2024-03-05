@@ -32,6 +32,7 @@ class SpellToken {
   }
 
   static errorToken(lexeme) { SpellToken.new(lexeme, TokenCategory.error, 0)}
+  static eof { SpellToken.new("<EOF>", TokenCategory.error, 0)}
 }
 
 class SpellWords {
@@ -49,7 +50,7 @@ class SpellWords {
   // object
   static self { SpellToken.new("SELF", TokenCategory.object, 2) }
   static close { SpellToken.new("CLOSE", TokenCategory.object, 3) }
-  static far { SpellToken.new("FAR", TokenCategory.object, 3) }
+  static far { SpellToken.new("FAR", TokenCategory.object, 4) }
 
   static big { SpellToken.new("BIG", TokenCategory.modifier, 1) }
   static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, 2) }
@@ -86,8 +87,7 @@ var AllWords = [
 
 class Spell is Stateful {
   static build(phrase) {
-    System.print(phrase)
-    var valid = phrase != null
+    var valid = phrase.valid
     var effects = []
     var cost = 0
 
@@ -118,6 +118,9 @@ class Spell is Stateful {
   valid { data["valid"] }
   effects { data["effects"] }
 
+  incantation() {
+    return phrase.list.map {|token| SpellUtils.getWordFromToken(token) }.join(" ")
+  }
   cost(caster) {
     System.print("Calculating spell cost:")
     if (caster.has("proficiency")) {
@@ -126,7 +129,8 @@ class Spell is Stateful {
         var entry = caster["proficiency"][word.lexeme]
         if (!entry) {
           entry = caster["proficiency"][word.lexeme] = {
-            "used": false,
+            "floorUsed": false,
+            "gameUsed": false,
             "success": 0,
             "discovered": false
           }
@@ -185,6 +189,8 @@ class SpellPhrase {
     _object = object
   }
 
+  valid { list.all {|token| token.category != TokenCategory.error } }
+
   list {
     var result = [ _verb ]
     result.addAll(_subject.toList)
@@ -221,16 +227,26 @@ class SpellParser {
   }
 
   phrase() {
+    var verb = null
+    var subject = null
+    var object = null
+    var modifier = null
+
     if (!match(TokenCategory.verb)) {
       _error = true
-      return null
+      advance()
+      verb = SpellToken.errorToken(previous().lexeme)
+    } else {
+      verb = previous()
     }
-    var verb = previous()
+
     if (!match(TokenCategory.subject)) {
       _error = true
-      return null
+      advance()
+      subject = SpellToken.errorToken(previous().lexeme)
+    } else {
+      subject = previous()
     }
-    var subject = previous()
     /*
     // TODO
     if (match(TokenCategory.modifier)) {
@@ -239,9 +255,11 @@ class SpellParser {
     */
     if (!match(TokenCategory.object)) {
       _error = true
-      return null
+      advance()
+      object = SpellToken.errorToken(previous().lexeme)
+    } else {
+      object = previous()
     }
-    var object = previous()
 
     if (match(TokenCategory.modifier)) {
       object = SpellFragment.new(object, previous())
@@ -249,7 +267,6 @@ class SpellParser {
 
     if (!isAtEnd()) {
       _error = true
-      return null
     }
     return SpellPhrase.new(verb, subject, object)
   }
@@ -276,7 +293,7 @@ class SpellParser {
     return previous()
   }
 
-  isAtEnd() {  _current >= _tokens.count }
+  isAtEnd() {  _current == SpellToken.eof || _current >= _tokens.count }
   peek() {
     return _tokens[_current]
   }
@@ -323,6 +340,7 @@ class SpellUtils {
       System.print("%(word) -> %(token.category) [%(token.lexeme)]")
       return token
     }.toList
+    tokens.add(SpellToken.eof)
 
     var parser = SpellParser.new(tokens)
     var valid = parser.validate()
