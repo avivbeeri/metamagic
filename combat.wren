@@ -177,6 +177,12 @@ class Condition is Stateful {
   done { duration && duration <= 0 }
   hash() { id }
 
+  cure() {
+    if (curable) {
+      duration = 0
+    }
+  }
+
   extend(n) {
     if (duration != null) {
       if (refresh) {

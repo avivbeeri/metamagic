@@ -95,6 +95,10 @@ class Spell is Stateful {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
         effects.add([ "damage", { "damage": Damage.new(2, DamageType.fire) } ])
       }
+      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.water) {
+        effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
+        effects.add([ "cureCondition", { "condition": "burning" } ])
+      }
     }
 
     return Spell.new({

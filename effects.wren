@@ -18,6 +18,24 @@ class Effect is Stateful {
   addEvents(events) { _events.addAll(events) }
 }
 
+#!component(id="cureCondition", group="effect")
+class CureConditionEffect is Effect {
+  construct new(ctx, args) {
+    super(ctx, args)
+  }
+
+  target { data["target"] }
+  src { data["src"] }
+  condition { data["condition"] }
+
+  perform() {
+    if (target["conditions"].containsKey(condition)) {
+      target["conditions"][condition].cure()
+      addEvent(Components.events.clearCondition.new(target, condition))
+    }
+  }
+}
+
 #!component(id="push", group="effect")
 class PushEffect is Effect {
   construct new(ctx, args) {

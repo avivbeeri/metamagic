@@ -45,6 +45,7 @@ class CastAction is Action {
       effect["src"] = src
       for (entity in targets) {
         effect["target"] = entity
+        System.print(args)
         effect.perform()
       }
     }
