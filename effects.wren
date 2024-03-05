@@ -142,7 +142,6 @@ class ApplyModifierEffect is Effect {
   modifier { data["modifier"] }
 
   perform() {
-    System.print(modifier)
     var stats = target["stats"]
     var mod = Modifier.new(modifier["id"], modifier["add"], modifier["mult"], modifier["duration"], modifier["positive"])
     stats.addModifier(mod)
@@ -173,6 +172,7 @@ class ApplyConditionEffect is Effect {
     } else {
       target["conditions"][id] = Condition.new(id, duration, curable, refresh)
       addEvent(Components.events.inflictCondition.new(target, id))
+      System.print("inflict")
     }
   }
 }

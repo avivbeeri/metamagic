@@ -176,7 +176,7 @@ class AsciiRenderer is Element {
             printSymbolBg("£", x, y, bg)
             printSymbol("£", x, y, color)
           } else {
-            printSymbolBg(".", x, y, INK["wallBg"])
+            printSymbolBg("#", x, y, INK["wallBg"])
             printSymbol("#", x, y, INK["wall"])
           }
         } else if (map[x, y]["stairs"]) {
@@ -202,7 +202,7 @@ class AsciiRenderer is Element {
         var items = map[x, y]["items"]
         if (items && items.count > 0) {
           var bg = INK["bg"] * 1
-          bg.a = 64
+          bg.a = 128
           Canvas.rectfill(x * 16, y * 16, 16, 16, bg)
           var color = INK["treasure"]
           var symbolMap = {
@@ -267,6 +267,11 @@ class AsciiRenderer is Element {
   }
   printSymbol(symbol, x, y, color) {
     var top = y * 16 + 4
+    if (symbol == "~") {
+      top = top + 4
+      Canvas.print(symbol, x * 16 + 4, top, color)
+      return
+    }
     if (symbol == "\"") {
       top = top + 6
       Canvas.print(symbol, x * 16 + 4, top-2, color)

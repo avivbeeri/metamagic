@@ -300,7 +300,7 @@ class CombatProcessor {
       }
     }
 
-    ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
+    ctx.addEvent(Components.events.attack.new(src, target, "area", result, Damage.new(damage, incoming.type)))
     target["stats"].decrease("hp", damage)
     if (target["stats"].get("hp") <= 0) {
       ctx.zone.map[target.pos]["blood"] = true

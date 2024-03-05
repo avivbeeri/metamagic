@@ -604,7 +604,7 @@ class TestRoomGenerator {
       map[pos] = Tile.new({
         "blocking": false,
         "solid": false,
-        "visible": "maybe"
+        "visible": false
       })
     }
 
@@ -698,14 +698,14 @@ class StartRoomGenerator {
       map[pos] = Tile.new({
         "blocking": false,
         "solid": false,
-        "visible": "maybe"
+        "visible": false
       })
     }
     for (pos in room.walls) {
       map[pos] = Tile.new({
         "blocking": true,
         "solid": true,
-        "visible": "maybe"
+        "visible": false
       })
     }
 
@@ -733,14 +733,14 @@ class BossRoomGenerator {
       map[pos] = Tile.new({
         "blocking": false,
         "solid": false,
-        "visible": "maybe"
+        "visible": false
       })
     }
     for (pos in room.walls) {
       map[pos] = Tile.new({
         "blocking": true,
         "solid": true,
-        "visible": "maybe"
+        "visible": false
       })
     }
 

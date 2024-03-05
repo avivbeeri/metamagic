@@ -1,0 +1,10 @@
+{
+  "confused": {
+    "name": "confused"
+  },
+  "burning": {
+    "name": "burning",
+    "inflictVerb": "started",
+    "recoverVerb": "stopped"
+  }
+}

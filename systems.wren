@@ -129,7 +129,7 @@ class ManaRegenSystem is GameSystem {
         }
         stats.increase("mpHidden", 1)
         if (stats["mpHidden"] >= 5) {
-          stats.increase("mp", 5, "mpMax")
+          stats.increase("mp", 3, "mpMax")
           stats.set("mpHidden", 0)
           ctx.addEvent(Components.events.regen.new(entity))
         }

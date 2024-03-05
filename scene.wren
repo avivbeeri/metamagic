@@ -37,7 +37,7 @@ import "./ui" for
   HintText
 
 import "./generator" for WorldGenerator
-import "./combat" for AttackResult
+import "./combat" for AttackResult, DamageType
 import "./spells" for SpellUtils
 
 class InventoryWindowState is SceneState {
@@ -575,6 +575,7 @@ class HelpState is ModalWindowState {
 }
 
 var Dialogue = DataFile.load("dialogue", "data/dialogue.json")
+var ConditionNames = DataFile.load("dialogue", "data/conditions.json")
 class DialogueState is ModalWindowState {
   construct new() {
     super()
@@ -774,8 +775,11 @@ class GameScene is Scene {
       if (event.src is Player) {
         srcName = Pronoun.you.subject
       }
-      if (event.target is Player) {
+      if (target is Player) {
         targetName = Pronoun.you.subject
+        if (event.src is Player) {
+          targetName = "yourself"
+        }
       }
       srcName = TextSplitter.capitalize(srcName)
       if (target) {
@@ -798,13 +802,17 @@ class GameScene is Scene {
         targetName = "the " + targetName
       }
       srcName = TextSplitter.capitalize(srcName)
+      var verb = "attacked"
       if (event.result == AttackResult.invulnerable) {
         _messages.add("%(srcName) attacked %(targetName) but it seems unaffected.", INK["orange"], true)
 
       } else if (event.result == AttackResult.blocked) {
         _messages.add("%(srcName) hit %(targetName) but %(noun) wasn't powerful enough.", INK["orange"], true)
       } else {
-        _messages.add("%(srcName) attacked %(targetName) for %(event.damage) damage.", INK["enemyAtk"], true)
+        if (event.damage.type == DamageType.fire) {
+          verb = "burned"
+        }
+        _messages.add("%(srcName) %(verb) %(targetName) for %(event.damage.amount) damage.", INK["enemyAtk"], true)
       }
     }
     if (event is Components.events.lightning) {
@@ -843,13 +851,30 @@ class GameScene is Scene {
       _messages.add("%(event.src) used %(itemName)", INK["text"], false)
     }
     if (event is Components.events.inflictCondition) {
-      _messages.add("%(event.target) became confused.", INK["text"], false)
+      var name = ConditionNames[event.condition]["name"]
+      var verb = ConditionNames[event.condition]["inflictVerb"] || "became"
+
+      _messages.add("%(event.target) %(verb) %(name).", INK["text"], false)
+      if (event.target is Player) {
+        if (!_conditionLabel) {
+          name = TextSplitter.capitalize(name)
+          _conditionLabel = addElement(Label.new(Vec.new(0, Canvas.height - 28), name))
+          _conditionLabel.alignRight()
+        }
+      }
     }
     if (event is Components.events.extendCondition) {
-      _messages.add("%(event.target)'s confusion was extended.", INK["text"], false)
+      var name = ConditionNames[event.condition]["name"]
+      _messages.add("%(event.target)'s %(name) was extended.", INK["text"], false)
     }
     if (event is Components.events.clearCondition) {
-      _messages.add("%(event.target) recovered from %(event.condition).", INK["text"], false)
+      var name = ConditionNames[event.condition]["name"]
+      var verb = ConditionNames[event.condition]["recoverVerb"] || "recovered from"
+      _messages.add("%(event.target) %(verb) %(name).", INK["text"], false)
+      if (_conditionLabel) {
+        removeElement(_conditionLabel)
+        _conditionLabel = null
+      }
     }
     if (event is Components.events.descend) {
       _messages.add("You descend down the stairs.", INK["text"], false)

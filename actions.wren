@@ -33,9 +33,11 @@ class CastAction is Action {
       target["origin"] = src.pos
     }
     var targetGroup = TargetGroup.new(target)
-    var attackEvents = []
     var resultEvents = []
     var targets = targetGroup.entities(ctx, src)
+
+    ctx.addEvent(Components.events.cast.new(src, targets, spell, target["origin"]))
+
     for (effectData in spell.effects) {
       var args = {}
       if (effectData.count > 1) {
@@ -45,11 +47,11 @@ class CastAction is Action {
       effect["src"] = src
       for (entity in targets) {
         effect["target"] = entity
-        System.print(args)
         effect.perform()
       }
+      resultEvents.addAll(effect.events)
     }
-    ctx.addEvent(Components.events.cast.new(src, targets, spell, target["origin"]))
+    ctx.addEvents(resultEvents)
 
     // Update stats and do experience bookkeeping
     src["stats"].decrease("mp", _cost)

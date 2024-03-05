@@ -2,8 +2,8 @@
   "stats": {
     "hpMax": 10,
     "hp": 10,
-    "mpMax": 90,
-    "mp": 90
+    "mpMax": 50,
+    "mp": 50
   },
   "equipment": {
   },
