@@ -769,7 +769,7 @@ class GameScene is Scene {
       var targetName = null
       if (event.target.count == 1) {
         target = event.target[0]
-        targetName = event.target.name
+        targetName = target.name
       }
       if (event.src is Player) {
         srcName = TextSplitter.capitalize(Pronoun.you.subject)

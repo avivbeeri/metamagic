@@ -116,6 +116,10 @@ class AsciiRenderer is Element {
         found = true
         top.process(HoverEvent.new("Water"))
       }
+      if (!found && tile["burning"] && tile["burning"] > 0) {
+        found = true
+        top.process(HoverEvent.new("Fire"))
+      }
     }
     if (!found) {
       top.process(HoverEvent.new(null))
@@ -139,6 +143,9 @@ class AsciiRenderer is Element {
         var color = INK["default"]
         if (map[x, y]["blood"]) {
           color = INK["blood"]
+        }
+        if (map[x, y]["burning"] && map[x, y]["burning"] > 0) {
+          color = INK["fire"]
         }
         if (map[x, y]["grass"]) {
           color = INK["grass"]
@@ -179,6 +186,9 @@ class AsciiRenderer is Element {
           if (map[x, y]["stairs"] == "up") {
             printSymbol("<", x, y, INK["upstairs"])
           }
+        } else if (map[x, y]["burning"] && map[x, y]["burning"] > 0) {
+          printSymbolBg("~", x, y, INK["fireBg"])
+          printSymbol("^", x, y, color)
         } else if (map[x, y]["grass"]) {
           printSymbol("\"", x, y, color)
         } else if (map[x, y]["water"]) {

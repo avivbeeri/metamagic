@@ -48,7 +48,7 @@ class CastAction is Action {
         effect.perform()
       }
     }
-    ctx.addEvent(Components.events.cast.new(src, targets, spell))
+    ctx.addEvent(Components.events.cast.new(src, targets, spell, target["origin"]))
 
     // Update stats and do experience bookkeeping
     src["stats"].decrease("mp", _cost)

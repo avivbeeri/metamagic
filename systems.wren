@@ -1,9 +1,65 @@
 import "math" for Vec
 import "fov" for Vision2 as Vision
-import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra
+import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra, TargetGroup, RNG, DIR_EIGHT
 import "./entities" for Player
+import "./spells" for SpellWords
 import "combat" for Condition
+import "collections" for Set
 
+class FireSystem is GameSystem {
+  construct new() {
+    super()
+    _burning = Set.new()
+  }
+  setFire(ctx, position) {
+    if (_burning.contains(position)) {
+      return
+    }
+    var tile = ctx.zone.map[position]
+    tile["grass"] = false
+    tile["burning"] = 3
+    _burning.add(position)
+  }
+  process(ctx, event) {
+    if (event is Components.events.turn) {
+      var hyperspace = []
+      var map = ctx.zone.map
+      for (pos in _burning) {
+        var tile = map[pos]
+        if (tile["burning"] && tile["burning"] > 0) {
+          if (RNG.float() < 0.5) {
+            tile["burning"] = tile["burning"] - 1
+            if (tile["burning"] <= 0) {
+              _burning.remove(pos)
+            }
+          }
+          for (next in map.neighbours(pos)) {
+            var neighbour = map[next]
+            if (neighbour["grass"]) {
+              hyperspace.add(next)
+            }
+          }
+        }
+      }
+      for (pos in hyperspace) {
+        setFire(ctx, pos)
+      }
+    } else if (event is Components.events.cast) {
+      var spell = event.spell
+      if (spell.phrase.subject == SpellWords.fire) {
+        var targetSpec = spell.target()
+        targetSpec["origin"] = event.origin
+        var targetGroup = TargetGroup.new(targetSpec)
+        for (space in targetGroup.spaces()) {
+          var tile = ctx.zone.map[space]
+          if (tile["grass"]) {
+            setFire(ctx, space)
+          }
+        }
+      }
+    }
+  }
+}
 class ManaRegenSystem is GameSystem {
   construct new() { super() }
   process(ctx, event) {
@@ -150,7 +206,7 @@ class VisionSystem is GameSystem {
         }
       }
     }
-    var visibleList = Vision.new(map, player.pos, 16).compute()
+    var visibleList = Vision.new(map, player.pos, 12).compute()
     for (pos in visibleList) {
       map[pos]["visible"] = true
     }

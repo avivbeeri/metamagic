@@ -87,6 +87,8 @@ INK.setPurpose("statusApplied", "green")
 INK.setPurpose("grass", "green")
 INK.setPurpose("waterBg", "darkblue")
 INK.setPurpose("water", "blue")
+INK.setPurpose("fire", "red")
+INK.setPurpose("fireBg", "orange")
 
 INK.setPurpose("downstairs", "gold")
 INK.setPurpose("upstairs", "darkgreen")
