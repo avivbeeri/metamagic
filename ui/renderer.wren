@@ -108,6 +108,10 @@ class AsciiRenderer is Element {
         found = true
         top.process(HoverEvent.new("Pool of blood"))
       }
+      if (!found && tile["grass"]) {
+        found = true
+        top.process(HoverEvent.new("Grass"))
+      }
     }
     if (!found) {
       top.process(HoverEvent.new(null))
@@ -131,6 +135,9 @@ class AsciiRenderer is Element {
         var color = INK["default"]
         if (map[x, y]["blood"]) {
           color = INK["blood"]
+        }
+        if (map[x, y]["grass"]) {
+          color = INK["grass"]
         }
         if (map[x, y]["visible"] == "maybe") {
           color = INK["obscured"]
@@ -165,6 +172,8 @@ class AsciiRenderer is Element {
           if (map[x, y]["stairs"] == "up") {
             printSymbol("<", x, y, INK["upstairs"])
           }
+        } else if (map[x, y]["grass"]) {
+          printSymbol("\"", x, y, color)
         } else {
           printSymbolBg(".", x, y, INK["floorStone"])
           printSymbol(".", x, y, color)
@@ -237,7 +246,12 @@ class AsciiRenderer is Element {
     Canvas.rectfill(x * 16, y * 16, 15, 15, bg)
   }
   printSymbol(symbol, x, y, color) {
-    Canvas.print(symbol, x * 16 + 4, y * 16 + 4, color)
+    var top = y * 16 + 4
+    if (symbol == "\"") {
+      top = top + 6
+      Canvas.print(symbol, x * 16 + 4, top-2, color)
+    }
+    Canvas.print(symbol, x * 16 + 4, top, color)
   }
 
   printEntity(symbol, pos, color) {

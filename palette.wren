@@ -84,6 +84,7 @@ INK.setPurpose("healthRecovered", "white")
 INK.setPurpose("treasure", "gold")
 INK.setPurpose("needsTarget", "blue")
 INK.setPurpose("statusApplied", "green")
+INK.setPurpose("grass", "green")
 
 INK.setPurpose("downstairs", "gold")
 INK.setPurpose("upstairs", "darkgreen")

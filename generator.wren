@@ -1,4 +1,5 @@
 import "json" for Json
+import "collections" for Set
 import "math" for Vec
 import "parcel" for
   DIR_FOUR,
@@ -22,6 +23,33 @@ var TierData = GeneratorData["floors"]
 var Distribution = GeneratorData["distribution"]
 
 class GeneratorUtils {
+  static spawnGrass(zone, room) {
+    var valid = false
+    var attempts = 0
+    var position = null
+    while (!valid && attempts < 30) {
+      position = RNG.sample(room.inner)
+      valid = GeneratorUtils.isValidTileLocation(zone, position)
+    }
+    if (!valid) {
+      return
+    }
+    var rate = 1.0
+    var decay = 0.7 + RNG.float() * 0.29
+    var list = [ position ]
+    var visited = Set.new()
+    var map = zone.map
+    while (list.count > 0 && rate > 0.05) {
+      var pos = RNG.sample(list)
+      visited.add(pos)
+      list.remove(pos)
+      map[pos]["grass"] = true
+      var neighbours = zone.map.neighbours(pos).where {|tile| zone.map.isFloor(tile) }
+      list.addAll(neighbours.where {|tile| !visited.contains(tile)})
+      rate = rate * decay
+    }
+  }
+
   static getFloorData(level) {
     var result = null
     for (data in TierData) {
@@ -516,7 +544,9 @@ class BasicZoneGenerator {
 
 class TestRoomGenerator {
   static generate(args) {
+    var level = args[0]
     var map = TileMap8.new()
+    var zone = Zone.new(map)
     for (y in 0...32) {
       for (x in 0...32) {
         map[x,y] = Tile.new({
@@ -537,8 +567,8 @@ class TestRoomGenerator {
       })
     }
 
-    var level = args[0]
-    var zone = Zone.new(map)
+
+    GeneratorUtils.spawnGrass(zone, room)
     zone["entities"] = []
     zone["level"] = level
     // zone.map[Vec.new(15, 13)]["stairs"] = "down"
