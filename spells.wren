@@ -57,6 +57,7 @@ class SpellWords {
 }
 
 var BaseTable = {
+  SpellWords.self.lexeme: { "target": "self", "area": 0, "range": 0, "origin": null },
   SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": [ Vec.new(0,0) ]  },
   SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": [], "needEntity": false  },
   SpellWords.big.lexeme: { "area": 1 },
@@ -94,6 +95,14 @@ class Spell is Stateful {
     if (valid && phrase) {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
         effects.add([ "damage", { "damage": Damage.new(2, DamageType.fire) } ])
+        effects.add([ "applyCondition", {
+          "condition": {
+            "id": "burning",
+            "duration": 5,
+            "curable": true,
+            "refresh": true
+          }
+        } ])
       }
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.water) {
         effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])

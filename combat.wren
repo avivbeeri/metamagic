@@ -295,22 +295,18 @@ class CombatProcessor {
       }
     }
     if (target.has("resistances")) {
-      System.print("resist maybe")
-
       if (target["resistances"].contains(incoming.type)) {
         damage = (damage / 2).floor.max(1)
-        System.print("resist")
       }
     }
 
-    var kill = false
+    ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
     target["stats"].decrease("hp", damage)
     if (target["stats"].get("hp") <= 0) {
-      kill = true
+      ctx.zone.map[target.pos]["blood"] = true
+      ctx.addEvent(Components.events.kill.new(src, target))
       ctx.removeEntity(target)
     }
-    ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
-    return kill
   }
 }
 

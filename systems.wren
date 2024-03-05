@@ -10,6 +10,7 @@ class Environment {
   construct new(name) {
     _name = name
   }
+  has(field) { false }
   name { _name }
   static fire { Environment.new("fire") }
 }
@@ -31,6 +32,13 @@ class FireSystem is GameSystem {
     }
     _burning.add(position)
   }
+  cureBurning(ctx, actor) {
+    var effect = Components.effects.cureCondition.new(ctx, {
+      "target": actor,
+      "condition": "burning"
+    })
+    effect.perform()
+  }
   applyBurningTo(ctx, actor) {
     var effect = Components.effects.applyCondition.new(ctx, {
       "target": actor,
@@ -49,6 +57,9 @@ class FireSystem is GameSystem {
     }
     var tile = ctx.zone.map[actor.pos]
     if (actor.has("conditions") && actor["conditions"].containsKey("burning")) {
+      if (tile["water"]) {
+        cureBurning(ctx, actor)
+      }
       if (!actor["conditions"]["burning"].done) {
         CombatProcessor.calculate(Environment.fire, actor, Damage.new(1, DamageType.fire))
       }
@@ -132,7 +143,9 @@ class ExperienceSystem is GameSystem {
   process(ctx, event) {
     if (event is Components.events.kill) {
       // Count XP just in case
-      event.src["stats"].increase("xp", 1)
+      if (event.src.has("stats")) {
+        event.src["stats"].increase("xp", 1)
+      }
     }
   }
 }

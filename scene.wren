@@ -772,11 +772,12 @@ class GameScene is Scene {
         targetName = target.name
       }
       if (event.src is Player) {
-        srcName = TextSplitter.capitalize(Pronoun.you.subject)
+        srcName = Pronoun.you.subject
       }
       if (event.target is Player) {
         targetName = Pronoun.you.subject
       }
+      srcName = TextSplitter.capitalize(srcName)
       if (target) {
         _messages.add("%(srcName) cast \"%(event.spell.incantation())\" at %(targetName)", INK["blue"], true)
       } else {
@@ -788,7 +789,7 @@ class GameScene is Scene {
       var noun = srcName
       if (event.src is Player) {
         noun = Pronoun.you.subject
-        srcName = TextSplitter.capitalize(Pronoun.you.subject)
+        srcName = Pronoun.you.subject
       }
       var targetName = event.target.name
       if (event.target is Player) {
@@ -796,6 +797,7 @@ class GameScene is Scene {
       } else {
         targetName = "the " + targetName
       }
+      srcName = TextSplitter.capitalize(srcName)
       if (event.result == AttackResult.invulnerable) {
         _messages.add("%(srcName) attacked %(targetName) but it seems unaffected.", INK["orange"], true)
 
@@ -809,13 +811,16 @@ class GameScene is Scene {
       _messages.add("%(event.target) was struck by lightning.", INK["playerAtk"], false)
     }
     if (event is Components.events.kill) {
-      _messages.add("%(event.target) was killed.", INK["text"], false)
+      var targetName = TextSplitter.capitalize(event.target.name)
+      _messages.add("%(targetName) was killed.", INK["text"], false)
     }
     if (event is Components.events.heal) {
-      _messages.add("%(event.target) was healed for %(event.amount)", INK["healthRecovered"], false)
+      var targetName = TextSplitter.capitalize(event.target.name)
+      _messages.add("%(targetName) was healed for %(event.amount)", INK["healthRecovered"], false)
     }
     if (event is Components.events.rest) {
-      _messages.add("%(event.src) rests.", INK["text"], true)
+      var srcName = TextSplitter.capitalize(event.src.name)
+      _messages.add("%(srcName) rests.", INK["text"], true)
     }
     if (event is Components.events.unequipItem) {
       var itemName = _world["items"][event.item]["name"]
