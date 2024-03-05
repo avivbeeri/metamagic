@@ -4,8 +4,11 @@ import "parcel" for Palette
 
 var INK = Palette.new()
 
-INK.addColor("black", Color.hex("#1B0326"))
-INK.addColor("white", Color.hex("#E6DCB8"))
+INK.addColor("black", Color.hex("#101010"))
+INK.addColor("gray", Color.hex("#808080"))
+INK.addColor("violet", Color.hex("#1B0326"))
+INK.addColor("white", Color.hex("#E0E0E0"))
+INK.addColor("offwhite", Color.hex("#E6DCB8"))
 INK.addColor("brown", Color.hex("#5E3E24"))
 
 INK.addColor("burgandy", Color.hex("#450327"))
@@ -30,7 +33,7 @@ INK.addColor("pastelpurple", Color.hex("#9A649E"))
 INK.addColor("pastelpurpleTransparent", Color.hex("#9A649E60"))
 
 INK.addColor("orange", Color.hex("#CC751F"))
-INK.addColor("gray", Color.hex("#C5B26D"))
+INK.addColor("yellow", Color.hex("#C5B26D"))
 
 
 INK.setPurpose("targetArea", "pastelpurpleTransparent")
@@ -38,7 +41,9 @@ INK.setPurpose("targetCursor", "purpleTransparent")
 INK.setPurpose("targetBorder", "red")
 INK.setPurpose("targetAreaBg", "redTransparent")
 INK.setPurpose("targetAreaBorder", "red")
-INK.setPurpose("wall", "lilac")
+INK.setPurpose("default", "lilac")
+INK.setPurpose("wall", "black")
+INK.setPurpose("wallBg", "gray")
 INK.setPurpose("obscured", "purple")
 INK.setPurpose("bg", "black")
 INK.setPurpose("dialogBg", "darkblue")
@@ -59,12 +64,13 @@ INK.setPurpose("textCursor", "red")
 INK.setPurpose("fieldBg", "blue")
 
 INK.setPurpose("barText", "white")
-INK.setPurpose("barFilled", "purple")
-INK.setPurpose("barEmpty", "red")
+INK.setPurpose("barFilled", "red")
+INK.setPurpose("barEmpty", "burgandy")
 INK.setPurpose("manaBarFilled", "blue")
 INK.setPurpose("manaBarEmpty", "darkblue")
 
 INK.setPurpose("blood", "red")
+INK.setPurpose("floorStone", "black")
 
 INK.setPurpose("creature", "white")
 INK.setPurpose("altar", "orange")

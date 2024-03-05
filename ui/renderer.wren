@@ -128,7 +128,7 @@ class AsciiRenderer is Element {
         if (!map[x, y]["visible"]) {
           continue
         }
-        var color = INK["wall"]
+        var color = INK["default"]
         if (map[x, y]["blood"]) {
           color = INK["blood"]
         }
@@ -155,7 +155,8 @@ class AsciiRenderer is Element {
             printSymbolBg("£", x, y, bg)
             printSymbol("£", x, y, color)
           } else {
-            printSymbol("#", x, y, color)
+            printSymbolBg(".", x, y, INK["wallBg"])
+            printSymbol("#", x, y, INK["wall"])
           }
         } else if (map[x, y]["stairs"]) {
           if (map[x, y]["stairs"] == "down") {
@@ -165,6 +166,7 @@ class AsciiRenderer is Element {
             printSymbol("<", x, y, INK["upstairs"])
           }
         } else {
+          printSymbolBg(".", x, y, INK["floorStone"])
           printSymbol(".", x, y, color)
         }
 
@@ -232,7 +234,7 @@ class AsciiRenderer is Element {
   }
 
   printSymbolBg(symbol, x, y, bg) {
-    Canvas.rectfill(x * 16 + 2, y * 16 + 2, 12, 12, bg)
+    Canvas.rectfill(x * 16, y * 16, 15, 15, bg)
   }
   printSymbol(symbol, x, y, color) {
     Canvas.print(symbol, x * 16 + 4, y * 16 + 4, color)
