@@ -204,11 +204,11 @@ class WorldGenerator {
     world.generator = WorldGenerator
     world.systems.add(InventorySystem.new())
     world.systems.add(ExperienceSystem.new())
+    world.systems.add(FireSystem.new())
     world.systems.add(ConditionSystem.new())
     world.systems.add(InventorySystem.new())
     world.systems.add(VisionSystem.new())
     world.systems.add(ManaRegenSystem.new())
-    world.systems.add(FireSystem.new())
     // Must come last
     world.systems.add(DefeatSystem.new())
 

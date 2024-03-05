@@ -148,8 +148,11 @@ class ApplyConditionEffect is Effect {
   src { data["src"] }
   target { data["target"] }
   condition { data["condition"] }
+
+  // inside condition
   curable { condition["curable"] }
   duration { condition["duration"] }
+  refresh { condition["refresh"] }
   id { condition["id"] }
 
   perform() {
@@ -157,7 +160,7 @@ class ApplyConditionEffect is Effect {
       target["conditions"][id].extend(duration)
       addEvent(Components.events.extendCondition.new(target, id))
     } else {
-      target["conditions"][id] = Condition.new(id, duration, curable)
+      target["conditions"][id] = Condition.new(id, duration, curable, refresh)
       addEvent(Components.events.inflictCondition.new(target, id))
     }
   }

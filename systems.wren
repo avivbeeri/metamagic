@@ -3,8 +3,16 @@ import "fov" for Vision2 as Vision
 import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra, TargetGroup, RNG, DIR_EIGHT
 import "./entities" for Player
 import "./spells" for SpellWords
-import "combat" for Condition
+import "combat" for Condition, CombatProcessor, Damage, DamageType
 import "collections" for Set
+
+class Environment {
+  construct new(name) {
+    _name = name
+  }
+  name { _name }
+  static fire { Environment.new("fire") }
+}
 
 class FireSystem is GameSystem {
   construct new() {
@@ -18,7 +26,34 @@ class FireSystem is GameSystem {
     var tile = ctx.zone.map[position]
     tile["grass"] = false
     tile["burning"] = 3
+    for (entity in ctx.getEntitiesAtPosition(position)) {
+      applyBurningTo(ctx, entity)
+    }
     _burning.add(position)
+  }
+  applyBurningTo(ctx, actor) {
+    var effect = Components.effects.applyCondition.new(ctx, {
+      "target": actor,
+      "condition": {
+        "id": "burning",
+        "duration": 5,
+        "refresh": true,
+        "curable": false
+      }
+    })
+    effect.perform()
+  }
+  postUpdate(ctx, actor) {
+    if (actor.pos == null) {
+      return
+    }
+    var tile = ctx.zone.map[actor.pos]
+    if (actor.has("conditions") && actor["conditions"].containsKey("burning")) {
+      CombatProcessor.calculate(Environment.fire, actor, Damage.new(1, DamageType.fire))
+    }
+    if (tile["burning"] && tile["burning"] > 0) {
+      applyBurningTo(ctx, actor)
+    }
   }
   process(ctx, event) {
     if (event is Components.events.turn) {

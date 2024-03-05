@@ -157,17 +157,19 @@ class StatGroup {
  */
 
 class Condition is Stateful {
-  construct new(id, duration, curable) {
+  construct new(id, duration, curable, refresh) {
     super()
     data["id"] = id
     data["duration"] = duration
     data["curable"] = curable
+    data["refresh"] = refresh
   }
 
   id { data["id"] }
   duration { data["duration"] }
   duration=(v) { data["duration"] = v }
   curable { data["curable"] }
+  refresh { data["refresh"] || false }
 
   tick() {
     duration = duration ? duration - 1 : null
@@ -177,7 +179,11 @@ class Condition is Stateful {
 
   extend(n) {
     if (duration != null) {
-      duration = (duration  || 0) + n
+      if (refresh) {
+        duration = n
+      } else {
+        duration = (duration  || 0) + n
+      }
     }
   }
 }
@@ -262,10 +268,7 @@ class CombatProcessor {
   */
   static calculate(src, target) { calculate(src, target, Damage.new(src["stats"].get("atk"), DamageType.kinetic)) }
   static calculate(src, target, incoming) {
-    if (incoming is Damage) {
-      System.print(incoming)
-    }
-    var ctx = src.ctx
+    var ctx = target.ctx
     var result = AttackResult.success
     if (target["conditions"].containsKey("invulnerable")) {
       ctx.addEvent(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
