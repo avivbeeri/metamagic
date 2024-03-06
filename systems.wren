@@ -291,10 +291,13 @@ class ConditionSystem is GameSystem {
     if (actor.has("conditions")) {
       for (entry in actor["conditions"]) {
         var condition = entry.value
+        var wasDone = condition.done
         condition.tick()
         if (condition.done) {
           actor["conditions"].remove(condition.id)
-          ctx.addEvent(Components.events.clearCondition.new(actor, condition.id))
+          if (!wasDone) {
+            ctx.addEvent(Components.events.clearCondition.new(actor, condition.id))
+          }
         }
       }
     }

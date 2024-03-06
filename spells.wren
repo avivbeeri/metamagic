@@ -93,27 +93,35 @@ class Spell is Stateful {
     var cost = 0
 
     if (valid && phrase) {
-      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-        effects.add([ "damage", { "damage": Damage.new(1, DamageType.fire) } ])
-        effects.add([ "applyCondition", {
-          "condition": {
-            "id": "burning",
-            "duration": 5,
-            "curable": true,
-            "refresh": true
-          }
-        } ])
+      if (phrase.verb == SpellWords.infuse) {
+        if (phrase.subject == SpellWords.fire) {
+          effects.add([ "cureCondition", { "condition": "frozen" } ])
+        }
       }
-      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.water) {
-        // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
-        effects.add([ "cureCondition", { "condition": "burning" } ])
-        effects.add([ "push", { "distance": 2 } ])
-      }
-      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.earth) {
-        effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
-      }
-      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.air) {
-        effects.add([ "push", { "distance": 2 } ])
+
+      if (phrase.verb == SpellWords.conjure) {
+        if (phrase.subject == SpellWords.fire) {
+          effects.add([ "damage", { "damage": Damage.new(1, DamageType.fire) } ])
+          effects.add([ "applyCondition", {
+            "condition": {
+              "id": "burning",
+              "duration": 5,
+              "curable": true,
+              "refresh": true
+            }
+          } ])
+        }
+        if (phrase.subject == SpellWords.water) {
+          // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
+          effects.add([ "cureCondition", { "condition": "burning" } ])
+          effects.add([ "push", { "distance": 2 } ])
+        }
+        if (phrase.subject == SpellWords.earth) {
+          effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
+        }
+        if (phrase.subject == SpellWords.air) {
+          effects.add([ "push", { "distance": 2 } ])
+        }
       }
     }
 

@@ -34,7 +34,6 @@ class CastAction is Action {
     }
     target["src"] = src.pos
     var targetGroup = TargetGroup.new(target)
-    var resultEvents = []
     var targets = targetGroup.entities(ctx, src)
 
     ctx.addEvent(Components.events.cast.new(src, targets, spell, target["origin"]))
@@ -50,9 +49,8 @@ class CastAction is Action {
         effect["target"] = entity
         effect.perform()
       }
-      resultEvents.addAll(effect.events)
+      ctx.addEvents(effect.events)
     }
-    ctx.addEvents(resultEvents)
 
     // Update stats and do experience bookkeeping
     src["stats"].decrease("mp", _cost)
