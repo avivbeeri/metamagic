@@ -56,6 +56,9 @@ class PushEffect is Effect {
     }
 
     var current = target.pos
+    if (ctx.zone.map[current]["water"]) {
+      data["distance"] = 0
+    }
     var finalDistance = 0
     for (i in 0...distance) {
       var next = current + d

@@ -50,7 +50,7 @@ class FrozenBehaviour is Behaviour {
     super()
   }
   update(ctx, actor) {
-    if (!actor["conditions"].containsKey("frozen")) {
+    if (!actor["conditions"].containsKey("frozen") || actor["conditions"]["frozen"].done) {
       actor.removeBehaviour(this)
       return false
     }
