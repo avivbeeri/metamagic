@@ -371,6 +371,7 @@ class ActionResult {
 
 class Action is Stateful {
   static none { NoAction }
+  static doNothing { DoNothing }
   construct new() {
     super()
   }
@@ -405,6 +406,7 @@ class Action is Stateful {
   toString { (this.type == Action) ? "<no action>" : "<%(this.type.name)>" }
 }
 var NoAction = Action.new()
+var DoNothing = Action.new()
 
 class TargetGroup is Stateful {
   construct new(spec) {

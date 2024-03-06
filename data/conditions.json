@@ -2,6 +2,10 @@
   "confused": {
     "name": "confused"
   },
+  "frozen": {
+    "name": "frozen",
+    "recoverVerb": "thawed from"
+  },
   "burning": {
     "name": "burning",
     "inflictVerb": "started",

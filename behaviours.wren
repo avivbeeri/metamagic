@@ -44,6 +44,20 @@ class ConfusedBehaviour is Behaviour {
     return true
   }
 }
+#!component(id="frozen", group="behaviour")
+class FrozenBehaviour is Behaviour {
+  construct new(args) {
+    super()
+  }
+  update(ctx, actor) {
+    if (!actor["conditions"].containsKey("frozen")) {
+      actor.removeBehaviour(this)
+      return false
+    }
+    actor.pushAction(Components.actions.stuck.new())
+    return true
+  }
+}
 
 #!component(id="unconscious", group="behaviour")
 class UnconsciousBehaviour is Behaviour {

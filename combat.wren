@@ -8,6 +8,7 @@ class Environment {
   }
   has(field) { false }
   name { _name }
+  static ice { Environment.new("ice") }
   static fire { Environment.new("fire") }
   static wall { Environment.new("wall") }
 }
@@ -67,7 +68,8 @@ class DamageType {
   static kinetic { "KINETIC" } // Punches, bludgeoning
   static energy { "ENERGY" }
   static fire { "FIRE" } // Fire that burns
-  static poison { "POISON" } // Fire that burns
+  static ice { "ICE" }
+  static poison { "POISON" }
 }
 
 class StatGroup {

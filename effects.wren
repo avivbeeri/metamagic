@@ -51,6 +51,9 @@ class PushEffect is Effect {
     var d = (target.pos - src.pos)
     d.x = d.x.clamp(-1, 1)
     d.y = d.y.clamp(-1, 1)
+    if (d.x == d.y && d.x == 0) {
+      return
+    }
 
     var current = target.pos
     var finalDistance = 0

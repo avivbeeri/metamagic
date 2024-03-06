@@ -234,6 +234,17 @@ class MeleeAttackAction is Action {
   }
 }
 
+#!component(id="stuck", group="action")
+class StuckAction is Action {
+  construct new() {}
+  evaluate() {
+    return ActionResult.valid
+  }
+  perform() {
+    ctx.addEvent(Components.events.stuck.new(src))
+    return ActionResult.success
+  }
+}
 
 #!component(id="descend", group="action")
 class DescendAction is Action {

@@ -12,7 +12,27 @@ class AirSystem is GameSystem {
     _chilled = Set.new()
   }
 
+  applyFreezeTo(ctx, actor) {
+    var frozen = actor.has("conditions") && actor["conditions"].containsKey("frozen")
+    var effect = Components.effects.applyCondition.new(ctx, {
+      "target": actor,
+      "condition": {
+        "id": "frozen",
+        "duration": 5,
+        "refresh": true,
+        "curable": true
+      }
+    })
+    effect.perform()
+    if (!frozen) {
+      ctx.addEvents(effect.events)
+    }
+  }
+
   process(ctx, event) {
+    if (event is Components.events.clearCondition && event.condition == "frozen") {
+      CombatProcessor.calculate(Environment.ice, event.target, Damage.new(1, DamageType.ice))
+    }
     if (event is Components.events.turn) {
       var map = ctx.zone.map
       var removals = []
@@ -45,6 +65,9 @@ class AirSystem is GameSystem {
           } else {
             tile["chilled"] = 6
             _chilled.add(space)
+          }
+          for (entity in ctx.getEntitiesAtPosition(space)) {
+            applyFreezeTo(ctx, entity)
           }
         }
       } else if (spell.phrase.subject == SpellWords.fire) {
@@ -255,6 +278,9 @@ class ConditionSystem is GameSystem {
   process(ctx, event) {
     if (event is Components.events.inflictCondition && event.condition == "confusion") {
       event.target.behaviours.add(Components.behaviours.confused.new(null))
+    }
+    if (event is Components.events.inflictCondition && event.condition == "frozen") {
+      event.target.behaviours.add(Components.behaviours.frozen.new(null))
     }
 
   }

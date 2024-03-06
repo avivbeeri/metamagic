@@ -817,6 +817,9 @@ class GameScene is Scene {
         if (event.damage.type == DamageType.fire) {
           verb = "burned"
         }
+        if (event.damage.type == DamageType.ice) {
+          verb = "chilled"
+        }
         _messages.add("%(srcName) %(verb) %(targetName) for %(event.damage.amount) damage.", INK["enemyAtk"], true)
       }
     }
@@ -854,6 +857,16 @@ class GameScene is Scene {
     if (event is Components.events.useItem) {
       var itemName = _world["items"][event.item]["name"]
       _messages.add("%(event.src) used %(itemName)", INK["text"], false)
+    }
+    if (event is Components.events.stuck) {
+      var srcName = event.src.name
+      var modifier = "was"
+      if (event.src is Player) {
+        srcName = Pronoun.you.subject
+        modifier = "are"
+      }
+      srcName = TextSplitter.capitalize(srcName)
+      _messages.add("%(srcName) %(modifier) stuck and couldn't do anything.", INK["text"], false)
     }
     if (event is Components.events.inflictCondition) {
       var name = ConditionNames[event.condition]["name"]
