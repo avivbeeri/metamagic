@@ -124,7 +124,7 @@ class HistoryViewer is Element {
     _scroll = 0
     _log = log
     _height = (size.y / 10).floor
-    _viewer = addElement(LogViewer.new(pos + Vec.new(4, 4), log, _height))
+    _viewer = addElement(LogViewer.new(pos + Vec.new(4, 4), log, _height, false))
     _viewer.full = true
   }
 
@@ -217,22 +217,23 @@ class LineViewer is Element {
   }
 }
 class LogViewer is Element {
-  construct new(pos, log) {
+  construct new(pos, log, fade) {
     super()
-    init(pos, log, 5)
+    init(pos, log, 5, fade)
   }
-  construct new(pos, log, size) {
+  construct new(pos, log, size, fade) {
     super()
-    init(pos, log, size)
+    init(pos, log, size, fade)
   }
 
-  init(pos, log, size)  {
+  init(pos, log, size, fade)  {
     _full = false
     _pos = pos
     _messageLog = log
     _max = size
     _start = 0
     _messages = _messageLog.previous(_max) || []
+    _fade = fade
   }
 
   start { _start }
@@ -253,6 +254,7 @@ class LogViewer is Element {
   }
 
   draw() {
+    var a = 1.0
     var offset = Canvas.offset
     Canvas.offset(_pos.x,_pos.y)
 
@@ -281,7 +283,12 @@ class LogViewer is Element {
         }
         var y = start + dir * lineHeight * line
         if (y >= 0 && y + lineHeight <= Canvas.height) {
-          Canvas.print(word, x * glyphWidth, start + dir * lineHeight * line, message.color)
+          var color = message.color * 1
+          if (_fade) {
+            color.a = color.a * a
+            a = a * 0.98
+          }
+          Canvas.print(word, x * glyphWidth, start + dir * lineHeight * line, color)
         } else {
           break
         }

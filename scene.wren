@@ -728,7 +728,7 @@ class GameScene is Scene {
       addElement(ManaBar.new(Vec.new(left - 10 * 16 - 2, 4), player.ref))
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
-    addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages))
+    addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages, true))
     addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.75)))
     //addElement(LogViewer.new(Vec.new(0, Canvas.height - 12 * 7), _messages))
 

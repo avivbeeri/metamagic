@@ -279,7 +279,7 @@ class TagModifierSystem is GameSystem {
   postUpdate(ctx, actor) {
     for (field in actor.data.keys) {
       var group = actor[field]
-      if (!group is TagGroup) {
+      if (!(group is TagGroup)) {
         continue
       }
       for (modifier in group.modifiers) {
