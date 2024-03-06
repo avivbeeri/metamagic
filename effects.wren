@@ -45,6 +45,7 @@ class PushEffect is Effect {
   target { data["target"] }
   src { data["src"] }
   distance { data["distance"] }
+  strong { data["strong"] || false }
 
   perform() {
     var origin = target.pos
@@ -56,7 +57,7 @@ class PushEffect is Effect {
     }
 
     var current = target.pos
-    if (ctx.zone.map[current]["water"]) {
+    if (!strong && ctx.zone.map[current]["water"]) {
       data["distance"] = 0
     }
     var finalDistance = 0

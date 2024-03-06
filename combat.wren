@@ -90,7 +90,7 @@ class StatGroup {
     }
   }
 
-  modifiers { _mods }
+  modifiers { _mods.values }
 
   addModifier(mod) {
     _mods[mod.id] = mod
@@ -156,6 +156,7 @@ class StatGroup {
     return "\"%(stat)\": %(get(stat)) (%(base(stat)))"
   }
 
+/*
   tick() {
     for (modifier in _mods.values) {
       modifier.tick()
@@ -164,6 +165,7 @@ class StatGroup {
       }
     }
   }
+  */
 }
 
 /**

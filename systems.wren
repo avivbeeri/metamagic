@@ -274,6 +274,22 @@ class InventorySystem is GameSystem {
   }
 }
 
+class ModifierSystem is GameSystem {
+  construct new() { super() }
+  postUpdate(ctx, actor) {
+    if (actor["stats"]) {
+      var stats = actor["stats"]
+      for (modifier in stats.modifiers) {
+        modifier.tick()
+        if (modifier.done) {
+          stats.removeModifier(modifier.id)
+          ctx.addEvent(Components.events.clearModifier.new(actor, modifier.id))
+        }
+      }
+    }
+  }
+}
+
 class ConditionSystem is GameSystem {
   construct new() { super() }
   process(ctx, event) {
@@ -286,9 +302,6 @@ class ConditionSystem is GameSystem {
 
   }
   postUpdate(ctx, actor) {
-    if (actor["stats"]) {
-      actor["stats"].tick()
-    }
     if (actor.has("conditions")) {
       for (entry in actor["conditions"]) {
         var condition = entry.value

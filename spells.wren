@@ -97,6 +97,33 @@ class Spell is Stateful {
         if (phrase.subject == SpellWords.fire) {
           effects.add([ "cureCondition", { "condition": "frozen" } ])
         }
+        if (phrase.subject == SpellWords.water) {
+          effects.add([ "cureCondition", { "condition": "burning" } ])
+          // Make moving through water easier?
+          // provide fire immunity
+        }
+        if (phrase.subject == SpellWords.earth) {
+          // add to def
+          effects.add([ "applyModifier", {
+            "modifier": {
+              "id": "infuse.earth",
+              "add": { "def": 1 },
+              "duration": 10,
+              "positive": true
+            }
+          }])
+        }
+        if (phrase.subject == SpellWords.air) {
+          // make you faster
+          effects.add([ "applyModifier", {
+            "modifier": {
+              "id": "infuse.air",
+              "mult": { "spd": 1.2 },
+              "duration": 10,
+              "positive": true
+            }
+          }])
+        }
       }
 
       if (phrase.verb == SpellWords.conjure) {
@@ -114,7 +141,7 @@ class Spell is Stateful {
         if (phrase.subject == SpellWords.water) {
           // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
           effects.add([ "cureCondition", { "condition": "burning" } ])
-          effects.add([ "push", { "distance": 2 } ])
+          effects.add([ "push", { "distance": 2, "strong": true } ])
         }
         if (phrase.subject == SpellWords.earth) {
           effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])

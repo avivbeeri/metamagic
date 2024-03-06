@@ -1,7 +1,9 @@
 import "parcel" for Event
 
-var ApplyModifier = Event.create("applyModifier", ["src", "target", "modifierName"])
-var ConditionEvent = Event.create("condition", ["target", "condition"])
+var ApplyModifierEvent = Event.create("applyModifier", ["src", "target", "modifier"])
+var ClearModifierEvent = Event.create("clearModifier", ["target", "modifier"])
+
+// var ConditionEvent = Event.create("condition", ["target", "condition"])
 var ClearConditionEvent = Event.create("clearCondition", ["target", "condition"])
 var ExtendConditionEvent = Event.create("extendCondition", ["target", "condition"])
 var InflictConditionEvent = Event.create("inflictCondition", ["target", "condition"])

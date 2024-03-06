@@ -846,13 +846,16 @@ class World is Stateful {
         continue
       }
       events.clear()
-      // Check systems first to clear conditions
+      // TODO: Figure out how to handle this properly, it's in the wrong place
+      // if the player has to care about it.
       systems.each{|system| system.preUpdate(this, actor) }
       action = actor.getAction()
       if (action == null) {
           // Actor isn't ready to provide action (player)
           return false
       }
+
+
       actorId = _queue.remove()
     }
     if (actor == null) {

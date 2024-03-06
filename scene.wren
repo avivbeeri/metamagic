@@ -576,6 +576,7 @@ class HelpState is ModalWindowState {
 
 var Dialogue = DataFile.load("dialogue", "data/dialogue.json")
 var ConditionNames = DataFile.load("dialogue", "data/conditions.json")
+var ModifierNames = DataFile.load("dialogue", "data/modifiers.json")
 class DialogueState is ModalWindowState {
   construct new() {
     super()
@@ -773,6 +774,7 @@ class GameScene is Scene {
       var srcName = event.src.name
       var target = null
       var targetName = null
+      var directive = "at"
       if (event.target.count == 1) {
         target = event.target[0]
         targetName = target.name
@@ -783,12 +785,13 @@ class GameScene is Scene {
       if (target is Player) {
         targetName = Pronoun.you.subject
         if (event.src is Player) {
+          directive = "on"
           targetName = "yourself"
         }
       }
       srcName = TextSplitter.capitalize(srcName)
       if (target) {
-        _messages.add("%(srcName) cast \"%(event.spell.incantation())\" at %(targetName)", INK["blue"], true)
+        _messages.add("%(srcName) cast \"%(event.spell.incantation())\" %(directive) %(targetName)", INK["blue"], true)
       } else {
         _messages.add("%(srcName) cast \"%(event.spell.incantation())\"", INK["blue"], true)
       }
@@ -867,6 +870,20 @@ class GameScene is Scene {
       }
       srcName = TextSplitter.capitalize(srcName)
       _messages.add("%(srcName) %(modifier) stuck and couldn't do anything.", INK["text"], false)
+    }
+    if (event is Components.events.clearModifier) {
+      var config = ModifierNames[event.modifier]
+      if (config) {
+        var name = config["name"]
+        _messages.add("%(event.target) is no longer %(name).", INK["text"], false)
+      }
+    }
+    if (event is Components.events.applyModifier) {
+      var config = ModifierNames[event.modifier]
+      if (config) {
+        var name = config["name"]
+        _messages.add("%(event.target) is granted %(name).", INK["text"], false)
+      }
     }
     if (event is Components.events.inflictCondition) {
       var name = ConditionNames[event.condition]["name"]
