@@ -417,6 +417,8 @@ class TargetGroup is Stateful {
   area=(v) { data["area"] = v }
   origin { data["origin"] }
   origin=(v) { data["origin"] = v }
+  src { data["src"] }
+  src=(v) { data["src"] = v }
   mode { data["target"] }
   mode=(v) { data["target"] }
   exclude { data["exclude"] }
@@ -432,9 +434,12 @@ class TargetGroup is Stateful {
         var x = (origin.x + dx)
         var y = (origin.y + dy)
         var pos = Vec.new(x, y)
-        if (exclude.contains(Vec.new(dx, dy))) {
+        if (exclude.contains(src + Vec.new(dx, dy))) {
+          System.print("excluded")
+          System.print(data)
           continue
         }
+        System.print("parcel pos %(pos)")
         if (needSight && !ctx.zone.map["visible"]) {
           continue
         }

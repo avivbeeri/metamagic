@@ -32,6 +32,7 @@ class CastAction is Action {
     if (target["origin"] == null) {
       target["origin"] = src.pos
     }
+    target["src"] = src.pos
     var targetGroup = TargetGroup.new(target)
     var resultEvents = []
     var targets = targetGroup.entities(ctx, src)

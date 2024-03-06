@@ -38,8 +38,10 @@ class FireSystem is GameSystem {
       "condition": "burning"
     })
     effect.perform()
+    ctx.addEvents(effect.events)
   }
   applyBurningTo(ctx, actor) {
+    var burning = actor.has("conditions") && actor["conditions"].containsKey("burning")
     var effect = Components.effects.applyCondition.new(ctx, {
       "target": actor,
       "condition": {
@@ -50,6 +52,9 @@ class FireSystem is GameSystem {
       }
     })
     effect.perform()
+    if (!burning) {
+      ctx.addEvents(effect.events)
+    }
   }
   postUpdate(ctx, actor) {
     if (actor.pos == null) {
@@ -75,7 +80,7 @@ class FireSystem is GameSystem {
       for (pos in _burning) {
         var tile = map[pos]
         if (tile["burning"] && tile["burning"] > 0) {
-          if (RNG.float() < 0.5) {
+          if (RNG.float() < 0.6) {
             tile["burning"] = tile["burning"] - 1
             if (tile["burning"] <= 0) {
               _burning.remove(pos)
@@ -96,6 +101,7 @@ class FireSystem is GameSystem {
       var spell = event.spell
       var targetSpec = spell.target()
       targetSpec["origin"] = event.origin
+      targetSpec["src"] = event.src.pos
       var targetGroup = TargetGroup.new(targetSpec)
       if (spell.phrase.subject == SpellWords.water) {
         for (space in targetGroup.spaces()) {
@@ -105,7 +111,9 @@ class FireSystem is GameSystem {
           }
         }
       } else if (spell.phrase.subject == SpellWords.fire) {
+        System.print("fire cast")
         for (space in targetGroup.spaces()) {
+          System.print(space)
           var tile = ctx.zone.map[space]
           if (tile["grass"]) {
             setFire(ctx, space)

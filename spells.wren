@@ -58,7 +58,7 @@ class SpellWords {
 
 var BaseTable = {
   SpellWords.self.lexeme: { "target": "self", "area": 0, "range": 0, "origin": null },
-  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": [ Vec.new(0,0) ]  },
+  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": [ Vec.new(0,0) ], "needEntity": false  },
   SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": [], "needEntity": false  },
   SpellWords.big.lexeme: { "area": 1 },
   SpellWords.bigger.lexeme: { "area": 2 }
