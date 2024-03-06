@@ -375,6 +375,9 @@ class SpellUtils {
     return "<???>"
   }
   static initializeLexicon() {
+    if (__lexicon) {
+      return
+    }
     var location = FileSystem.prefPath("avivbeeri", "arcanist")
     var path = "%(location)lexicon.json"
     var lexicon = []

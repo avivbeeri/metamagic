@@ -267,6 +267,9 @@ class AsciiRenderer is Element {
           printSymbolBg("£", space.x, space.y, bg)
         }
         //Canvas.print(symbol, space.x * 16 + 4, space.y * 16 + 4, Color.white)
+        if (entity["conditions"].containsKey("burning")) {
+          color = INK["fireBg"]
+        }
         printEntity(symbol, space, color)
       }
     }
