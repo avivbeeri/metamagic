@@ -155,17 +155,6 @@ class StatGroup {
   print(stat) {
     return "\"%(stat)\": %(get(stat)) (%(base(stat)))"
   }
-
-/*
-  tick() {
-    for (modifier in _mods.values) {
-      modifier.tick()
-      if (modifier.done) {
-        removeModifier(modifier.id)
-      }
-    }
-  }
-  */
 }
 
 /**
@@ -256,38 +245,6 @@ class Modifier {
 
 class CombatProcessor {
 
- /*
-  static calculateMelee(src, target) { calculateMelee(src, target, null) }
-  static calculateMelee(src, target, damage) {
-    var ctx = src.ctx
-    var result = AttackResult.success
-    if (target["conditions"].containsKey("invulnerable")) {
-      ctx.addEvent(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
-      return [false, false, 0]
-    }
-    if (damage == null) {
-      var srcStats = src["stats"]
-      var atk = srcStats.get("atk")
-
-      var targetStats = target["stats"]
-      var def = targetStats.get("def")
-
-      damage = Damage.calculate(atk, def)
-    }
-    if (damage == 0) {
-      result = AttackResult.blocked
-    }
-
-    var kill = false
-    target["stats"].decrease("hp", damage)
-    if (target["stats"].get("hp") <= 0) {
-      kill = true
-      ctx.removeEntity(target)
-    }
-    ctx.addEvent(Components.events.attack.new(src, target, "area", result, damage))
-    return kill
-  }
-  */
   static calculate(src, target) { calculate(src, target, Damage.new(src["stats"].get("atk"), DamageType.kinetic)) }
   static calculate(src, target, incoming) {
     var ctx = target.ctx
