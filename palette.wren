@@ -27,6 +27,7 @@ INK.addColor("green", Color.hex("#239617"))
 
 INK.addColor("darkblue", Color.hex("#1F4A69"))
 INK.addColor("blue", Color.hex("#3A8CC7"))
+INK.addColor("iceblue", Color.hex("#95CEFB"))
 
 INK.addColor("deeppurple", Color.hex("#65276A"))
 INK.addColor("pastelpurple", Color.hex("#9A649E"))
@@ -87,6 +88,8 @@ INK.setPurpose("statusApplied", "green")
 INK.setPurpose("grass", "green")
 INK.setPurpose("waterBg", "darkblue")
 INK.setPurpose("water", "blue")
+INK.setPurpose("iceBg", "iceblue")
+INK.setPurpose("ice", "darkblue")
 INK.setPurpose("fire", "red")
 INK.setPurpose("fireBg", "orange")
 

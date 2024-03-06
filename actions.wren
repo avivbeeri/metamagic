@@ -122,7 +122,8 @@ class SimpleMoveAction is Action {
   }
 
   cost() {
-    if (ctx.zone.map[src.pos]["water"]) {
+    var tile = ctx.zone.map[src.pos]
+    if (tile["water"] && (!tile["chilled"] || tile["chilled"] == 0)) {
       return super.cost() * 1.5
     }
     return super.cost()

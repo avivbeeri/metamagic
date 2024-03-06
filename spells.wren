@@ -94,7 +94,7 @@ class Spell is Stateful {
 
     if (valid && phrase) {
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.fire) {
-        effects.add([ "damage", { "damage": Damage.new(2, DamageType.fire) } ])
+        effects.add([ "damage", { "damage": Damage.new(1, DamageType.fire) } ])
         effects.add([ "applyCondition", {
           "condition": {
             "id": "burning",
@@ -105,8 +105,15 @@ class Spell is Stateful {
         } ])
       }
       if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.water) {
-        effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
+        // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
         effects.add([ "cureCondition", { "condition": "burning" } ])
+        effects.add([ "push", { "distance": 2 } ])
+      }
+      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.earth) {
+        effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
+      }
+      if (phrase.verb == SpellWords.conjure && phrase.subject == SpellWords.air) {
+        effects.add([ "push", { "distance": 2 } ])
       }
     }
 

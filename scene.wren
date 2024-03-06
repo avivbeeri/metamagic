@@ -764,6 +764,11 @@ class GameScene is Scene {
     if (event is Components.events.changeZone && event.floor == 1) {
       _messages.add("Welcome to the dungeon.", INK["welcome"], false)
     }
+    if (event is Components.events.push) {
+      var srcName = event.src.name
+      var target = event.target.name
+      _messages.add("%(srcName) pushed %(target) away.", INK["text"], true)
+    }
     if (event is Components.events.cast) {
       var srcName = event.src.name
       var target = null

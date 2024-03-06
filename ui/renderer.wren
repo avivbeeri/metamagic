@@ -114,7 +114,11 @@ class AsciiRenderer is Element {
       }
       if (!found && tile["water"]) {
         found = true
-        top.process(HoverEvent.new("Water"))
+        if (tile["chilled"] && tile["chilled"] > 0) {
+          top.process(HoverEvent.new("Ice"))
+        } else {
+          top.process(HoverEvent.new("Water"))
+        }
       }
       if (!found && tile["burning"] && tile["burning"] > 0) {
         found = true
@@ -151,7 +155,11 @@ class AsciiRenderer is Element {
           color = INK["grass"]
         }
         if (map[x, y]["water"]) {
-          color = INK["water"]
+          if (map[x,y]["chilled"] && map[x,y]["chilled"] > 0) {
+            color = INK["ice"]
+          } else {
+            color = INK["water"]
+          }
         }
         if (map[x, y]["visible"] == "maybe") {
           color = INK["obscured"]
@@ -192,7 +200,11 @@ class AsciiRenderer is Element {
         } else if (map[x, y]["grass"]) {
           printSymbol("\"", x, y, color)
         } else if (map[x, y]["water"]) {
-          printSymbolBg("~", x, y, INK["waterBg"])
+          if (map[x, y]["chilled"] && map[x,y]["chilled"] > 0) {
+            printSymbolBg("~", x, y, INK["iceBg"])
+          } else {
+            printSymbolBg("~", x, y, INK["waterBg"])
+          }
           printSymbol("~", x, y, color)
         } else {
           printSymbolBg(".", x, y, INK["floorStone"])
@@ -241,6 +253,7 @@ class AsciiRenderer is Element {
       entity.spaces.where {|space| map[space]["visible"] == true }.each {|space|
         var symbol = entity["symbol"] || entity.name && entity.name[0] || "?"
         var color = INK["creature"]
+
         if (entity["killed"]) {
           color = (color * 1)
           color.a = 192
@@ -280,6 +293,9 @@ class AsciiRenderer is Element {
   }
 
   printEntity(symbol, pos, color) {
+    var colorBg = (INK["black"] * 1)
+    colorBg.a = 64
+    printSymbolBg(symbol, pos.x, pos.y, colorBg)
     printSymbol(symbol, pos.x, pos.y, color)
   }
 

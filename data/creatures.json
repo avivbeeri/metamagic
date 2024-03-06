@@ -7,7 +7,9 @@
         "randomWalk"
       ]
     ],
-    "resistances": [ "FIRE" ],
+    "immunities": [ ],
+    "vulnerabilities": [ ],
+    "resistances": [ ],
     "name": "Rat",
     "pronoun": "it",
     "stats": {

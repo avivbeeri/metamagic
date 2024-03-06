@@ -1,6 +1,18 @@
 import "math" for M
 import "parcel" for Action, ActionResult, Event, Stateful, RNG
 
+// Fake combat source
+class Environment {
+  construct new(name) {
+    _name = name
+  }
+  has(field) { false }
+  name { _name }
+  static fire { Environment.new("fire") }
+  static wall { Environment.new("wall") }
+}
+
+
 class Damage is Stateful {
   static calculateLow(atk, def) {
     var o1 = atk * 2 - def
@@ -276,7 +288,7 @@ class CombatProcessor {
   static calculate(src, target, incoming) {
     var ctx = target.ctx
     var result = AttackResult.success
-    if (target["conditions"].containsKey("invulnerable")) {
+    if (target["conditions"].containsKey("invulnerable") || (target.has("immunities") && target["immunities"].contains(incoming.type))) {
       ctx.addEvent(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
       return [false, false, 0]
     }

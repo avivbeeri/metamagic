@@ -205,6 +205,7 @@ class WorldGenerator {
     world.systems.add(InventorySystem.new())
     world.systems.add(ExperienceSystem.new())
     world.systems.add(FireSystem.new())
+    world.systems.add(AirSystem.new())
     world.systems.add(ConditionSystem.new())
     world.systems.add(InventorySystem.new())
     world.systems.add(VisionSystem.new())
@@ -880,4 +881,12 @@ class DiamondRoom {
 
 import "./entities" for Player
 import "./items" for InventoryEntry
-import "./systems" for VisionSystem, DefeatSystem, InventorySystem, ConditionSystem, ExperienceSystem, ManaRegenSystem, FireSystem
+import "./systems" for
+  VisionSystem,
+  DefeatSystem,
+  InventorySystem,
+  ConditionSystem,
+  ExperienceSystem,
+  ManaRegenSystem,
+  FireSystem,
+  AirSystem

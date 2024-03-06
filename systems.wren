@@ -3,16 +3,60 @@ import "fov" for Vision2 as Vision
 import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra, TargetGroup, RNG, DIR_EIGHT
 import "./entities" for Player
 import "./spells" for SpellWords
-import "combat" for Condition, CombatProcessor, Damage, DamageType
+import "combat" for Condition, CombatProcessor, Damage, DamageType, Environment
 import "collections" for Set
 
-class Environment {
-  construct new(name) {
-    _name = name
+class AirSystem is GameSystem {
+  construct new() {
+    super()
+    _chilled = Set.new()
   }
-  has(field) { false }
-  name { _name }
-  static fire { Environment.new("fire") }
+
+  process(ctx, event) {
+    if (event is Components.events.turn) {
+      var map = ctx.zone.map
+      var removals = []
+      for (pos in _chilled) {
+        var tile = map[pos]
+        if (tile["chilled"] && tile["chilled"] > 0) {
+          tile["chilled"] = tile["chilled"] - 1
+          if (tile["chilled"] <= 0) {
+            removals.add(pos)
+          }
+        }
+      }
+      for (pos in removals) {
+        _chilled.remove(pos)
+      }
+    } else if (event is Components.events.cast) {
+      var spell = event.spell
+      var targetSpec = spell.target()
+      targetSpec["origin"] = event.origin
+      targetSpec["src"] = event.src.pos
+      var targetGroup = TargetGroup.new(targetSpec)
+      if (spell.phrase.subject == SpellWords.air) {
+        for (space in targetGroup.spaces()) {
+          var tile = ctx.zone.map[space]
+          if (!tile["water"]) {
+            continue
+          }
+          if (tile["chilled"] && tile["chilled"] > 0) {
+            tile["chilled"] = tile["chilled"] + 1
+          } else {
+            tile["chilled"] = 6
+            _chilled.add(space)
+          }
+        }
+      } else if (spell.phrase.subject == SpellWords.fire) {
+        for (space in targetGroup.spaces()) {
+          var tile = ctx.zone.map[space]
+          if (tile["chilled"] && tile["chilled"] > 0) {
+            tile["chilled"] = (tile["chilled"] / 2).floor
+          }
+        }
+      }
+    }
+  }
 }
 
 class FireSystem is GameSystem {
@@ -77,13 +121,14 @@ class FireSystem is GameSystem {
     if (event is Components.events.turn) {
       var hyperspace = []
       var map = ctx.zone.map
+      var removals = []
       for (pos in _burning) {
         var tile = map[pos]
         if (tile["burning"] && tile["burning"] > 0) {
           if (RNG.float() < 0.6) {
             tile["burning"] = tile["burning"] - 1
             if (tile["burning"] <= 0) {
-              _burning.remove(pos)
+              removals.add(pos)
             }
           }
           for (next in map.neighbours(pos)) {
@@ -91,6 +136,9 @@ class FireSystem is GameSystem {
             if (neighbour["grass"]) {
               hyperspace.add(next)
             }
+          }
+          for (pos in removals) {
+            _burning.remove(pos)
           }
         }
       }
@@ -103,6 +151,14 @@ class FireSystem is GameSystem {
       targetSpec["origin"] = event.origin
       targetSpec["src"] = event.src.pos
       var targetGroup = TargetGroup.new(targetSpec)
+      if (spell.phrase.subject == SpellWords.air) {
+        for (space in targetGroup.spaces()) {
+          var tile = ctx.zone.map[space]
+          if (tile["burning"] && tile["burning"] > 0) {
+            tile["burning"] = tile["burning"] + 2
+          }
+        }
+      }
       if (spell.phrase.subject == SpellWords.water) {
         for (space in targetGroup.spaces()) {
           var tile = ctx.zone.map[space]

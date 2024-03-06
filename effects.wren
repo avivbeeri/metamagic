@@ -1,7 +1,7 @@
 import "math" for Vec
 import "parcel" for Stateful, RNG, Line
 import "groups" for Components
-import "combat" for Condition, Modifier, CombatProcessor
+import "combat" for Condition, Modifier, CombatProcessor, Environment, Damage, DamageType
 
 class Effect is Stateful {
   construct new(ctx, args) {
@@ -53,6 +53,7 @@ class PushEffect is Effect {
     d.y = d.y.clamp(-1, 1)
 
     var current = target.pos
+    var finalDistance = 0
     for (i in 0...distance) {
       var next = current + d
       if (ctx.zone.map.neighbours(current).contains(next)) {
@@ -60,12 +61,23 @@ class PushEffect is Effect {
         // TODO: if the space is occupied already?
         // TODO: if hit a wall, stun? extra damage?
       } else {
+        var damageEffect = Components.effects.damage.new(ctx, {
+          "damage": Damage.new(distance - i, DamageType.kinetic),
+          "target": target,
+          "src": Environment.wall
+        })
+        damageEffect.perform()
+        addEvents(damageEffect.events)
         break
       }
       current = next
+      finalDistance = i + 1
     }
 
-    ctx.addEvent(Components.events.move.new(target, origin))
+    if (finalDistance > 0) {
+      addEvent(Components.events.push.new(src, target))
+      addEvent(Components.events.move.new(target, origin))
+    }
   }
 }
 
