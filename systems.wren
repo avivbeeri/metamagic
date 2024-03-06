@@ -12,13 +12,13 @@ class AirSystem is GameSystem {
     _chilled = Set.new()
   }
 
-  applyFreezeTo(ctx, actor) {
+  applyFreezeTo(ctx, actor, duration) {
     var frozen = actor.has("conditions") && actor["conditions"].containsKey("frozen")
     var effect = Components.effects.applyCondition.new(ctx, {
       "target": actor,
       "condition": {
         "id": "frozen",
-        "duration": 5,
+        "duration": duration,
         "refresh": true,
         "curable": true
       }
@@ -60,14 +60,15 @@ class AirSystem is GameSystem {
           if (!tile["water"]) {
             continue
           }
+          var duration = 6 + RNG.int(4)
           if (tile["chilled"] && tile["chilled"] > 0) {
             tile["chilled"] = tile["chilled"] + 1
           } else {
-            tile["chilled"] = 6
+            tile["chilled"] = duration
             _chilled.add(space)
           }
           for (entity in ctx.getEntitiesAtPosition(space)) {
-            applyFreezeTo(ctx, entity)
+            applyFreezeTo(ctx, entity, duration)
           }
         }
       } else if (spell.phrase.subject == SpellWords.fire) {
