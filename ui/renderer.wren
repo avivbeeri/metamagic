@@ -273,7 +273,7 @@ class AsciiRenderer is Element {
       return
     }
     if (symbol == "\"") {
-      top = top + 6
+      top = top + 5
       Canvas.print(symbol, x * 16 + 4, top-2, color)
     }
     Canvas.print(symbol, x * 16 + 4, top, color)
