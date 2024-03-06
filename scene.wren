@@ -730,6 +730,8 @@ class GameScene is Scene {
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages, true))
     addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.75)))
+
+    _conditionLabels = {}
     //addElement(LogViewer.new(Vec.new(0, Canvas.height - 12 * 7), _messages))
 
     for (event in _world.events) {
@@ -876,6 +878,7 @@ class GameScene is Scene {
       if (config) {
         var name = config["name"]
         _messages.add("%(event.target) is no longer %(name).", INK["text"], false)
+        removeConditionLabel(event.modifier)
       }
     }
     if (event is Components.events.clearTag) {
@@ -883,6 +886,7 @@ class GameScene is Scene {
       if (config) {
         var name = config["name"]
         _messages.add("%(event.target) is no longer %(name).", INK["text"], false)
+        removeConditionLabel(event.tag)
       }
     }
     if (event is Components.events.applyTag) {
@@ -890,6 +894,7 @@ class GameScene is Scene {
       if (config) {
         var name = config["name"]
         _messages.add("%(event.target) is granted %(name).", INK["text"], false)
+        addConditionLabel(event.tag, name)
       }
     }
     if (event is Components.events.applyModifier) {
@@ -897,6 +902,7 @@ class GameScene is Scene {
       if (config) {
         var name = config["name"]
         _messages.add("%(event.target) is granted %(name).", INK["text"], false)
+        addConditionLabel(event.modifier, name)
       }
     }
     if (event is Components.events.inflictCondition) {
@@ -905,11 +911,8 @@ class GameScene is Scene {
 
       _messages.add("%(event.target) %(verb) %(name).", INK["text"], false)
       if (event.target is Player) {
-        if (!_conditionLabel) {
-          name = TextSplitter.capitalize(name)
-          _conditionLabel = addElement(Label.new(Vec.new(0, Canvas.height - 28), name))
-          _conditionLabel.alignRight()
-        }
+        name = TextSplitter.capitalize(name)
+        addConditionLabel(event.condition, name)
       }
     }
     if (event is Components.events.extendCondition) {
@@ -920,13 +923,33 @@ class GameScene is Scene {
       var name = ConditionNames[event.condition]["name"]
       var verb = ConditionNames[event.condition]["recoverVerb"] || "recovered from"
       _messages.add("%(event.target) %(verb) %(name).", INK["text"], false)
-      if (_conditionLabel) {
-        removeElement(_conditionLabel)
-        _conditionLabel = null
-      }
+      removeConditionLabel(event.condition)
     }
     if (event is Components.events.descend) {
       _messages.add("You descend down the stairs.", INK["text"], false)
+    }
+  }
+
+  removeConditionLabel(id) {
+    if (_conditionLabels[id]) {
+      removeElement(_conditionLabels[id])
+      _conditionLabels.remove(id)
+      recomputeConditionLabels()
+    }
+  }
+  addConditionLabel(id, label) {
+    if (!_conditionLabels[id]) {
+      _conditionLabels[id] = addElement(Label.new(Vec.new(0, Canvas.height - 28), label))
+      _conditionLabels[id].alignRight()
+      recomputeConditionLabels()
+    }
+
+  }
+  recomputeConditionLabels() {
+    var y = (Canvas.height - (_conditionLabels.count * 8) + ((_conditionLabels.count - 1) * 12)) / 2
+    for (label in _conditionLabels.values) {
+      label.pos.y = y
+      y = y - 12
     }
   }
 

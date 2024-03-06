@@ -100,8 +100,8 @@ class BaseModifier is Stateful {
 class TagModifier is BaseModifier {
   construct new(id, duration, add, remove) {
     super(id, duration, {
-      "add": add,
-      "remove": remove
+      "add": add || [],
+      "remove": remove || []
     })
   }
 
