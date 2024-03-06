@@ -1,3 +1,4 @@
+import "collections" for Set
 import "math" for M
 import "parcel" for Action, ActionResult, Event, Stateful, RNG
 
@@ -71,6 +72,105 @@ class DamageType {
   static ice { "ICE" }
   static poison { "POISON" }
 }
+
+
+class AModifier is Stateful {
+  construct new(id, duration, args) {
+    super()
+    data["id"] = id
+    data["duration"] = duration || null
+    assign(args)
+  }
+
+  id { data["id"] }
+  duration=(v) { data["duration"] = v }
+  duration { data["duration"] }
+
+  done { duration && duration <= 0 }
+  tick() {
+    duration = duration ? duration - 1 : null
+  }
+
+  extend(n) {
+    if (duration != null) {
+      duration = (duration || 0) + n
+    }
+  }
+}
+class TagModifier is AModifier {
+  construct new(id, duration, add, remove) {
+    super(id, duration, {
+      "add": add,
+      "remove": remove
+    })
+  }
+
+  add { data["add"] }
+  remove { data["remove"] }
+}
+
+class TagGroup {
+  construct new(tags) {
+    _base = Set.new()
+    _mods = {}
+    _base.addAll(tags)
+  }
+
+  tags {
+    var result = Set.new()
+    var tags = {}
+    for (tag in _base) {
+      tags[tag] = 1
+    }
+
+    for (modifier in modifiers) {
+      if (modifier.done) {
+        continue
+      }
+      for (item in modifier.add) {
+        tags[item] = (tags[item] || 0) + 1
+      }
+      for (item in modifier.remove) {
+        tags[item] = (tags[item] || 0) - 1
+      }
+    }
+    result.addAll(tags.where {|entry| entry.value > 0 }.map {|entry| entry.key })
+    return result.toList
+  }
+
+  modifiers { _mods.values }
+
+  add(tag) {
+    _base.add(tag)
+  }
+
+  remove(tag) {
+    _base.remove(tag)
+  }
+
+  addModifier(mod) {
+    _mods[mod.id] = mod
+  }
+
+  removeModifier(id) {
+    _mods.remove(id)
+  }
+  getModifier(id) {
+    return _mods[id]
+  }
+}
+
+var group = TagGroup.new([ "chocolate", "programming" ])
+System.print(group.tags)
+group.addModifier(TagModifier.new("7drl", 4, ["roguelikes", "things"], ["chocolate"]))
+group.addModifier(TagModifier.new("food", 4, ["chili"], [ "roguelikes" ]))
+System.print(group.tags)
+group.getModifier("7drl").tick()
+group.getModifier("7drl").tick()
+group.getModifier("7drl").tick()
+group.getModifier("7drl").tick()
+System.print(group.tags)
+
 
 class StatGroup {
   construct new(statMap, onChange) {
