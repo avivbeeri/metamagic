@@ -74,7 +74,7 @@ class DamageType {
 }
 
 
-class AModifier is Stateful {
+class BaseModifier is Stateful {
   construct new(id, duration, args) {
     super()
     data["id"] = id
@@ -97,7 +97,7 @@ class AModifier is Stateful {
     }
   }
 }
-class TagModifier is AModifier {
+class TagModifier is BaseModifier {
   construct new(id, duration, add, remove) {
     super(id, duration, {
       "add": add,
@@ -110,36 +110,48 @@ class TagModifier is AModifier {
 }
 
 class TagGroup {
+  construct new() {
+    init_([])
+  }
   construct new(tags) {
+    init_(tags)
+  }
+  init_(tags) {
     _base = Set.new()
     _mods = {}
     _base.addAll(tags)
   }
 
+  contains(value) { tags.contains(value) }
+
   tags {
     var result = Set.new()
-    var tags = {}
-    for (tag in _base) {
-      tags[tag] = 1
-    }
+    result.addAll(_base)
 
     for (modifier in modifiers) {
       if (modifier.done) {
         continue
       }
       for (item in modifier.add) {
-        tags[item] = (tags[item] || 0) + 1
-      }
-      for (item in modifier.remove) {
-        tags[item] = (tags[item] || 0) - 1
+        result.add(item)
       }
     }
-    result.addAll(tags.where {|entry| entry.value > 0 }.map {|entry| entry.key })
+    for (modifier in modifiers) {
+      if (modifier.done) {
+        continue
+      }
+      for (item in modifier.remove) {
+        result.remove(item)
+      }
+    }
     return result.toList
   }
 
   modifiers { _mods.values }
 
+  addAll(tags) {
+    _base.addAll(tags)
+  }
   add(tag) {
     _base.add(tag)
   }
@@ -159,18 +171,6 @@ class TagGroup {
     return _mods[id]
   }
 }
-
-var group = TagGroup.new([ "chocolate", "programming" ])
-System.print(group.tags)
-group.addModifier(TagModifier.new("7drl", 4, ["roguelikes", "things"], ["chocolate"]))
-group.addModifier(TagModifier.new("food", 4, ["chili"], [ "roguelikes" ]))
-System.print(group.tags)
-group.getModifier("7drl").tick()
-group.getModifier("7drl").tick()
-group.getModifier("7drl").tick()
-group.getModifier("7drl").tick()
-System.print(group.tags)
-
 
 class StatGroup {
   construct new(statMap, onChange) {

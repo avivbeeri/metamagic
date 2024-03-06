@@ -1,5 +1,7 @@
 import "parcel" for Event
 
+var ApplyTagEvent = Event.create("applyTag", ["src", "target", "tag"])
+var ClearTagEvent = Event.create("clearTag", ["target", "tag"])
 var ApplyModifierEvent = Event.create("applyModifier", ["src", "target", "modifier"])
 var ClearModifierEvent = Event.create("clearModifier", ["target", "modifier"])
 

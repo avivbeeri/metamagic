@@ -3,7 +3,7 @@ import "fov" for Vision2 as Vision
 import "parcel" for GameSystem, GameEndEvent, ChangeZoneEvent, Dijkstra, TargetGroup, RNG, DIR_EIGHT
 import "./entities" for Player
 import "./spells" for SpellWords
-import "combat" for Condition, CombatProcessor, Damage, DamageType, Environment
+import "combat" for Condition, CombatProcessor, Damage, DamageType, Environment, TagGroup
 import "collections" for Set
 
 class AirSystem is GameSystem {
@@ -269,6 +269,27 @@ class InventorySystem is GameSystem {
         } else {
           return order[itemA.slot] < order[itemB.slot]
         }
+      }
+    }
+  }
+}
+
+class TagModifierSystem is GameSystem {
+  construct new() { super() }
+  postUpdate(ctx, actor) {
+    for (field in actor.data.keys) {
+      var group = actor[field]
+      if (!group is TagGroup) {
+        continue
+      }
+      for (modifier in group.modifiers) {
+        modifier.tick()
+        if (!modifier.done) {
+          continue
+        }
+
+        group.removeModifier(modifier.id)
+        ctx.addEvent(Components.events.clearTag.new(actor, modifier.id))
       }
     }
   }

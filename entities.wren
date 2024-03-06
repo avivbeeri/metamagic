@@ -8,6 +8,9 @@ class Creature is BehaviourEntity {
     super()
     this["symbol"] = "?"
     this["solid"] = true
+    this["resistances"] = TagGroup.new([])
+    this["vulnerabilities"] = TagGroup.new([])
+    this["immunities"] = TagGroup.new([])
     this["stats"] =  StatGroup.new({
       "hpMax": 1,
       "hp": 1,
@@ -75,5 +78,5 @@ class Player is Creature {
 }
 
 import "items" for InventoryEntry, EquipmentSlot
-import "combat" for StatGroup, Condition
+import "combat" for StatGroup, Condition, TagGroup
 import "messages" for Pronoun

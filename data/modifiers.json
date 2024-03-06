@@ -4,5 +4,8 @@
   },
   "infuse.air": {
     "name": "Swift"
+  },
+  "infuse.water": {
+    "name": "Soaking"
   }
 }

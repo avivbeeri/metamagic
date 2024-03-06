@@ -1,7 +1,7 @@
 import "math" for Vec
 import "parcel" for Stateful, RNG, Line
 import "groups" for Components
-import "combat" for Condition, Modifier, CombatProcessor, Environment, Damage, DamageType
+import "combat" for Condition, Modifier, CombatProcessor, Environment, Damage, DamageType, TagModifier
 
 class Effect is Stateful {
   construct new(ctx, args) {
@@ -149,6 +149,25 @@ class HealEffect is Effect {
   }
 }
 
+// Applies a stat modifier to <target>
+#!component(id="applyTag", group="effect")
+class ApplyTagEffect is Effect {
+  construct new(ctx, args) {
+    super(ctx, args)
+  }
+
+  src { data["src"] }
+  target { data["target"] }
+  field { data["field"] }
+  modifier { data["modifier"] }
+
+  perform() {
+    var group = target[field]
+    var mod = TagModifier.new(modifier["id"], modifier["duration"], modifier["add"], modifier["remove"])
+    group.addModifier(mod)
+    addEvent(Components.events.applyTag.new(src, target, modifier["id"]))
+  }
+}
 // Applies a stat modifier to <target>
 #!component(id="applyModifier", group="effect")
 class ApplyModifierEffect is Effect {

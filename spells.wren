@@ -99,6 +99,14 @@ class Spell is Stateful {
         }
         if (phrase.subject == SpellWords.water) {
           effects.add([ "cureCondition", { "condition": "burning" } ])
+          effects.add([ "applyTag", {
+            "field": "resistances",
+            "modifier": {
+              "id": "infuse.water",
+              "duration": 10,
+              "add": [ DamageType.fire ]
+            }
+          }])
           // Make moving through water easier?
           // provide fire immunity
         }

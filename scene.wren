@@ -878,6 +878,20 @@ class GameScene is Scene {
         _messages.add("%(event.target) is no longer %(name).", INK["text"], false)
       }
     }
+    if (event is Components.events.clearTag) {
+      var config = ModifierNames[event.tag]
+      if (config) {
+        var name = config["name"]
+        _messages.add("%(event.target) is no longer %(name).", INK["text"], false)
+      }
+    }
+    if (event is Components.events.applyTag) {
+      var config = ModifierNames[event.tag]
+      if (config) {
+        var name = config["name"]
+        _messages.add("%(event.target) is granted %(name).", INK["text"], false)
+      }
+    }
     if (event is Components.events.applyModifier) {
       var config = ModifierNames[event.modifier]
       if (config) {

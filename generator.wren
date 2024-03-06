@@ -206,6 +206,7 @@ class WorldGenerator {
     world.systems.add(ExperienceSystem.new())
     world.systems.add(FireSystem.new())
     world.systems.add(AirSystem.new())
+    world.systems.add(TagModifierSystem.new())
     world.systems.add(ModifierSystem.new())
     world.systems.add(ConditionSystem.new())
     world.systems.add(InventorySystem.new())
@@ -886,6 +887,7 @@ import "./systems" for
   VisionSystem,
   DefeatSystem,
   InventorySystem,
+  TagModifierSystem,
   ModifierSystem,
   ConditionSystem,
   ExperienceSystem,
