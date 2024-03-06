@@ -286,7 +286,7 @@ class LogViewer is Element {
           var color = message.color * 1
           if (_fade) {
             color.a = color.a * a
-            a = a * 0.98
+            a = a * 0.97
           }
           Canvas.print(word, x * glyphWidth, start + dir * lineHeight * line, color)
         } else {
