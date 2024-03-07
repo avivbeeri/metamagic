@@ -1,6 +1,6 @@
 import "io" for FileSystem
 import "json" for Json
-import "./parcel" for Stateful, RNG
+import "./parcel" for Stateful, RNG, GameSystem
 import "collections" for Set
 import "math" for Vec
 import "combat" for Damage, DamageType
@@ -448,4 +448,41 @@ class SpellUtils {
     return sortedList
   }
 
+}
+class SpellSystem is GameSystem {
+  construct new() {
+    super()
+  }
+  start(ctx) {
+    var player = ctx.getEntityByTag("player")
+    if (!player) {
+      return
+    }
+    if (!player.has("proficiency")) {
+      Fiber.abort("Player has no proficiency")
+    }
+
+    var table = player["proficiency"]
+    var words = [
+      RNG.sample(AllWords.where {|word| word.category == TokenCategory.verb }.toList),
+      RNG.sample(AllWords.where {|word| word.category == TokenCategory.subject }.toList),
+      RNG.sample(AllWords.where {|word| word.category == TokenCategory.object }.toList)
+    ]
+
+    for (word in words) {
+      var entry = table[word.lexeme]
+      if (!entry) {
+        entry = table[word.lexeme] = {
+          "floorUsed": false,
+          "gameUsed": false,
+          "success": 0,
+          "discovered": true
+        }
+      } else {
+        entry["discovered"] = true
+      }
+      player["learningOrder"].add(word)
+    }
+
+  }
 }

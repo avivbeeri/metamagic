@@ -502,19 +502,23 @@ class LexiconState is SceneState {
     addLabel(_leftPageLabels, left, "0")
     var label
     label = addLabel(_leftPageLabels, left, "")
-    label.pos.y = left.size.y / 2
+    label.pos.y = left.size.y / 4
     label = addLabel(_leftPageLabels, left, "")
-    label.pos.y = left.size.y / 2 + label.size.y * 2
+    label.pos.y = left.size.y / 4 + label.size.y * 2
     label = addLabel(_leftPageLabels, left, "")
-    label.pos.y = left.size.y / 2 + label.size.y * 4
+    label.pos.y = left.size.y * 0.5
+    label = addLabel(_leftPageLabels, left, "")
+    label.pos.y = left.size.y * 0.75
 
     addLabel(_rightPageLabels, right, "0")
     label = addLabel(_rightPageLabels, right, "")
-    label.pos.y = left.size.y / 2
+    label.pos.y = left.size.y / 4
     label = addLabel(_rightPageLabels, right, "")
-    label.pos.y = left.size.y / 2 + label.size.y * 2
+    label.pos.y = left.size.y / 4 + label.size.y * 2
     label = addLabel(_rightPageLabels, right, "")
-    label.pos.y = left.size.y / 2 + label.size.y * 4
+    label.pos.y = left.size.y * 0.5
+    label = addLabel(_rightPageLabels, right, "")
+    label.pos.y = left.size.y * 0.75
 
     _page = 0
   }
@@ -582,9 +586,7 @@ class LexiconState is SceneState {
       _leftPageLabels[3].text = "\"%(leftLex)\""
       _leftPageLabels[3].centerHorizontally()
     } else {
-      _leftPageLabels[1].text = ""
-      _leftPageLabels[2].text = ""
-      _leftPageLabels[3].text = ""
+      _leftPageLabels.skip(1).each {|label| label.text = "" }
     }
     if (rightWord) {
       var rightLex = SpellUtils.getWordFromToken(rightWord)
@@ -595,9 +597,7 @@ class LexiconState is SceneState {
       _rightPageLabels[3].text = "\"%(rightLex)\""
       _rightPageLabels[3].centerHorizontally()
     } else {
-      _rightPageLabels[1].text = ""
-      _rightPageLabels[2].text = ""
-      _rightPageLabels[3].text = ""
+      _rightPageLabels.skip(1).each {|label| label.text = "" }
     }
     return this
   }

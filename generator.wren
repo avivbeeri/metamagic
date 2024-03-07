@@ -202,6 +202,7 @@ class WorldGenerator {
 
     var world = World.new()
     world.generator = WorldGenerator
+    world.systems.add(SpellSystem.new())
     world.systems.add(InventorySystem.new())
     world.systems.add(ExperienceSystem.new())
     world.systems.add(FireSystem.new())
@@ -883,6 +884,7 @@ class DiamondRoom {
 
 import "./entities" for Player
 import "./items" for InventoryEntry
+import "./spells" for SpellSystem
 import "./systems" for
   VisionSystem,
   DefeatSystem,
