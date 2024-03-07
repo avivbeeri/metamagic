@@ -25,7 +25,8 @@ import "./text" for TextSplitter
 import "./ui/renderer" for Renderer
 import "./ui/label" for Label
 import "./ui/pane" for Pane
-import "./ui/panel" for SizeMode
+import "./ui/line" for Line as UiLine
+import "./ui/panel" for SizeMode, Panel
 import "./ui/dialog" for Dialog
 import "./ui" for
   HealthBar,
@@ -54,6 +55,7 @@ class InventoryWindowState is SceneState {
     var world = scene.world
     var worldItems = world["items"]
 
+    System.print(size)
     var player = scene.world.getEntityByTag("player")
     var playerItems = player["inventory"]
     var i = 0
@@ -457,6 +459,60 @@ class ModalWindowState is SceneState {
     return this
   }
 }
+class LexiconState is SceneState {
+  construct new() {
+    super()
+  }
+
+  window { _window }
+  window=(v) {
+    if (_window) {
+      scene.removeElement(_window)
+    }
+    _window = v
+    if (_window) {
+      scene.addElement(_window)
+    }
+  }
+
+  onEnter() {
+    window = Pane.new(Vec.new(Canvas.width * 0.5, Canvas.height * 0.5))
+    window.padding = 0
+    window.border = 4
+    window.borderColor = INK["bookBorder"]
+    window.bg = INK["bookBg"]
+    window.center()
+    var line = window.addElement(UiLine.new())
+    line.start = Vec.new(window.size.x / 2, 0)
+    line.end = Vec.new(window.size.x / 2, window.size.y)
+    line.thickness = 3
+    var left = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
+    var right = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
+    left.pos.x = 4
+    left.padding = 4
+    left.centerVertically()
+    right.padding = 4
+    right.alignRight()
+    right.centerVertically()
+
+    var leftText = left.addElement(Label.new("Left"))
+    var rightText = right.addElement(Label.new("Left"))
+    leftText.color = INK["bookText"]
+    rightText.color = INK["bookText"]
+  }
+
+  onExit() {
+    scene.removeElement(window)
+    window = null
+  }
+  update() {
+    if (INPUT["reject"].firing || INPUT["confirm"].firing) {
+      return scene.world.complete ? previous : PlayerInputState.new()
+    }
+    return this
+  }
+}
+
 class CastState is ModalWindowState {
   construct new() {
     super()
@@ -638,6 +694,9 @@ class GameEndState is ModalWindowState {
       }
       return this
     }
+    if (INPUT["lexicon"].firing) {
+      changeState(LexiconState.new())
+    }
     if (INPUT["inventory"].firing) {
       changeState(InventoryWindowState.new().with("readonly"))
     }
@@ -664,6 +723,9 @@ class PlayerInputState is SceneState {
   }
 
   update() {
+    if (INPUT["lexicon"].firing) {
+      return LexiconState.new()
+    }
     if (INPUT["inventory"].firing) {
       return InventoryWindowState.new()
     }

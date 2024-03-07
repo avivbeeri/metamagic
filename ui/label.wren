@@ -4,6 +4,12 @@ import "./ui/panel" for Panel
 import "./palette" for INK
 
 class Label is Panel {
+  construct new(t) {
+    // TODO: handle font size
+    super(Vec.new(), Vec.new())
+    text = t
+  }
+
   construct new(pos, t) {
     // TODO: handle font size
     _text = t
@@ -11,6 +17,9 @@ class Label is Panel {
 
     super(size, pos)
   }
+
+  color=(v) { _color = v }
+  color { _color || INK["text"] }
   text { _text }
   text=(v) {
     _text = v
@@ -18,6 +27,7 @@ class Label is Panel {
   }
 
   content() {
-    Canvas.print(_text, 0, 0, INK["text"])
+    System.print(_text)
+    Canvas.print(_text, 0, 0, color)
   }
 }

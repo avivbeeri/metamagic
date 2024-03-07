@@ -83,6 +83,7 @@ class Panel is Element {
     var current = this
     var result = Vec.new()
     while (current != null) {
+      System.print(current.pos)
       result = result + current.pos
       current = current.parent
     }
@@ -91,13 +92,6 @@ class Panel is Element {
 
   updateSize() {
     if (sizeMode == SizeMode.auto) {
-      /*
-      for (element in elements) {
-        if (element is Panel) {
-          element.updateSize()
-        }
-      }
-      */
       var current = Vec.new()
       for (element in elements) {
         current.x = current.x.max(element.pos.x + element.size.x)

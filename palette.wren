@@ -96,4 +96,7 @@ INK.setPurpose("fireBg", "orange")
 INK.setPurpose("downstairs", "gold")
 INK.setPurpose("upstairs", "darkgreen")
 
+INK.setPurpose("bookBg", "offwhite")
+INK.setPurpose("bookText", "black")
+INK.setPurpose("bookBorder", "brown")
 

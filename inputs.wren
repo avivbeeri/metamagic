@@ -116,6 +116,7 @@ BASIC.register("cast", [ Keyboard["space"], Keyboard["keypad ."], Keyboard["keyp
 BASIC.register("drop", [ Keyboard["r"]  ])
 BASIC.register("pickup", [ Keyboard["g"] ])
 BASIC.register("inventory", [ Keyboard["i"] ])
+BASIC.register("lexicon", [ Keyboard["l"] ])
 BASIC.register("log", [ Keyboard["v"] ])
 BASIC.register("info", [ Keyboard["t"] ])
 BASIC.register("strike", [ Keyboard["x"]  ])

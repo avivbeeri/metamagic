@@ -18,9 +18,18 @@ class Pane is Panel {
   init() {
     super.init()
     _border = 4
+    _bg = INK["dialogBg"]
+    _borderColor = INK["border"]
   }
+
+  bg { _bg }
+  bg=(v) { _bg = v }
+
   border { _border }
   border=(v) { _border = v }
+
+  borderColor { _borderColor }
+  borderColor=(v) { _borderColor = v }
 
   alignRight() {
     super.alignRight()
@@ -33,10 +42,10 @@ class Pane is Panel {
 
   draw() {
     Canvas.offset(offset.x, offset.y)
-    Canvas.rectfill(-padding, -padding, size.x + padding * 2, size.y + padding * 2, INK["dialogBg"])
+    Canvas.rectfill(-padding, -padding, size.x + padding * 2, size.y + padding * 2, bg)
     for (i in 0...(border)) {
       var j = i + padding + 1
-      Canvas.rect(-j, -j, size.x + 2 * j, size.y + 2 * j, INK["border"])
+      Canvas.rect(-j, -j, size.x + 2 * j, size.y + 2 * j, borderColor)
     }
     content()
     super.draw()
