@@ -1,6 +1,6 @@
 import "json" for Json
 import "collections" for Set
-import "math" for Vec
+import "math" for Vec, Elegant
 import "parcel" for
   DIR_FOUR,
   DIR_EIGHT,
@@ -254,6 +254,8 @@ class WorldGenerator {
     var zone = null
     var data = GeneratorUtils.getFloorData(level)
     if (data["generator"] == "start") {
+    } else if (data["generator"] == "forest") {
+      zone = ForestLevelGenerator.generate(args)
     } else if (data["generator"] == "test") {
       zone = TestRoomGenerator.generate(args)
     } else if (data["generator"] == "basic") {
@@ -587,6 +589,49 @@ class BasicZoneGenerator {
   }
 }
 
+class ForestLevelGenerator {
+  static generate(args) {
+    var level = args[0]
+    var map = TileMap8.new()
+    var zone = Zone.new(map)
+
+    for (y in 0...32) {
+      for (x in 0...32) {
+        map[x,y] = Tile.new({
+          "blocking": true,
+          "solid": true,
+          "visible": false
+        })
+      }
+    }
+
+    var center = Vec.new(15, 15)
+    var range = 5
+    var room = AutomataRoom.new(0, 0, 32, 32)
+    var inner = room.inner
+    for (pos in inner) {
+      map[pos] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+    }
+    var start = RNG.sample(inner)
+
+
+    GeneratorUtils.spawnGrass(zone, room)
+    GeneratorUtils.spawnWater(zone, room)
+    zone["entities"] = []
+    zone["level"] = level
+    // zone.map[Vec.new(15, 13)]["stairs"] = "down"
+    zone["start"] = start
+
+ //   placeMonster(zone, Vec.new(16, 10))
+//    placeItem(zone, Vec.new(16, 14))
+    return zone
+  }
+}
+
 class TestRoomGenerator {
   static generate(args) {
     var level = args[0]
@@ -602,7 +647,6 @@ class TestRoomGenerator {
     }
 
     var center = Vec.new(15, 15)
-    var range = 5
     var room = RectangularRoom.new(0, 0, 32, 31)
     for (pos in room.inner) {
       map[pos] = Tile.new({
@@ -873,6 +917,152 @@ class DiamondRoom {
   walls { _walls }
   center { _center }
   inner { _inside }
+  intersects(other) {
+     return _p0.x <= other.p1.x &&
+            _p1.x >= other.p0.x &&
+            _p0.y <= other.p1.y &&
+            _p1.y >= other.p0.y
+
+  }
+}
+
+class AutomataRoom {
+  construct new(x, y, w, h) {
+    _p0 = Vec.new(x, y)
+    _size = Vec.new(w, h)
+    _p1 = _p0 + _size - Vec.new(1,1)
+    initializeBoard()
+  }
+
+  getCell(board, x, y) {
+    var i = Elegant.pair(x, y)
+    return board[i] || false
+  }
+  getCell(x, y) {
+    return getCell(_board, x, y)
+  }
+
+  setCell(board, x, y, v) {
+    var i = Elegant.pair(x, y)
+    board[i] = v
+  }
+  setCell(x, y, v) {
+    setCell(_board, x, y, v)
+  }
+
+  printBoard() {
+    for (y in _p0.y.._p1.y) {
+      for (x in _p0.x.._p1.x) {
+        System.write(getCell(x, y) ? "#" : " ")
+      }
+      System.write("\n")
+    }
+  }
+  initializeBoard() {
+    // true is solid
+    _board = {}
+    for (y in _p0.y.._p1.y) {
+      for (x in _p0.x.._p1.x) {
+        setCell(x, y, RNG.float() > 0.5)
+      }
+    }
+
+    for (round in 0...3) {
+      stepSimulation()
+    }
+
+    pruneBoard()
+    printBoard()
+  }
+  pruneBoard() {
+    var regions = []
+    var tiles = Set.new()
+    tiles.addAll(this.inner)
+
+    while (tiles.count > 0) {
+      var queue = tiles.take(1).toList
+      var visited = Set.new()
+      visited.add(queue[0])
+
+      while (queue.count > 0) {
+        System.print(queue)
+        var node = queue.removeAt(0)
+        tiles.remove(node)
+        for (dir in DIR_FOUR) {
+          var next = node + dir
+          visited.add(next)
+          if (tiles.contains(next) && getCell(next.x, next.y) && !visited.contains(next)) {
+            queue.add(next)
+          }
+        }
+      }
+      regions.add(visited.toList)
+    }
+    if (regions.count > 1) {
+      regions.sort {|a , b| a.count < b.count }
+      System.print(regions.map {|region| region.count}.toList.join(","))
+      for (region in regions.skip(1)) {
+        for (cell in region) {
+          setCell(cell.x, cell.y, false)
+        }
+      }
+    }
+    System.print("Regions: %(regions.count)")
+  }
+  getNeighbours(x, y) {
+    var count = 0
+    for (dy in -1..1) {
+      for (dx in -1..1) {
+        if (dx == 0 && dx == dy) {
+          continue
+        }
+        if (getCell(x + dx, y + dy)) {
+          count = count + 1
+        }
+      }
+    }
+    return count
+  }
+  stepSimulation() {
+    var stepBoard = {}
+    for (y in _p0.y.._p1.y) {
+      for (x in _p0.x.._p1.x) {
+        var count = getNeighbours(x, y)
+        var alive = getCell(x, y)
+        if (!alive && count >= 5) {
+          setCell(stepBoard, x, y, true)
+        } else if (alive && count >= 4) {
+          setCell(stepBoard, x, y, true)
+        } else {
+          setCell(stepBoard, x, y, false)
+        }
+      }
+    }
+    _board = stepBoard
+  }
+
+  center {
+    var c = (_p0 + (_size / 2))
+    c.x = c.x.floor
+    c.y = c.y.floor
+    return c
+  }
+
+  inner {
+    var inside = []
+    for (y in (_p0.y+1)..._p1.y) {
+      for (x in (_p0.x+1)..._p1.x) {
+        if (!getCell(x, y)) {
+          inside.add(Vec.new(x, y))
+        }
+      }
+    }
+    return inside
+  }
+
+  p0 { _p0 }
+  p1 { _p1 }
+
   intersects(other) {
      return _p0.x <= other.p1.x &&
             _p1.x >= other.p0.x &&
