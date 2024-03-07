@@ -544,9 +544,16 @@ class LexiconState is SceneState {
 
   update() {
     var player = scene.world.getEntityByTag("player")
+    var truePage = 0
+
+    _leftPageLabels[0].text = (_page * 2) + 1
+    _leftPageLabels[0].alignBottom()
+    _rightPageLabels[0].text = (_page * 2) + 2
+    _rightPageLabels[0].alignRight()
+    _rightPageLabels[0].alignBottom()
 
     var order = player["learningOrder"]
-    var maxPageCount = (AllWords.count / 2).floor
+    var maxPageCount = (AllWords.count / 2).floor + 1
     var pageCount = (order.count / 2).floor
 
     var leftInput = INPUT.list("dir")[3]
@@ -563,6 +570,19 @@ class LexiconState is SceneState {
       return scene.world.complete ? previous : PlayerInputState.new()
     }
 
+    if (_page == 0) {
+
+      _leftPageLabels.skip(1).each {|label| label.text = "" }
+      _rightPageLabels.skip(1).each {|label| label.text = "" }
+      _leftPageLabels[1].text = "Veralethi"
+      _leftPageLabels[1].centerHorizontally()
+      _leftPageLabels[2].text = "Grammar and Lexicon"
+      _leftPageLabels[2].centerHorizontally()
+      return this
+    }
+
+    truePage = _page - 1
+
 
     var leftWord = null
     var rightWord = null
@@ -570,21 +590,16 @@ class LexiconState is SceneState {
     // not the last page
     // orderCount % 2 != 0
 
-    if (order.count >= 1 && (_page < pageCount || (_page == pageCount && (order.count % 2) != 0))) {
-      leftWord = order[(_page * 2)]
+    if (order.count >= 1 && (truePage < pageCount || (truePage == pageCount && (order.count % 2) != 0))) {
+      leftWord = order[(truePage * 2)]
     }
     // at least 2 items
     // not the last page
     // or the last page and there's a multiple of two items
-    if (order.count >= 2 && (_page <= pageCount - 1 || (_page == pageCount - 1 && (order.count % 2) == 0))) {
-      rightWord = order[(_page * 2) + 1]
+    if (order.count >= 2 && (truePage <= pageCount - 1 || (truePage == pageCount - 1 && (order.count % 2) == 0))) {
+      rightWord = order[(truePage * 2) + 1]
     }
 
-    _leftPageLabels[0].text = (_page * 2) + 1
-    _leftPageLabels[0].alignBottom()
-    _rightPageLabels[0].text = (_page * 2) + 2
-    _rightPageLabels[0].alignRight()
-    _rightPageLabels[0].alignBottom()
     if (leftWord) {
       var leftLex = SpellUtils.getWordFromToken(leftWord)
       _leftPageLabels[1].text = "%(leftWord.lexeme)"
