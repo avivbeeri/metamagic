@@ -24,6 +24,7 @@ import "./text" for TextSplitter
 
 import "./ui/renderer" for Renderer
 import "./ui/label" for Label
+import "./ui/textbox" for TextBox
 import "./ui/pane" for Pane
 import "./ui/line" for Line as UiLine
 import "./ui/panel" for SizeMode, Panel
@@ -476,7 +477,7 @@ class LexiconState is SceneState {
 
   onEnter() {
 
-    window = Pane.new(Vec.new(Canvas.width * 0.5, Canvas.height * 0.5))
+    window = Pane.new(Vec.new(Canvas.width * 0.6, Canvas.height * 0.6))
     window.padding = 0
     window.border = 4
     window.borderColor = INK["bookBorder"]
@@ -487,7 +488,7 @@ class LexiconState is SceneState {
     line.end = Vec.new(window.size.x / 2, window.size.y)
     line.thickness = 3
     var left = _leftPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
-    var right = _rightPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
+    var right = _rightPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 12, window.size.y - 8)))
     left.pos.x = 8
     left.padding = 4
     left.centerVertically()
@@ -510,6 +511,12 @@ class LexiconState is SceneState {
     label = addLabel(_leftPageLabels, left, "")
     label.pos.y = left.size.y * 0.75
 
+    var textBox = right.addElement(TextBox.new("", right.size.x - 8))
+    textBox.alignRight()
+    _rightPageTextBox = textBox
+    textBox.color = INK["bookText"]
+    textBox.pos.y = left.size.y * 0.6
+
     addLabel(_rightPageLabels, right, "0")
     label = addLabel(_rightPageLabels, right, "")
     label.pos.y = left.size.y / 4
@@ -527,6 +534,12 @@ class LexiconState is SceneState {
     var title = _dialog.addElement(Label.new(Vec.new(0, 0), "Your Lexicon"))
     _dialog.centerHorizontally()
     _dialog.pos.y = window.pos.y - 30
+
+    _hint = scene.addElement(Pane.new(Vec.new()))
+    _hint.sizeMode = SizeMode.auto
+    _hint.addElement(Label.new(Vec.new(0, 0), "Press LEFT or RIGHT to change pages"))
+    _hint.centerHorizontally()
+    _hint.pos.y = window.pos.y + window.size.y + 20
   }
 
   addLabel(list, parent, text) {
@@ -539,6 +552,7 @@ class LexiconState is SceneState {
   onExit() {
     scene.removeElement(window)
     scene.removeElement(_dialog)
+    scene.removeElement(_hint)
     window = null
   }
 
@@ -546,9 +560,13 @@ class LexiconState is SceneState {
     var player = scene.world.getEntityByTag("player")
     var truePage = 0
 
-    _leftPageLabels[0].text = (_page * 2) + 1
-    _leftPageLabels[0].alignBottom()
-    _rightPageLabels[0].text = (_page * 2) + 2
+    if (_page > 0) {
+      _leftPageLabels[0].text = (_page * 2)
+      _leftPageLabels[0].alignBottom()
+    } else {
+      _leftPageLabels[0].text = ""
+    }
+    _rightPageLabels[0].text = (_page * 2) + 1
     _rightPageLabels[0].alignRight()
     _rightPageLabels[0].alignBottom()
 
@@ -571,14 +589,17 @@ class LexiconState is SceneState {
     }
 
     if (_page == 0) {
-
       _leftPageLabels.skip(1).each {|label| label.text = "" }
       _rightPageLabels.skip(1).each {|label| label.text = "" }
-      _leftPageLabels[1].text = "Veralethi"
-      _leftPageLabels[1].centerHorizontally()
-      _leftPageLabels[2].text = "Grammar and Lexicon"
-      _leftPageLabels[2].centerHorizontally()
+      _rightPageLabels[1].text = "Veralethi"
+      _rightPageLabels[1].centerHorizontally()
+      _rightPageLabels[2].text = "Grammar and Lexicon"
+      _rightPageLabels[2].centerHorizontally()
+
+      _rightPageTextBox.text = "Spells spoken in Veralethi are composed in the following structure:\n\n<VERB> <SUBJECT> <OBJECT>.\n\n The <OBJECT> may be followed by a <MODIFIER>."
       return this
+    } else {
+      _rightPageTextBox.text = ""
     }
 
     truePage = _page - 1
@@ -720,17 +741,14 @@ class HelpState is ModalWindowState {
     var message = [
       "'Confirm' - Return",
       "'Reject' - Escape",
-      "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
-      "Rest - Space",
       "",
-      "Coup-de-grace - 'x'",
-      "Pick-up item - 'g'",
-      "Descend to the next floor - ','",
+      "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
+      "Cast a spell - Space",
+      "View your lexicon - 'l'",
       "",
       "Other commands",
-      "Inventory - 'i', then number to use/equip/unequip",
-      "Open Log - 'v'",
-      "Drop from Inventory - 'r' then number"
+      "Inventory - 'i', press number to use",
+      "Open Log - 'v'"
     ]
 
     window = Dialog.new(message)
@@ -909,7 +927,7 @@ class GameScene is Scene {
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages, true))
-    addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.75)))
+    addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.8)))
 
     _conditionLabels = {}
     //addElement(LogViewer.new(Vec.new(0, Canvas.height - 12 * 7), _messages))
