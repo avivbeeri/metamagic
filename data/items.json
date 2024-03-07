@@ -1,4 +1,15 @@
 {
+  "book": {
+    "id": "book",
+    "kind": "book",
+    "slot": null,
+    "consumable": true,
+    "name": "Book",
+    "description": "A tome of knowledge",
+    "effects": [ ],
+    "actions": {
+    }   
+  },
   "food": {
     "id": "food",
     "kind": "food",

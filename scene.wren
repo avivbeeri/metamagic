@@ -55,7 +55,6 @@ class InventoryWindowState is SceneState {
     var world = scene.world
     var worldItems = world["items"]
 
-    System.print(size)
     var player = scene.world.getEntityByTag("player")
     var playerItems = player["inventory"]
     var i = 0
@@ -476,6 +475,7 @@ class LexiconState is SceneState {
   }
 
   onEnter() {
+
     window = Pane.new(Vec.new(Canvas.width * 0.5, Canvas.height * 0.5))
     window.padding = 0
     window.border = 4
@@ -488,7 +488,7 @@ class LexiconState is SceneState {
     line.thickness = 3
     var left = _leftPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
     var right = _rightPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
-    left.pos.x = 4
+    left.pos.x = 8
     left.padding = 4
     left.centerVertically()
     right.padding = 4
@@ -506,7 +506,7 @@ class LexiconState is SceneState {
     label = addLabel(_leftPageLabels, left, "")
     label.pos.y = left.size.y / 4 + label.size.y * 2
     label = addLabel(_leftPageLabels, left, "")
-    label.pos.y = left.size.y * 0.5
+    label.pos.y = left.size.y * 0.6
     label = addLabel(_leftPageLabels, left, "")
     label.pos.y = left.size.y * 0.75
 
@@ -516,11 +516,17 @@ class LexiconState is SceneState {
     label = addLabel(_rightPageLabels, right, "")
     label.pos.y = left.size.y / 4 + label.size.y * 2
     label = addLabel(_rightPageLabels, right, "")
-    label.pos.y = left.size.y * 0.5
+    label.pos.y = left.size.y * 0.6
     label = addLabel(_rightPageLabels, right, "")
     label.pos.y = left.size.y * 0.75
 
     _page = 0
+
+    _dialog = scene.addElement(Pane.new(Vec.new()))
+    _dialog.sizeMode = SizeMode.auto
+    var title = _dialog.addElement(Label.new(Vec.new(0, 0), "Your Lexicon"))
+    _dialog.centerHorizontally()
+    _dialog.pos.y = window.pos.y - 30
   }
 
   addLabel(list, parent, text) {
@@ -532,6 +538,7 @@ class LexiconState is SceneState {
 
   onExit() {
     scene.removeElement(window)
+    scene.removeElement(_dialog)
     window = null
   }
 
@@ -541,6 +548,8 @@ class LexiconState is SceneState {
     var order = player["learningOrder"]
     var maxPageCount = (AllWords.count / 2).floor
     var pageCount = (order.count / 2).floor
+    System.print(order)
+    System.print(pageCount)
 
     var leftInput = INPUT.list("dir")[3]
     var rightInput = INPUT.list("dir")[1]
@@ -559,19 +568,20 @@ class LexiconState is SceneState {
 
     var leftWord = null
     var rightWord = null
-    if (order.count >= 1 && _page <= pageCount) {
+    // there's at least one item
+    // not the last page
+    // orderCount % 2 != 0
+
+    if (order.count >= 1 && (_page < pageCount || (_page == pageCount && (order.count % 2) != 0))) {
       leftWord = order[(_page * 2)]
     }
     // at least 2 items
     // not the last page
     // or the last page and there's a multiple of two items
-    if (order.count >= 2 && (_page < pageCount || (order.count % 2) == 0)) {
+    if (order.count >= 2 && (_page <= pageCount - 1 || (_page == pageCount - 1 && (order.count % 2) == 0))) {
       rightWord = order[(_page * 2) + 1]
     }
 
-    System.print(player["learningOrder"])
-    System.print("%(_page)")
-    System.print("%(leftWord) and %(rightWord)")
     _leftPageLabels[0].text = (_page * 2) + 1
     _leftPageLabels[0].alignBottom()
     _rightPageLabels[0].text = (_page * 2) + 2
@@ -585,6 +595,8 @@ class LexiconState is SceneState {
       _leftPageLabels[2].centerHorizontally()
       _leftPageLabels[3].text = "\"%(leftLex)\""
       _leftPageLabels[3].centerHorizontally()
+      _leftPageLabels[4].text = "\"%(leftWord.description)\""
+      _leftPageLabels[4].centerHorizontally()
     } else {
       _leftPageLabels.skip(1).each {|label| label.text = "" }
     }
@@ -596,6 +608,8 @@ class LexiconState is SceneState {
       _rightPageLabels[2].centerHorizontally()
       _rightPageLabels[3].text = "\"%(rightLex)\""
       _rightPageLabels[3].centerHorizontally()
+      _rightPageLabels[4].text = "\"%(rightWord.description)\""
+      _rightPageLabels[4].centerHorizontally()
     } else {
       _rightPageLabels.skip(1).each {|label| label.text = "" }
     }
@@ -677,7 +691,6 @@ class CastState is ModalWindowState {
         }
         return "???"
       }.join(" ")
-      System.print(phrase)
       _phraseLabel.text = phrase
       _phraseLabel.centerHorizontally()
       _costLabel.centerHorizontally()
