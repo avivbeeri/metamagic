@@ -32,7 +32,7 @@ class HintText is Pane {
   construct new(pos) {
     super()
     this.pos = pos
-    _text = "press '/' for help"
+    _text = "press F1 or '/' for help"
     addElement(Label.new(Vec.new(0, 0), _text))
     _t = 0
     sizeMode = SizeMode.auto
