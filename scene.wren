@@ -548,8 +548,6 @@ class LexiconState is SceneState {
     var order = player["learningOrder"]
     var maxPageCount = (AllWords.count / 2).floor
     var pageCount = (order.count / 2).floor
-    System.print(order)
-    System.print(pageCount)
 
     var leftInput = INPUT.list("dir")[3]
     var rightInput = INPUT.list("dir")[1]
@@ -938,6 +936,17 @@ class GameScene is Scene {
       var srcName = event.src.name
       var target = event.target.name
       _messages.add("%(srcName) pushed %(target) away.", INK["text"], true)
+    }
+    if (event is Components.events.learn) {
+      var srcName = event.src.name
+      var prep = "their"
+      if (event.src is Player) {
+        srcName = Pronoun.you.subject
+        prep = "your"
+      }
+      srcName = TextSplitter.capitalize(srcName)
+      var wordText = "\"%(SpellUtils.getWordFromToken(event.word))\" <%(event.word.lexeme)>"
+      _messages.add("%(srcName) added %(wordText) to %(prep) lexicon.", INK["gold"], false)
     }
     if (event is Components.events.cast) {
       var srcName = event.src.name

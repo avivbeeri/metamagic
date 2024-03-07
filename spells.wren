@@ -58,7 +58,7 @@ class SpellWords {
   static far { SpellToken.new("FAR", TokenCategory.object, "Distant from here", 4) }
 
   static big { SpellToken.new("BIG", TokenCategory.modifier, "...in a broad area", 1) }
-  static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, "...in an enormous area.", 2) }
+  static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, "...in an enormous area", 2) }
 }
 
 var BaseTable = {
@@ -501,12 +501,13 @@ class SpellSystem is GameSystem {
           var entry = actor["proficiency"][word.lexeme]
           return (!entry || !entry["discovered"])
         }.toList)
-        teach(actor, newWord)
+        teach(actor, newWord, true)
       }
 
     }
   }
-  teach(actor, word) {
+  teach(actor, word) { teach(actor, word, false) }
+  teach(actor, word, notify) {
     if (actor.has("learningOrder")) {
       actor["learningOrder"].add(word)
     }
@@ -515,6 +516,9 @@ class SpellSystem is GameSystem {
     }
     var table = actor["proficiency"]
     var entry = table[word.lexeme]
+    if (notify && (!entry || !entry["discovered"])) {
+      actor.ctx.addEvent(Components.events.learn.new(actor, word))
+    }
     if (!entry) {
       entry = table[word.lexeme] = {
         "floorUsed": false,
