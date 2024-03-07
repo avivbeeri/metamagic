@@ -5,7 +5,7 @@
     "behaviours": [
       [ "cast" ],
       [
-        "seek"
+        "seek", false
       ]
     ],
     "immunities": [ ],
@@ -15,6 +15,8 @@
     "pronoun": "they",
     "stats": {
       "spd": 0.75,
+      "mp": 10,
+      "mpMax": 10,
       "hp": 3,
       "hpMax": 3
     }

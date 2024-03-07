@@ -1,6 +1,6 @@
 import "jps" for JPS
 import "math" for Vec, M
-import "./spells" for Spell, SpellPhrase, SpellWords
+import "./spells" for Spell, SpellPhrase, SpellWords, SpellFragment
 import "parcel" for
   TargetGroup,
   Reflect,
@@ -11,8 +11,9 @@ import "parcel" for
   Stateful,
   DIR_EIGHT,
   RNG,
-  Action,
-  Set
+  Action
+
+import "collections" for Set
 
 class Behaviour is GameSystem {
   construct new(args) {
@@ -28,6 +29,10 @@ class Behaviour is GameSystem {
   static spaceAvailable(ctx, pos) {
     var destEntities = ctx.getEntitiesAtPosition(pos)
     return (destEntities.isEmpty || !destEntities.any{|entity| !(entity is Player) && entity is Creature && !entity["killed"] })
+  }
+  static spaceAvailableWithPlayer(ctx, pos) {
+    var destEntities = ctx.getEntitiesAtPosition(pos)
+    return (destEntities.isEmpty || !destEntities.any{|entity| entity is Creature && !entity["killed"] })
   }
 }
 
@@ -167,7 +172,8 @@ class CastBehaviour is Behaviour {
   }
   update(ctx, actor) {
     if (!_spell) {
-      _spell = Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellWords.close))
+      _spell = Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellFragment.new(SpellWords.far, SpellWords.big)))
+      System.print(_spell.cost(actor))
     }
     var player = ctx.getEntityByTag("player")
     if (!player) {
@@ -185,17 +191,34 @@ class CastBehaviour is Behaviour {
     System.print("%(targetGroup.distance(player)) vs %(maxRange)")
     if (targetGroup.distance(player) <= maxRange) {
       System.print("hit!")
-      if (targetGroup["area"] == 0) {
+      if (targetGroup.distance(player) <= targetGroup["range"] || targetGroup["area"] == 0) {
         targetGroup["origin"] = player.pos
         valid = true
       } else {
-        // can I hit you without hitting me?
-        return false
-        // targetGroup["origin"] =
+        var playerScan = TargetGroup.new({
+          "src": player.pos,
+          "target": "area",
+          "area": targetGroup["area"],
+          "range": 0,
+          "origin": player.pos
+        })
+        var options = Set.new()
+        options.addAll(playerScan.spaces())
+
+        var originalOptions = targetGroup.spaces()
+        var intersection = originalOptions.where {|space| options.contains(space) }.toList
+        if (intersection.count > 0) {
+          targetGroup["origin"] = RNG.sample(intersection)
+          valid = true
+        }
       }
     }
 
     if (!valid) {
+      return false
+    }
+    if (_spell.cost(actor) > actor["stats"]["mp"]) {
+      System.print("out of mana")
       return false
     }
 
@@ -211,6 +234,11 @@ class CastBehaviour is Behaviour {
 class SeekBehaviour is Behaviour {
   construct new(args) {
     super()
+    if (args.count > 0) {
+      _bump = args[0]
+    } else {
+      _bump = true
+    }
   }
   update(ctx, actor) {
     var player = ctx.getEntityByTag("player")
@@ -230,6 +258,14 @@ class SeekBehaviour is Behaviour {
       // Stop swarms eating each other
       return false
     }
+    if (!_bump) {
+      if (!Behaviour.spaceAvailableWithPlayer(ctx, next)) {
+        actor.pushAction(Action.doNothing)
+        return false
+      }
+      actor.pushAction(Components.actions.simpleMove.new(dir))
+      return true
+    }
     actor.pushAction(Components.actions.bump.new(dir))
     return true
   }
@@ -247,7 +283,7 @@ class LocalSeekBehaviour is SeekBehaviour {
       return false
     }
     var dpath = player["map"][0]
-    if (!dpath[actor.pos] || dpath[actor.pos] > _range) {
+    if (!dpath[actor.pos] || (_range && dpath[actor.pos] > _range)) {
       return false
     }
     return super.update(ctx, actor)

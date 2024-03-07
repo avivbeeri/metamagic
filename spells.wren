@@ -215,7 +215,13 @@ class Spell is Stateful {
     }
 
     // figure out a default
-    return valid ? 3 : 0
+
+    var cost = 0
+    var floor = caster.ctx.zoneIndex
+    for (word in phrase.list) {
+      cost = cost + (word.maxCost - floor).max(word.minCost)
+    }
+    return valid ? cost : 0
   }
 
   target() {
@@ -377,8 +383,16 @@ class SpellUtils {
     }
     return __lexicon
   }
+  static indexOfWord(token) {
+    for (i in 0...AllWords.count) {
+      if (AllWords[i] == token) {
+        return i
+      }
+    }
+    return -1
+  }
   static getWordFromToken(token) {
-    var position = AllWords.indexOf(token)
+    var position = SpellUtils.indexOfWord(token)
     if (position != -1) {
       return lexicon[position]
     }
