@@ -20,14 +20,13 @@ class Label is Panel {
 
   color=(v) { _color = v }
   color { _color || INK["text"] }
-  text { _text }
+  text { _text || "" }
   text=(v) {
-    _text = v
-    size = Vec.new(_text.count * 8, 8)
+    _text = v.toString
+    size = Vec.new(text.count * 8, 8)
   }
 
   content() {
-    System.print(_text)
     Canvas.print(_text, 0, 0, color)
   }
 }

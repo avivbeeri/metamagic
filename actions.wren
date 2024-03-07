@@ -66,6 +66,11 @@ class CastAction is Action {
             "discovered": false
           }
         } else {
+          if (!entry["gameUsed"]) {
+            if (src.has("learningOrder")) {
+              src["learningOrder"].add(word)
+            }
+          }
           entry["floorUsed"] = true
           entry["gameUsed"] = true
         }

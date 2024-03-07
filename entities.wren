@@ -55,6 +55,7 @@ class Player is Creature {
       this["inventory"].add(InventoryEntry.new(entry[0], entry[1]))
     }
     this["proficiency"] = {}
+    this["learningOrder"] = []
   }
 
   name { data["name"] || "Player" }

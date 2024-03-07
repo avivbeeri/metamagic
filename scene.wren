@@ -39,7 +39,7 @@ import "./ui" for
 
 import "./generator" for WorldGenerator
 import "./combat" for AttackResult, DamageType
-import "./spells" for SpellUtils
+import "./spells" for SpellUtils, AllWords
 
 class InventoryWindowState is SceneState {
   construct new() {
@@ -486,8 +486,8 @@ class LexiconState is SceneState {
     line.start = Vec.new(window.size.x / 2, 0)
     line.end = Vec.new(window.size.x / 2, window.size.y)
     line.thickness = 3
-    var left = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
-    var right = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
+    var left = _leftPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
+    var right = _rightPanel = window.addElement(Panel.new(Vec.new(window.size.x / 2 - 8, window.size.y - 8)))
     left.pos.x = 4
     left.padding = 4
     left.centerVertically()
@@ -495,22 +495,114 @@ class LexiconState is SceneState {
     right.alignRight()
     right.centerVertically()
 
-    var leftText = left.addElement(Label.new("Left"))
-    var rightText = right.addElement(Label.new("Left"))
-    leftText.color = INK["bookText"]
-    rightText.color = INK["bookText"]
+    _leftPageLabels = []
+    _rightPageLabels = []
+
+
+    addLabel(_leftPageLabels, left, "0")
+    var label
+    label = addLabel(_leftPageLabels, left, "")
+    label.pos.y = left.size.y / 2
+    label = addLabel(_leftPageLabels, left, "")
+    label.pos.y = left.size.y / 2 + label.size.y * 2
+    label = addLabel(_leftPageLabels, left, "")
+    label.pos.y = left.size.y / 2 + label.size.y * 4
+
+    addLabel(_rightPageLabels, right, "0")
+    label = addLabel(_rightPageLabels, right, "")
+    label.pos.y = left.size.y / 2
+    label = addLabel(_rightPageLabels, right, "")
+    label.pos.y = left.size.y / 2 + label.size.y * 2
+    label = addLabel(_rightPageLabels, right, "")
+    label.pos.y = left.size.y / 2 + label.size.y * 4
+
+    _page = 0
+  }
+
+  addLabel(list, parent, text) {
+    var label = parent.addElement(Label.new(text))
+    list.add(label)
+    label.color = INK["bookText"]
+    return label
   }
 
   onExit() {
     scene.removeElement(window)
     window = null
   }
+
   update() {
+    var player = scene.world.getEntityByTag("player")
+
+    var order = player["learningOrder"]
+    var maxPageCount = (AllWords.count / 2).floor
+    var pageCount = (order.count / 2).floor
+
+    var leftInput = INPUT.list("dir")[3]
+    var rightInput = INPUT.list("dir")[1]
+
+    if (leftInput.firing) {
+      _page = (_page - 1).max(0)
+    }
+    if (rightInput.firing) {
+      _page = (_page + 1).min(maxPageCount)
+    }
+
     if (INPUT["reject"].firing || INPUT["confirm"].firing) {
       return scene.world.complete ? previous : PlayerInputState.new()
     }
+
+
+    var leftWord = null
+    var rightWord = null
+    if (order.count >= 1 && _page <= pageCount) {
+      leftWord = order[(_page * 2)]
+    }
+    // at least 2 items
+    // not the last page
+    // or the last page and there's a multiple of two items
+    if (order.count >= 2 && (_page < pageCount || (order.count % 2) == 0)) {
+      rightWord = order[(_page * 2) + 1]
+    }
+
+    System.print(player["learningOrder"])
+    System.print("%(_page)")
+    System.print("%(leftWord) and %(rightWord)")
+    _leftPageLabels[0].text = (_page * 2) + 1
+    _leftPageLabels[0].alignBottom()
+    _rightPageLabels[0].text = (_page * 2) + 2
+    _rightPageLabels[0].alignRight()
+    _rightPageLabels[0].alignBottom()
+    if (leftWord) {
+      var leftLex = SpellUtils.getWordFromToken(leftWord)
+      _leftPageLabels[1].text = "%(leftWord.lexeme)"
+      _leftPageLabels[1].centerHorizontally()
+      _leftPageLabels[2].text = "<%(leftWord.category)>"
+      _leftPageLabels[2].centerHorizontally()
+      _leftPageLabels[3].text = "\"%(leftLex)\""
+      _leftPageLabels[3].centerHorizontally()
+    } else {
+      _leftPageLabels[1].text = ""
+      _leftPageLabels[2].text = ""
+      _leftPageLabels[3].text = ""
+    }
+    if (rightWord) {
+      var rightLex = SpellUtils.getWordFromToken(rightWord)
+      _rightPageLabels[1].text = "%(rightWord.lexeme)"
+      _rightPageLabels[1].centerHorizontally()
+      _rightPageLabels[2].text = "<%(rightWord.category)>"
+      _rightPageLabels[2].centerHorizontally()
+      _rightPageLabels[3].text = "\"%(rightLex)\""
+      _rightPageLabels[3].centerHorizontally()
+    } else {
+      _rightPageLabels[1].text = ""
+      _rightPageLabels[2].text = ""
+      _rightPageLabels[3].text = ""
+    }
     return this
   }
+
+
 }
 
 class CastState is ModalWindowState {

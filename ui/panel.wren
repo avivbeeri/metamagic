@@ -83,7 +83,6 @@ class Panel is Element {
     var current = this
     var result = Vec.new()
     while (current != null) {
-      System.print(current.pos)
       result = result + current.pos
       current = current.parent
     }
