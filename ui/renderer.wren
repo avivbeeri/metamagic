@@ -268,8 +268,9 @@ class AsciiRenderer is Element {
         }
         //Canvas.print(symbol, space.x * 16 + 4, space.y * 16 + 4, Color.white)
         if (entity["conditions"].containsKey("burning")) {
+          color = INK["waterBg"]
         } else if (entity["conditions"].containsKey("frozen")) {
-          color = INK["iceBg"]
+          color = INK["ice"]
         }
         printEntity(symbol, space, color)
       }

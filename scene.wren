@@ -871,7 +871,7 @@ class GameScene is Scene {
         modifier = "are"
       }
       srcName = TextSplitter.capitalize(srcName)
-      _messages.add("%(srcName) %(modifier) stuck and couldn't do anything.", INK["text"], false)
+      _messages.add("%(srcName) %(modifier) stuck and couldn't do anything.", INK["text"], true)
     }
     if (event is Components.events.clearModifier) {
       var config = ModifierNames[event.modifier]
