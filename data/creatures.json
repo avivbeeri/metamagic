@@ -1,4 +1,24 @@
 {
+  "sorcerer": {
+    "symbol": "A",
+    "kind": "sorcerer",
+    "behaviours": [
+      [ "cast" ],
+      [
+        "seek"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ ],
+    "resistances": [ ],
+    "name": "Sorcerer",
+    "pronoun": "they",
+    "stats": {
+      "spd": 0.75,
+      "hp": 3,
+      "hpMax": 3
+    }
+  },
   "rat": {
     "symbol": "r",
     "kind": "rat",

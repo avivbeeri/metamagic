@@ -1,6 +1,8 @@
 import "jps" for JPS
 import "math" for Vec, M
+import "./spells" for Spell, SpellPhrase, SpellWords
 import "parcel" for
+  TargetGroup,
   Reflect,
   Entity,
   BehaviourEntity,
@@ -158,6 +160,53 @@ class WanderBehaviour is RandomWalkBehaviour {
   }
 }
 
+#!component(id="cast", group="behaviour")
+class CastBehaviour is Behaviour {
+  construct new(args) {
+    super()
+  }
+  update(ctx, actor) {
+    if (!_spell) {
+      _spell = Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellWords.close))
+    }
+    var player = ctx.getEntityByTag("player")
+    if (!player) {
+      return false
+    }
+    // TODO generate spells for this user to cast
+    // TODO check if player is in range of our cast spells
+    // TODO check if player is a valid target of our spells
+    var targetGroup = TargetGroup.new(_spell.target())
+    targetGroup["src"] = actor.pos
+    targetGroup["origin"] = actor.pos
+    var maxRange = targetGroup["area"] + targetGroup["range"]
+
+    var valid = false
+    System.print("%(targetGroup.distance(player)) vs %(maxRange)")
+    if (targetGroup.distance(player) <= maxRange) {
+      System.print("hit!")
+      if (targetGroup["area"] == 0) {
+        targetGroup["origin"] = player.pos
+        valid = true
+      } else {
+        // can I hit you without hitting me?
+        return false
+        // targetGroup["origin"] =
+      }
+    }
+
+    if (!valid) {
+      return false
+    }
+
+    // TODO construct spell
+    actor.pushAction(Components.actions.cast.new().withArgs({
+      "spell": _spell,
+      "target": targetGroup
+    }))
+    return true
+  }
+}
 #!component(id="seek", group="behaviour")
 class SeekBehaviour is Behaviour {
   construct new(args) {

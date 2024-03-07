@@ -33,7 +33,8 @@ class CreatureFactory {
       creature["conditions"][condition[0]] = Condition.new(condition[0], condition[1], condition[2])
     }
     var behaviours = data["behaviours"] || []
-    for (behaviour in behaviours) {
+    // Behaviours are stacked, so we reverse the order
+    for (behaviour in behaviours[-1..0]) {
       var id = behaviour[0]
       var args = behaviour.count > 1 ? behaviour[1..-1] : []
       creature.behaviours.add(Reflect.get(Components.behaviours, id).new(args))

@@ -4,6 +4,10 @@
       "enemies": [
         [
           "rat",
+          0.0
+        ],
+        [
+          "sorcerer",
           1.0
         ]
       ],
