@@ -54,7 +54,8 @@ class AirSystem is GameSystem {
       targetSpec["origin"] = event.origin
       targetSpec["src"] = event.src.pos
       var targetGroup = TargetGroup.new(targetSpec)
-      if (spell.phrase.subject == SpellWords.air) {
+      System.print(spell.phrase.verb)
+      if (spell.phrase.verb != SpellWords.infuse && spell.phrase.subject == SpellWords.air) {
         for (space in targetGroup.spaces()) {
           var tile = ctx.zone.map[space]
           if (!tile["water"]) {

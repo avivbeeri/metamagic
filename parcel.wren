@@ -226,7 +226,7 @@ class Entity is Stateful {
     _lastCost = 0
   }
 
-  nextTime { _lastTurn + _lastCost * speed }
+  nextTime { _lastTurn + (_lastCost * speed).ceil }
   pushAction(action) { _actions.add(action) }
 
   bind(ctx, id) {
@@ -893,10 +893,10 @@ class World is Stateful {
     actor.lastTurn = turn
     //if (actor.state == EntityState.active || actor.pos == null || actor.zone == originalZone) {
     if (actor.pos == null || actor.zone == originalZone && actor.state == EntityState.active) {
-      Log.d("%(actor): Action cost was %(action.cost() * actor.speed)")
-      Log.d("%(actor): next turn is %(turn + action.cost() * actor.speed)")
-      actor.lastCost = action.cost()
-      _queue.add(actorId, turn + action.cost() * actor.speed)
+      Log.d("%(actor): Action cost was %((action.cost() * actor.speed).ceil)")
+      Log.d("%(actor): next turn is %(turn + (action.cost() * actor.speed).ceil)")
+      actor.lastCost = action.cost().ceil
+      _queue.add(actorId, turn + (action.cost() * actor.speed).ceil)
     }
 
     var outcome = result.succeeded

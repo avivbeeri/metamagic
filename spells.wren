@@ -27,8 +27,11 @@ class SpellToken {
   minCost { 1 }
   toList { [ this ] }
 
+  != (other) {
+    return lexeme != other.lexeme
+  }
   == (other) {
-    return _lexeme == other.lexeme
+    return lexeme == other.lexeme
   }
 
   static errorToken(lexeme) { SpellToken.new(lexeme, TokenCategory.error, 0)}
