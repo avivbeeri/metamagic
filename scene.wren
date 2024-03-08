@@ -783,11 +783,15 @@ class DialogueState is ModalWindowState {
   onExit() {
     super.onExit()
   }
+
+  dialogue { _dialogue }
+  index { _index }
+
   update() {
     if (INPUT["reject"].firing || INPUT["confirm"].firing) {
       if (_index < _dialogue.count - 1) {
         _index = _index + 1
-        window.setMessage(_dialogue[_index])
+        window.setMessage(_dialogue[_index] + ["", "Press 'ENTER' to continue..."])
       } else {
         return PlayerInputState.new()
       }
@@ -797,11 +801,18 @@ class DialogueState is ModalWindowState {
 }
 class IntroDialogueState is DialogueState {
   construct new() { super() }
+  onExit() {
+    super.onExit()
+    scene.addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.8)))
+  }
   update() {
     var next = super.update()
-    if (next == this) {
+    if (index == dialogue.count - 1 && next == this) {
       if (INPUT["lexicon"].firing) {
         return LexiconState.new()
+      }
+      if (INPUT["cast"].firing) {
+        return CastState.new()
       }
     }
     return next
@@ -939,7 +950,6 @@ class GameScene is Scene {
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages, true))
-    addElement(HintText.new(Vec.new(Canvas.width / 2, Canvas.height * 0.8)))
 
     _conditionLabels = {}
     //addElement(LogViewer.new(Vec.new(0, Canvas.height - 12 * 7), _messages))

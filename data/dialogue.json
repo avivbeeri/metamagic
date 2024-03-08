@@ -2,9 +2,13 @@
   "gameStart": [
     [
       "You set out on your adventure, lexicon in hand.",
-      "Contained within is the knowledge of your grandparent.",
+      "Contained within is the knowledge of your ancestor.",
       "",
-      "Press 'L' to open the lexicon and see your powers.",
+      "Venture forth and discover your own secrets to add to the collection.",
+      ""
+    ],
+    [
+      "Press 'L' to open the lexicon and see your word of power.",
       "Press 'SPACE' to begin casting a spell!",
       ""
     ]
