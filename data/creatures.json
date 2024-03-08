@@ -70,6 +70,7 @@
     "kind": "archmage",
     "behaviours": [
       [
+        "buffer",
         "boss"
       ]
     ],
@@ -84,7 +85,7 @@
       "mpMax": 10,
       "mp": 0,
       "atk": 1,
-      "def": 2
+      "def": 1
     }
   },
   "slime": {

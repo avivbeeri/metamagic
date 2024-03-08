@@ -69,7 +69,7 @@ class PushEffect is Effect {
         // TODO: if hit a wall, stun? extra damage?
       } else {
         var damageEffect = Components.effects.damage.new(ctx, {
-          "damage": Damage.new(((distance - i) / 2).ceil.min(1), DamageType.kinetic),
+          "damage": Damage.new(((distance - i) / 0.75).ceil.min(1), DamageType.kinetic),
           "target": target,
           "src": Environment.wall
         })

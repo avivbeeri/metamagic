@@ -203,7 +203,7 @@ class CastBehaviour is Behaviour {
     var targetGroup = TargetGroup.new(spell.target())
     targetGroup["src"] = actor.pos
     targetGroup["origin"] = actor.pos
-    var maxRange = targetGroup["area"] + targetGroup["range"]
+    var maxRange = targetGroup["area"] + (targetGroup["range"] - 1).max(0)
 
     var valid = false
     if (targetGroup.distance(player) <= maxRange) {
@@ -337,6 +337,67 @@ class SeekBehaviour is Behaviour {
       return true
     }
     actor.pushAction(Components.actions.bump.new(dir))
+    return true
+  }
+}
+
+#!component(id="buffer", group="behaviour")
+class BufferBehaviour is Behaviour {
+  construct new(args) {
+    super()
+  }
+
+  update(ctx, actor) {
+    var player = ctx.getEntityByTag("player")
+    if (!player) {
+      return false
+    }
+    var minRange = 4
+
+    var dMap = player["map"]
+    var costMap = dMap[0]
+    var nextMap = dMap[1]
+    var next = null
+    if (costMap[actor.pos] < minRange) {
+      var neighbours = ctx.zone.map.neighbours(actor.pos)
+      var candidate = []
+      for (node in neighbours) {
+        if (costMap[node] >= minRange) {
+          candidate.add(node)
+        }
+      }
+      if (candidate.isEmpty) {
+        for (node in neighbours) {
+          if (costMap[node] >= costMap[actor.pos]) {
+            candidate.add(node)
+          }
+        }
+      }
+      if (candidate.isEmpty) {
+        next = RNG.sample(neighbours)
+      } else {
+        next = RNG.sample(candidate)
+      }
+    } else if (costMap[actor.pos] > minRange) {
+      var path = pathTo(ctx, actor, actor.pos, player.pos)
+      if (path == null || path.count < 2) {
+        return false
+      }
+      next = path[1]
+    } else {
+      return false
+    }
+
+    var dir = next - actor.pos
+    dir.x = M.mid(-1, dir.x, 1)
+    dir.y = M.mid(-1, dir.y, 1)
+
+    if (!Behaviour.spaceAvailable(ctx, next)) {
+      // Stop swarms eating each other
+      return false
+    }
+
+      actor.pushAction(Components.actions.bump.new(dir))
     return true
   }
 }
