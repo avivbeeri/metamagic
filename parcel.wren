@@ -424,11 +424,12 @@ class TargetGroup is Stateful {
   mode { data["target"] }
   mode=(v) { data["target"] }
   exclude { data["exclude"] }
-  needSight { data["needSight"] }
+  needSight { data["needSight"] || true }
 
   requireSelection { mode == "area" }
 
-  spaces() {
+  spaces() { spaces(null) }
+  spaces(ctx) {
     // Return valid spaces for this target group
     var spaces = []
     for (dy in (-area)..(area)) {
@@ -441,8 +442,7 @@ class TargetGroup is Stateful {
           System.print(data)
           continue
         }
-        System.print("parcel pos %(pos)")
-        if (needSight && !ctx.zone.map["visible"]) {
+        if (needSight && !ctx.zone.map[pos]["visible"]) {
           continue
         }
         spaces.add(pos)
@@ -462,9 +462,9 @@ class TargetGroup is Stateful {
     var tileEntities = []
     var tiles = [ src.pos ]
     if (mode == "area" || mode == "nearest") {
-      tiles = spaces()
+      tiles = spaces(ctx)
     } else if (mode == "random") {
-      tiles = [ RNG.sample(spaces()) ]
+      tiles = [ RNG.sample(spaces(ctx)) ]
     }
 
     for (space in tiles) {

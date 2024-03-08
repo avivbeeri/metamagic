@@ -124,6 +124,7 @@
     { 
       "minFloor": 0,
       "generator": "forest",
+      "theme": "forest",
       "tier": 1,
       "title": "Library"
     },

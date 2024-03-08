@@ -1,5 +1,6 @@
 import "jps" for JPS
 import "math" for Vec, M
+import "fov" for Vision
 import "./spells" for Spell, SpellPhrase, SpellWords, SpellFragment
 import "parcel" for
   TargetGroup,
@@ -190,6 +191,10 @@ class CastBehaviour is Behaviour {
     var valid = false
     System.print("%(targetGroup.distance(player)) vs %(maxRange)")
     if (targetGroup.distance(player) <= maxRange) {
+      var visibleSet = Set.new()
+      var vision = Vision.new(ctx.zone.map, actor.pos, targetGroup["range"])
+      vision.compute()
+      visibleSet.addAll(vision.result)
       System.print("hit!")
       if (targetGroup.distance(player) <= targetGroup["range"] || targetGroup["area"] == 0) {
         targetGroup["origin"] = player.pos
@@ -203,14 +208,17 @@ class CastBehaviour is Behaviour {
           "origin": player.pos
         })
         var options = Set.new()
-        options.addAll(playerScan.spaces())
+        options.addAll(playerScan.spaces(ctx))
 
-        var originalOptions = targetGroup.spaces()
-        var intersection = originalOptions.where {|space| options.contains(space) }.toList
+        var originalOptions = targetGroup.spaces(ctx)
+        var intersection = originalOptions.where {|space| visibleSet.contains(space) && options.contains(space) }.toList
         if (intersection.count > 0) {
           targetGroup["origin"] = RNG.sample(intersection)
           valid = true
         }
+      }
+      if (!visibleSet.contains(targetGroup["origin"])) {
+        valid = false
       }
     }
 

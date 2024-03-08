@@ -219,7 +219,7 @@ class LineViewer is Element {
 class LogViewer is Element {
   construct new(pos, log, fade) {
     super()
-    init(pos, log, 5, fade)
+    init(pos, log, 4, fade)
   }
   construct new(pos, log, size, fade) {
     super()

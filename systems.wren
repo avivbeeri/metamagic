@@ -56,7 +56,7 @@ class AirSystem is GameSystem {
       var targetGroup = TargetGroup.new(targetSpec)
       System.print(spell.phrase.verb)
       if (spell.phrase.verb != SpellWords.infuse && spell.phrase.subject == SpellWords.air) {
-        for (space in targetGroup.spaces()) {
+        for (space in targetGroup.spaces(ctx)) {
           var tile = ctx.zone.map[space]
           if (!tile["water"]) {
             continue
@@ -73,7 +73,7 @@ class AirSystem is GameSystem {
           }
         }
       } else if (spell.phrase.subject == SpellWords.fire) {
-        for (space in targetGroup.spaces()) {
+        for (space in targetGroup.spaces(ctx)) {
           var tile = ctx.zone.map[space]
           if (tile["chilled"] && tile["chilled"] > 0) {
             tile["chilled"] = (tile["chilled"] / 2).floor
@@ -158,7 +158,7 @@ class FireSystem is GameSystem {
           }
           for (next in map.neighbours(pos)) {
             var neighbour = map[next]
-            if (neighbour["grass"]) {
+            if (neighbour["grass"] && RNG.float() > 0.3) {
               hyperspace.add(next)
             }
           }
@@ -177,7 +177,7 @@ class FireSystem is GameSystem {
       targetSpec["src"] = event.src.pos
       var targetGroup = TargetGroup.new(targetSpec)
       if (spell.phrase.subject == SpellWords.air) {
-        for (space in targetGroup.spaces()) {
+        for (space in targetGroup.spaces(ctx)) {
           var tile = ctx.zone.map[space]
           if (tile["burning"] && tile["burning"] > 0) {
             tile["burning"] = tile["burning"] + 2
@@ -185,7 +185,7 @@ class FireSystem is GameSystem {
         }
       }
       if (spell.phrase.subject == SpellWords.water) {
-        for (space in targetGroup.spaces()) {
+        for (space in targetGroup.spaces(ctx)) {
           var tile = ctx.zone.map[space]
           if (tile["burning"] && tile["burning"] > 0) {
             tile["burning"] = 0
@@ -193,7 +193,7 @@ class FireSystem is GameSystem {
         }
       } else if (spell.phrase.subject == SpellWords.fire) {
         System.print("fire cast")
-        for (space in targetGroup.spaces()) {
+        for (space in targetGroup.spaces(ctx)) {
           System.print(space)
           var tile = ctx.zone.map[space]
           if (tile["grass"]) {

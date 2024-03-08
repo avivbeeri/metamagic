@@ -23,6 +23,64 @@ var TierData = GeneratorData["floors"]
 var Distribution = GeneratorData["distribution"]
 
 class GeneratorUtils {
+  static placeItem(zone, pos) {
+    var startPos = zone["start"]
+    var level = zone["level"]
+    var entities = zone["entities"]
+    if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
+      var itemId = GeneratorUtils.pickItem(level) //RNG.sample(Items.findable).id
+      if (itemId != null) {
+        zone.map[pos]["items"] = [ InventoryEntry.new(itemId, 1) ]
+        return true
+      }
+    }
+    return false
+  }
+
+  static placeMonster(zone, pos) {
+    var startPos = zone["start"]
+    var level = zone["level"]
+    var entities = zone["entities"]
+    if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
+      var entity = GeneratorUtils.pickEnemy(level)
+      if (entity != null) {
+        entity = CreatureFactory.spawn(entity, level, pos)
+        entities.add(entity)
+        return true
+      }
+    }
+    return false
+  }
+
+  static placeEntities(zone, room, maxMonsters, maxItems) {
+    var totalMonsters = RNG.int(maxMonsters + 1)
+    var startPos = zone["start"]
+    var level = zone["level"]
+    var totalItems = RNG.int(maxItems + 1)
+    var entities = zone["entities"]
+    for (i in 0...totalMonsters) {
+      var x = RNG.int(room.p0.x + 1, room.p1.x - 1)
+      var y = RNG.int(room.p0.y + 1, room.p1.y - 1)
+
+      var pos = Vec.new(x, y)
+      placeMonster(zone, position)
+    }
+    for (i in 0...totalItems) {
+      var x = RNG.int(room.p0.x + 1, room.p1.x - 1)
+      var y = RNG.int(room.p0.y + 1, room.p1.y - 1)
+
+      var pos = Vec.new(x, y)
+
+      if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
+        //var itemId = RNG.sample(Items.findable).id
+        var itemId = GeneratorUtils.pickItem(level) //RNG.sample(Items.findable).id
+        if (itemId == null) {
+          continue
+        }
+        zone.map[pos]["items"] = [ InventoryEntry.new(itemId, 1) ]
+      }
+    }
+  }
   static spawnWater(zone, room) {
     var valid = false
     var attempts = 0
@@ -272,6 +330,7 @@ class WorldGenerator {
     }
     zone.data.remove("entities")
     zone["title"] = data["title"]
+    zone["theme"] = data["theme"]
     return zone
   }
 }
@@ -589,14 +648,15 @@ class BasicZoneGenerator {
   }
 }
 
-class ForestLevelGenerator {
+
+class ForestLevelGenerator  {
   static generate(args) {
     var level = args[0]
     var map = TileMap8.new()
     var zone = Zone.new(map)
 
     for (y in 0...32) {
-      for (x in 0...32) {
+      for (x in 0...31) {
         map[x,y] = Tile.new({
           "blocking": true,
           "solid": true,
@@ -607,10 +667,32 @@ class ForestLevelGenerator {
 
     var center = Vec.new(15, 15)
     var range = 5
-    var room = AutomataRoom.new(0, 0, 32, 32)
+    var room = AutomataRoom.new(0, 0, 32, 31)
     var inner = room.inner
     for (pos in inner) {
       map[pos] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+    }
+    for (x in 0...32) {
+      map[x, 0] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+      map[x, 31] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+      map[0, x] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+      map[31, x] = Tile.new({
         "blocking": false,
         "solid": false,
         "visible": false
@@ -625,9 +707,11 @@ class ForestLevelGenerator {
     zone["level"] = level
     // zone.map[Vec.new(15, 13)]["stairs"] = "down"
     zone["start"] = start
+    var place = RNG.sample(inner)
 
- //   placeMonster(zone, Vec.new(16, 10))
-//    placeItem(zone, Vec.new(16, 14))
+    GeneratorUtils.placeMonster(zone, place)
+    place = RNG.sample(inner)
+    GeneratorUtils.placeItem(zone, place)
     return zone
   }
 }
@@ -664,40 +748,12 @@ class TestRoomGenerator {
     // zone.map[Vec.new(15, 13)]["stairs"] = "down"
     zone["start"] = Vec.new(16, 16)
 
-    placeMonster(zone, Vec.new(16, 10))
-    placeItem(zone, Vec.new(16, 14))
+    GeneratorUtils.placeMonster(zone, Vec.new(16, 10))
+    GeneratorUtils.placeItem(zone, Vec.new(16, 14))
     return zone
   }
-  static placeItem(zone, pos) {
-    var startPos = zone["start"]
-    var level = zone["level"]
-    var entities = zone["entities"]
-    if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
-      var itemId = GeneratorUtils.pickItem(level) //RNG.sample(Items.findable).id
-      if (itemId != null) {
-        zone.map[pos]["items"] = [ InventoryEntry.new(itemId, 1) ]
-        return true
-      }
-    }
-    return false
-  }
 
-  static placeMonster(zone, pos) {
-    var startPos = zone["start"]
-    var level = zone["level"]
-    var entities = zone["entities"]
-    if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
-      var entity = GeneratorUtils.pickEnemy(level)
-      if (entity != null) {
-        entity = CreatureFactory.spawn(entity, level, pos)
-        entities.add(entity)
-        return true
-      }
-    }
-    return false
-  }
-
-  static placeEntities(zone, room, maxMonsters, maxItems) {
+  placeEntities(zone, room, maxMonsters, maxItems) {
     var totalMonsters = RNG.int(maxMonsters + 1)
     var startPos = zone["start"]
     var level = zone["level"]
@@ -708,7 +764,7 @@ class TestRoomGenerator {
       var y = RNG.int(room.p0.y + 1, room.p1.y - 1)
 
       var pos = Vec.new(x, y)
-      placeMonster(zone, position)
+      GeneratorUtils.placeMonster(zone, position)
     }
     for (i in 0...totalItems) {
       var x = RNG.int(room.p0.x + 1, room.p1.x - 1)
@@ -1050,8 +1106,8 @@ class AutomataRoom {
 
   inner {
     var inside = []
-    for (y in (_p0.y+1)..._p1.y) {
-      for (x in (_p0.x+1)..._p1.x) {
+    for (y in (_p0.y).._p1.y) {
+      for (x in (_p0.x).._p1.x) {
         if (!getCell(x, y)) {
           inside.add(Vec.new(x, y))
         }

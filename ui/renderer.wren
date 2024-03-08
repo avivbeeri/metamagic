@@ -55,6 +55,8 @@ class AsciiRenderer is Element {
     _pos = pos
     _bg = INK["bg"] * 1
     _bg.a = 128
+    _sheet = SpriteSheet.load("res/img/helper.png", 8)
+    _sheet.bg = Color.none
   }
   process(event) {
     if (event is TargetBeginEvent) {
@@ -145,6 +147,9 @@ class AsciiRenderer is Element {
           continue
         }
         var color = INK["default"]
+        if (_world.zone["theme"] == "forest") {
+          color = INK["forest.default"]
+        }
         if (map[x, y]["blood"]) {
           color = INK["blood"]
         }
@@ -184,8 +189,13 @@ class AsciiRenderer is Element {
             printSymbolBg("£", x, y, bg)
             printSymbol("£", x, y, color)
           } else {
-            printSymbolBg("#", x, y, INK["wallBg"])
-            printSymbol("#", x, y, INK["wall"])
+            if (_world.zone["theme"] == "forest") {
+              printSymbolBg("#", x, y, INK["forest.wallBg"])
+              printSymbolHelper("♣", x, y, INK["forest.wall"])
+            } else {
+              printSymbolBg("#", x, y, INK["wallBg"])
+              printSymbol("#", x, y, INK["wall"])
+            }
           }
         } else if (map[x, y]["stairs"]) {
           if (map[x, y]["stairs"] == "down") {
@@ -208,7 +218,11 @@ class AsciiRenderer is Element {
           printSymbol("~", x, y, color)
         } else {
           printSymbolBg(".", x, y, INK["floorStone"])
-          printSymbol(".", x, y, color)
+          if (_world.zone["theme"] == "forest") {
+            printSymbol(".", x, y, color)
+          } else {
+            printSymbol(".", x, y, color)
+          }
         }
 
         var items = map[x, y]["items"]
@@ -283,6 +297,16 @@ class AsciiRenderer is Element {
 
   printSymbolBg(symbol, x, y, bg) {
     Canvas.rectfill(x * 16, y * 16, 15, 15, bg)
+  }
+  printSymbolHelper(symbol, x, y, color) {
+    var sx = 0
+    var sy = 0
+    if (symbol == "♣") {
+      sx = 0
+      sy = 0
+    }
+    _sheet.fg = color
+    _sheet.drawFrom(sx, sy, x * 16 + 4, y * 16 + 4)
   }
   printSymbol(symbol, x, y, color) {
     var top = y * 16 + 4
