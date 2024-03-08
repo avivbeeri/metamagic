@@ -37,14 +37,18 @@ class GeneratorUtils {
     return false
   }
 
-  static placeMonster(zone, pos) {
+  static placeMonster(zone, pos) { placeMonster(zone, pos, null) }
+  static placeMonster(zone, pos, id) {
     var startPos = zone["start"]
     var level = zone["level"]
     var entities = zone["entities"]
     if (GeneratorUtils.isValidEntityLocation(zone, pos) && pos != startPos) {
-      var entity = GeneratorUtils.pickEnemy(level)
-      if (entity != null) {
-        entity = CreatureFactory.spawn(entity, level, pos)
+      var entityId = id
+      if (entityId == null) {
+        entityId = GeneratorUtils.pickEnemy(level)
+      }
+      if (entityId != null) {
+        var entity = CreatureFactory.spawn(entityId, level, pos)
         entities.add(entity)
         return true
       }
@@ -360,7 +364,7 @@ class RandomZoneGenerator {
         })
       }
     }
-    var current = Vec.new(RNG.int(1, 31), RNG.int(1, 31))
+    var current = Vec.new(RNG.int(1, 31), RNG.int(1, 30))
     if (startPos) {
       current = startPos
     }
@@ -372,7 +376,7 @@ class RandomZoneGenerator {
     var inner = [ current ]
     for (i in 0...dist) {
       var next = null
-      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 31) {
+      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 30) {
         var dir = DIR_FOUR[RNG.int(4)]
         next = current + dir
       }
@@ -510,7 +514,7 @@ class BasicZoneGenerator {
       var w = RNG.int(minSize, maxSize + 1)
       var h = RNG.int(minSize, maxSize + 1)
       var x = RNG.int(1, 32 - w - 1)
-      var y = RNG.int(1, 31 - h - 1)
+      var y = RNG.int(1, 30 - h - 1)
       if (rooms.count == 0 && startPos) {
         // ensure start position is contained in first room
         x = (startPos.x - RNG.int(1, w - 1)).max(0)
@@ -710,7 +714,9 @@ class ForestLevelGenerator  {
 
     var place = RNG.sample(inner)
     zone.map[place]["stairs"] = "down"
-    var startOptions = inner.where {|position| Line.chebychev(position, place) > 20 }.toList
+    var startOptions = inner.where {|position|
+      return Line.chebychev(position, place) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
+    }.toList
     if (startOptions.count == 0) {
       zone["start"] = RNG.sample(inner)
     } else {
@@ -719,6 +725,8 @@ class ForestLevelGenerator  {
 
     place = RNG.sample(inner)
     GeneratorUtils.placeMonster(zone, place)
+    place = RNG.sample(inner)
+    GeneratorUtils.placeMonster(zone, place, "treant")
     place = RNG.sample(inner)
     GeneratorUtils.placeItem(zone, place)
     return zone

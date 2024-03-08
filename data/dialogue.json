@@ -1,4 +1,14 @@
 {
+  "gameStart": [
+    [
+      "You set out on your adventure, lexicon in hand.",
+      "Contained within is the knowledge of your grandparent.",
+      "",
+      "Press 'L' to open the lexicon and see your powers.",
+      "Press 'SPACE' to begin casting a spell!",
+      ""
+    ]
+  ],
   "beforeBoss": [
     ["????: Well well, you made it..."],
     ["????: Yes, I've been expecting you."],

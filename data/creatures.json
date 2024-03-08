@@ -21,6 +21,27 @@
       "hpMax": 3
     }
   },
+  "treant": {
+    "symbol": "T",
+    "kind": "treant",
+    "behaviours": [
+      [
+        "seek"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ "FIRE" ],
+    "resistances": [ "KINETIC" ],
+    "name": "Treant",
+    "pronoun": "it",
+    "stats": {
+      "hp": 5,
+      "hpMax": 5,
+      "atk": 2,
+      "def": 2,
+      "spd": 0.333
+    }
+  },
   "skeleton": {
     "symbol": "s",
     "kind": "skeleton",
@@ -30,13 +51,15 @@
       ]
     ],
     "immunities": [ ],
-    "vulnerabilities": [ "EARTH" ],
+    "vulnerabilities": [ "KINETIC" ],
     "resistances": [ "FIRE" ],
     "name": "Skeleton",
     "pronoun": "it",
     "stats": {
       "hp": 3,
-      "hpMax": 3
+      "hpMax": 3,
+      "atk": 2,
+      "def": 1
     }
   },
   "slime": {

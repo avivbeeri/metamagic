@@ -202,6 +202,7 @@ class Event is Stateful {
 }
 // Generate events for general use
 var TurnEvent = Event.create("turn", ["turn"])
+var GameStartEvent = Event.create("gameStart", [])
 var GameEndEvent = Event.create("gameEnd", ["win"])
 var ChangeZoneEvent = Event.create("changeZone", ["floor"])
 var EntityAddedEvent = Event.create("entityAdded", ["entity"])
@@ -604,6 +605,7 @@ class World is Stateful {
   start() {
     _started = true
     systems.each{|system| system.start(this) }
+    addEvent(GameStartEvent.new())
 
     for (event in _events) {
       process(event)

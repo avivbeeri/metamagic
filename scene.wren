@@ -739,7 +739,7 @@ class HelpState is ModalWindowState {
 
   onEnter() {
     var message = [
-      "'Confirm' - Return",
+      "'Confirm' - Enter",
       "'Reject' - Escape",
       "",
       "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
@@ -778,7 +778,7 @@ class DialogueState is ModalWindowState {
     _dialogue = Dialogue[moment]
     _index = 0
     super.onEnter()
-    window = Dialog.new(_dialogue[_index] + ["", "Press 'confirm' to continue..."])
+    window = Dialog.new(_dialogue[_index] + ["", "Press 'ENTER' to continue..."])
   }
   onExit() {
     super.onExit()
@@ -793,6 +793,18 @@ class DialogueState is ModalWindowState {
       }
     }
     return this
+  }
+}
+class IntroDialogueState is DialogueState {
+  construct new() { super() }
+  update() {
+    var next = super.update()
+    if (next == this) {
+      if (INPUT["lexicon"].firing) {
+        return LexiconState.new()
+      }
+    }
+    return next
   }
 }
 class GameEndState is ModalWindowState {
@@ -945,6 +957,10 @@ class GameScene is Scene {
     _state.process(event)
     super.process(event)
 
+    if (event is Components.events.gameStart) {
+      System.print("Game started!")
+      changeState(IntroDialogueState.new().with(["gameStart"]))
+    }
     if (event is Components.events.gameEnd) {
       var message
       var restart = true
@@ -955,7 +971,7 @@ class GameScene is Scene {
         message = "You have fallen, but perhaps others will take up your cause."
       }
       _messages.add(message, INK["playerDie"], false)
-      changeState(GameEndState.new().with([ [ message, "", "Press 'confirm' to try again" ], restart ]))
+      changeState(GameEndState.new().with([ [ message, "", "Press 'ENTER' to try again" ], restart ]))
     }
     if (event is Components.events.story) {
       if (event.moment.startsWith("dialogue:")) {
