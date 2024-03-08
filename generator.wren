@@ -264,6 +264,7 @@ class WorldGenerator {
 
     var world = World.new()
     world.generator = WorldGenerator
+    world.systems.add(ElementalSystem.new())
     world.systems.add(SpellSystem.new())
     world.systems.add(InventorySystem.new())
     world.systems.add(ExperienceSystem.new())
@@ -1197,4 +1198,5 @@ import "./systems" for
   ExperienceSystem,
   ManaRegenSystem,
   FireSystem,
-  AirSystem
+  AirSystem,
+  ElementalSystem

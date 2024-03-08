@@ -739,7 +739,7 @@ class World is Stateful {
     _queue.add(id, t)
     entity.lastTurn = t
     entity.lastCost = 0
-    addEvent(EntityAddedEvent.new(id))
+    addEvent(EntityAddedEvent.new(entity))
     return EntityRef.new(this, entity.id)
   }
 

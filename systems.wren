@@ -6,6 +6,48 @@ import "./spells" for SpellWords
 import "combat" for Condition, CombatProcessor, Damage, DamageType, Environment, TagGroup
 import "collections" for Set
 
+class ElementalSystem is GameSystem {
+  construct new() {
+    super()
+    _variants  = {
+      0: {
+        "words": [ SpellWords.fire, SpellWords.conjure, SpellWords.far],
+        "resistances": [ "FIRE" ],
+        "vulnerabilities": [ "ICE" ],
+        "name": "Fire Elemental"
+      },
+      1: {
+        "vulnerabilities": [],
+        "resistances": [ "KINETIC" ],
+        "words": [ SpellWords.earth, SpellWords.conjure, SpellWords.close],
+        "name": "Earth Elemental"
+      },
+      2: {
+        "vulnerabilities": [],
+        "resistances": [ "FIRE", "ICE" ],
+        "words": [ SpellWords.water, SpellWords.conjure, SpellWords.far],
+        "name": "Water Elemental"
+      },
+      3: {
+        "vulnerabilities": [],
+        "resistances": [ "FIRE" ],
+        "words": [ SpellWords.air, SpellWords.conjure, SpellWords.close],
+        "name": "Air Elemental"
+      },
+    }
+  }
+  process(ctx, event) {
+    if (event is Components.events.entityAdded && event.entity["kind"] == "elemental") {
+      var choice = RNG.int(4)
+      var variant = _variants[choice]
+      var entity = event.entity
+      entity["name"] = variant["name"]
+      entity["words"] = variant["words"]
+      entity["vulnerabilities"].addAll(variant["vulnerabilities"])
+      entity["resistances"].addAll(variant["resistances"])
+    }
+  }
+}
 class AirSystem is GameSystem {
   construct new() {
     super()

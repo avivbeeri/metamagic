@@ -183,9 +183,11 @@ class CastBehaviour is Behaviour {
 
   update(ctx, actor) {
     if (!actor.has("words")) {
-      actor["spells.queue"] = []
       actor["words"] = []
       initializeWords(actor)
+    }
+    if (!actor.has("spells.queue")) {
+      actor["spells.queue"] = []
     }
     if (actor["spells.queue"].isEmpty) {
       actor["spells.queue"].add(buildSpell(actor))

@@ -33,7 +33,7 @@ class SpellToken {
     return !(this == other)
   }
   == (other) {
-    return lexeme == other.lexeme
+    return other is SpellToken && lexeme == other.lexeme
   }
 
   static errorToken(lexeme) { SpellToken.new(lexeme, TokenCategory.error, "<ERROR>", 0)}
