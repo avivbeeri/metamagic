@@ -248,7 +248,7 @@ class GeneratorUtils {
             count = count + 1
           }
         }
-        if (count == 3) {
+        if (count > 2) {
           list.add(Vec.new(x, y))
         }
       }
@@ -513,7 +513,7 @@ class BasicZoneGenerator {
     for (i in 0...maxRooms) {
       var w = RNG.int(minSize, maxSize + 1)
       var h = RNG.int(minSize, maxSize + 1)
-      var x = RNG.int(1, 32 - w - 1)
+      var x = RNG.int(1, 31 - w - 1)
       var y = RNG.int(1, 30 - h - 1)
       if (rooms.count == 0 && startPos) {
         // ensure start position is contained in first room
@@ -720,6 +720,13 @@ class ForestLevelGenerator  {
     }
     var start = RNG.sample(inner)
 
+    var place = RNG.sample(inner)
+    for (dy in -1..1) {
+      for (dx in -1..1) {
+        zone.map[place]["stone"] = true
+      }
+    }
+    zone.map[place]["stairs"] = "down"
 
     for (i in 0...RNG.int(2, 6)) {
       GeneratorUtils.spawnGrass(zone, room)
@@ -731,13 +738,6 @@ class ForestLevelGenerator  {
     zone["level"] = level
     zone["start"] = start
 
-    var place = RNG.sample(inner)
-    for (dy in -1..1) {
-      for (dx in -1..1) {
-        zone.map[place]["stone"] = true
-      }
-    }
-    zone.map[place]["stairs"] = "down"
     var startOptions = inner.where {|position|
       return Line.chebychev(position, place) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
     }.toList

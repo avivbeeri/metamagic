@@ -1,4 +1,26 @@
 {
+  "elemental": {
+    "symbol": "e",
+    "kind": "elemental",
+    "behaviours": [
+      [ "cast" ],
+      [
+        "wander"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ ],
+    "resistances": [ ],
+    "name": "Elemental",
+    "pronoun": "it",
+    "stats": {
+      "spd": 0.75,
+      "mp": 10,
+      "mpMax": 10,
+      "hp": 3,
+      "hpMax": 3
+    }
+  },
   "sorcerer": {
     "symbol": "a",
     "kind": "sorcerer",

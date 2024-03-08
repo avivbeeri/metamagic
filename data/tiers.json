@@ -20,11 +20,15 @@
       "enemies": [
         [
           "rat",
-          0.3
+          0.2
+        ],
+        [
+          "elemental",
+          0.4
         ],
         [
           "skeleton",
-          0.7
+          0.4
         ]
       ],
       "items": [
@@ -42,11 +46,11 @@
       "tier": 3,
       "enemies": [
         [
-          "rat",
-          0.1
+          "skeleton",
+          0.2
         ],
         [
-          "skeleton",
+          "elemental",
           0.3
         ],
         [

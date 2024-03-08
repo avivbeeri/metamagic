@@ -1589,6 +1589,7 @@ class TextUtils {
 
 // ==================================
 var RNG
+var DEBUG
 class DataFile {
   construct load(name, path) {
     init_(name, path, {}, false)
@@ -1646,6 +1647,7 @@ class ConfigData is DataFile {
     var Seed = this["seed"]
     Log.d("RNG Seed: %(Seed)")
     RNG = Random.new(Seed)
+    DEBUG = this["debug"] || false
     SCALE = this["scale"]
   }
 }
