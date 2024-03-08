@@ -13,8 +13,8 @@ if [ -z "$(git status --porcelain)" ]; then
 
   # build and deploy
   dome nest -c res data *.wren
-  mv game.egg ../dome-builds/brazier
-  cp config.json ../dome-builds/brazier
+  mv game.egg ../dome-builds/arcanist
+  cp config.json ../dome-builds/arcanist
   cd ../dome-builds/brazier
   ./upload-all.sh $1 $2
 else 
