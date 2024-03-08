@@ -9,13 +9,19 @@ import "palette" for INK
 import "ui/animation" for Animation
 import "ui" for HintText
 
+var TITLE = [
+  "Arcanist's",
+  "Heritage",
+]
+
 class StartScene is Scene {
   construct new(args) {
     super(args)
     Window.color = Color.black
-    _area = [
-      Vec.new(8 * 8, 8), // Font["nightmare"].getArea("Acolyte's"),
-    ]
+    Font.load("empire", "res/fonts/empire.ttf", 64)
+    _font = Font["empire"]
+    _area = TITLE.map {|line| _font.getArea(line) }.toList
+
     _t = 0
     _a = 0
 
@@ -67,13 +73,17 @@ class StartScene is Scene {
     var top = (Canvas.height - height) / 2
     var x0 = (Canvas.width - _area[0].x) / 2
     var thick = 4
-    for (y in -thick..thick) {
-      for (x in -thick..thick) {
-        Canvas.print("Untitled", x0 + x, top + y, INK["titleBg"])
+    var i = 0
+    for (line in TITLE) {
+      for (y in -thick..thick) {
+        for (x in -thick..thick) {
+          _font.print(line, x0 + x, top + y, INK["titleBg"])
+        }
       }
+      _font.print(line, x0, top, INK["titleFg"])
+      top = top + _area[i].y
+      i = i + 1
     }
-    Canvas.print("Untitled", x0, top, INK["titleFg"])
-
     var x = (Canvas.width - 30 * 8)/ 2
     Canvas.print("Press SPACE or ENTER to begin", x, Canvas.height * 0.90, INK["title"])
     super.draw()
