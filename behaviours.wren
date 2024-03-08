@@ -1,7 +1,7 @@
 import "jps" for JPS
 import "math" for Vec, M
 import "fov" for Vision
-import "./spells" for Spell, SpellPhrase, SpellWords, SpellFragment
+import "./spells" for Spell, SpellPhrase, SpellWords, SpellFragment, TokenCategory, AllWords
 import "parcel" for
   TargetGroup,
   Reflect,
@@ -92,32 +92,6 @@ class UnconsciousBehaviour is Behaviour {
   }
 }
 
-#!component(id="boss", group="behaviour")
-class BossBehaviour is Behaviour {
-  construct new(args) {
-    super()
-  }
-  update(ctx, actor) {
-    var player = ctx.getEntityByTag("player")
-    // initial setup
-    // Get spells to know
-
-    // If no illusions,
-    // summon illusions
-
-    // Queue the next spell
-    // Move to a valid target spot
-    // attack the player?
-    // retreat
-    // repeat
-    if (!player) {
-      return false
-    }
-    return false
-    // Compute LoS to player
-    // if in range, charge and target with a spell
-  }
-}
 
 #!component(id="randomWalk", group="behaviour")
 class RandomWalkBehaviour is Behaviour {
@@ -182,14 +156,40 @@ class CastBehaviour is Behaviour {
   construct new(args) {
     super()
   }
+
+  initializeWords(actor) {
+    actor["words"].addAll([
+      SpellWords.conjure,
+      SpellWords.fire,
+      SpellWords.far,
+      SpellWords.big
+    ])
+  }
+
+  buildSpell(actor) {
+    var words = actor["words"]
+    var verb =  RNG.sample(words.where {|word| word.category == TokenCategory.verb }.toList)
+    var subject =  RNG.sample(words.where {|word| word.category == TokenCategory.subject }.toList)
+    var object =  RNG.sample(words.where {|word| word.category == TokenCategory.object }.toList)
+
+    var modifiers = words.where {|word| word.category == TokenCategory.modifier }.toList
+    if (!modifiers.isEmpty && RNG.float() > 0.5) {
+      var modifier =  RNG.sample(modifiers)
+      object = SpellFragment.new(object, modifier)
+    }
+
+    return Spell.build(SpellPhrase.new(verb, subject, object))
+  }
+
   update(ctx, actor) {
-    if (!actor.has("spells")) {
-      actor["spells"] = []
-      actor["spells"].add(Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellFragment.new(SpellWords.far, SpellWords.big))))
+    if (!actor.has("words")) {
       actor["spells.queue"] = []
+      actor["words"] = []
+      initializeWords(actor)
     }
     if (actor["spells.queue"].isEmpty) {
-      actor["spells.queue"] = RNG.shuffle(actor["spells"][0..-1])
+      actor["spells.queue"].add(buildSpell(actor))
+      return false
     }
     var spell = actor["spells.queue"][0]
 
@@ -253,6 +253,53 @@ class CastBehaviour is Behaviour {
     return true
   }
 }
+
+#!component(id="boss", group="behaviour")
+class BossBehaviour is CastBehaviour {
+  construct new(args) {
+    super()
+  }
+  initializeWords(actor) {
+    var ctx = actor.ctx
+    var player = ctx.getEntityByTag("player")
+    var table = player["proficiency"]
+    for (tableEntry in table) {
+      var entry = tableEntry.value
+      var key = tableEntry.key
+      if (entry["gameUsed"] || entry["discovered"]) {
+        var word = AllWords.where {|word| word.lexeme == key }.toList[0]
+        actor["words"].add(word)
+      }
+    }
+    System.print(actor["words"])
+  }
+  buildSpell(actor) {
+    var spell = super.buildSpell(actor)
+    var mp = actor["stats"]["mp"]
+    var mpMax = actor["stats"]["mpMax"]
+    var cost = spell.cost(actor)
+    System.print("MP: %(mp)/%(mpMax) - spell: %(cost)")
+    actor["stats"].set("mpMax", cost)
+    if (actor["stats"]["mp"] > cost) {
+      actor["stats"].set("mp", cost)
+    }
+
+    return spell
+  }
+
+  update(ctx, actor) {
+    // If no illusions,
+    // summon illusions
+
+    // Queue the next spell
+    // Move to a valid target spot
+    // attack the player?
+    // retreat
+    // repeat
+    return super.update(ctx, actor)
+  }
+}
+
 #!component(id="seek", group="behaviour")
 class SeekBehaviour is Behaviour {
   construct new(args) {

@@ -69,7 +69,6 @@
     "symbol": "A",
     "kind": "archmage",
     "behaviours": [
-      [ "cast"],
       [
         "boss"
       ]
@@ -82,8 +81,8 @@
     "stats": {
       "hp": 10,
       "hpMax": 10,
-      "mpMax": 50,
-      "mp": 50,
+      "mpMax": 10,
+      "mp": 0,
       "atk": 1,
       "def": 2
     }
