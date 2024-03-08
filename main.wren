@@ -1,7 +1,7 @@
 import "dome" for Window
 import "math" for Vec
 import "jukebox" for Jukebox
-import "graphics" for Canvas, Font, ImageData, Color
+import "graphics" for Canvas, Font, ImageData, Color, SpriteSheet
 import "parcel" for ParcelMain, Scene, Config, Scheduler
 import "inputs" for VI_SCHEME as INPUT
 import "input" for Mouse
@@ -17,6 +17,8 @@ var TITLE = [
 class StartScene is Scene {
   construct new(args) {
     super(args)
+    _icons = SpriteSheet.load("res/img/icons.png", 32)
+    _icons.bg = Color.none
     Window.color = Color.black
     Font.load("empire", "res/fonts/empire.ttf", 64)
     _font = Font["empire"]
@@ -106,6 +108,7 @@ class StartScene is Scene {
       var y = (c.y + (angle + (i / 4)* 2 * Num.pi).sin * 128 * d)
       Canvas.circlefill(x, y, r, color)
       Canvas.circlefill(x, y, r - thick, INK["black"])
+      _icons.drawFrom(i - 1, 0, x - 15, y - 15)
     }
     for (i in 1..4) {
       var r = 24
