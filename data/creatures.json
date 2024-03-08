@@ -48,7 +48,10 @@
     "kind": "skeleton",
     "behaviours": [
       [
-        "localSeek", 7
+        "localSeek", 7, true
+      ],
+      [
+        "wander"
       ]
     ],
     "immunities": [ ],

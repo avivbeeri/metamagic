@@ -336,6 +336,8 @@ class SeekBehaviour is Behaviour {
       _bump = true
     }
   }
+  bump { _bump }
+  bump=(v) { _bump = v }
   update(ctx, actor) {
     var player = ctx.getEntityByTag("player")
     if (!player) {
@@ -355,6 +357,7 @@ class SeekBehaviour is Behaviour {
       return false
     }
     if (!_bump) {
+      System.print("nobump")
       if (!Behaviour.spaceAvailableWithPlayer(ctx, next)) {
         actor.pushAction(Action.doNothing)
         return false
@@ -362,6 +365,7 @@ class SeekBehaviour is Behaviour {
       actor.pushAction(Components.actions.simpleMove.new(dir))
       return true
     }
+    System.print("bump")
     actor.pushAction(Components.actions.bump.new(dir))
     return true
   }
@@ -444,8 +448,11 @@ class BufferBehaviour is Behaviour {
 #!component(id="localSeek", group="behaviour")
 class LocalSeekBehaviour is SeekBehaviour {
   construct new(args) {
-    super()
+    super(args)
     _range = args[0]
+    if (args.count > 1) {
+      bump = args[1]
+    }
   }
   update(ctx, actor) {
     var player = ctx.getEntityByTag("player")
@@ -454,6 +461,7 @@ class LocalSeekBehaviour is SeekBehaviour {
     }
     var dpath = player["map"][0]
     if (!dpath[actor.pos] || (_range && dpath[actor.pos] > _range)) {
+      System.print("ignoring localseek")
       return false
     }
     return super.update(ctx, actor)

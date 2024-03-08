@@ -227,6 +227,11 @@ class StatGroup {
     set(stat, M.mid(0, _base[stat] + amount, _base[maxStat]))
     return amount
   }
+  maximize(stat, maxStat) {
+    var amount = (_base[maxStat] - _base[stat])
+    set(stat, _base[stat] + amount)
+    return amount
+  }
 
   has(stat) { _base[stat] }
   [stat] { get(stat) }

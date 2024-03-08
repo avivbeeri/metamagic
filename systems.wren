@@ -12,17 +12,20 @@ class ElementalSystem is GameSystem {
     _variants  = {
       0: {
         "words": [ SpellWords.fire, SpellWords.conjure, SpellWords.far],
-        "resistances": [ "FIRE" ],
+        "immunities": [ "FIRE" ],
+        "resistances": [],
         "vulnerabilities": [ "ICE" ],
         "name": "Fire Elemental"
       },
       1: {
+        "immunities": [ ],
         "vulnerabilities": [],
         "resistances": [ "KINETIC" ],
         "words": [ SpellWords.earth, SpellWords.conjure, SpellWords.close],
         "name": "Earth Elemental"
       },
       2: {
+        "immunities": [ ],
         "vulnerabilities": [],
         "resistances": [ "FIRE", "ICE" ],
         "words": [ SpellWords.water, SpellWords.conjure, SpellWords.far],
@@ -30,6 +33,7 @@ class ElementalSystem is GameSystem {
       },
       3: {
         "vulnerabilities": [],
+        "immunities": [ ],
         "resistances": [ "FIRE" ],
         "words": [ SpellWords.air, SpellWords.conjure, SpellWords.close],
         "name": "Air Elemental"
@@ -45,6 +49,7 @@ class ElementalSystem is GameSystem {
       entity["words"] = variant["words"]
       entity["vulnerabilities"].addAll(variant["vulnerabilities"])
       entity["resistances"].addAll(variant["resistances"])
+      entity["immunities"].addAll(variant["immunities"])
     }
   }
 }
@@ -139,7 +144,9 @@ class FireSystem is GameSystem {
     tile["grass"] = false
     tile["burning"] = 3
     for (entity in ctx.getEntitiesAtPosition(position)) {
-      applyBurningTo(ctx, entity)
+      if (!entity["immunities"].contains("FIRE")) {
+        applyBurningTo(ctx, entity)
+      }
     }
     _burning.add(position)
   }
@@ -254,6 +261,31 @@ class FireSystem is GameSystem {
 class ManaRegenSystem is GameSystem {
   construct new() { super() }
   process(ctx, event) {
+    if (event is ChangeZoneEvent && event.floor != 0) {
+      var player = ctx.getEntityByTag("player")
+      var inventory = player["inventory"]
+
+      var entries = player["inventory"].where {|entry| entry.id == "food" }
+      if (entries.count <= 0) {
+        ctx.addEvent(Components.events.campfire.new(false))
+        return
+      }
+      var entry = entries.toList[0]
+      if (entry.qty <= 0) {
+        ctx.addEvent(Components.events.campfire.new(false))
+        return
+      }
+      if (player["stats"]["hp"] < player["stats"]["hpMax"]) {
+        entry.subtract(1)
+        var amount = player["stats"].maximize("hp", "hpMax")
+        player["stats"].maximize("mp", "mpMax")
+        ctx.addEvent(Components.events.heal.new(player, amount))
+        ctx.addEvent(Components.events.regen.new(player))
+        ctx.addEvent(Components.events.campfire.new(true))
+      } else {
+        ctx.addEvent(Components.events.campfire.new(false))
+      }
+    }
     if (event is Components.events.turn) {
       for (entity in ctx.entities()) {
         if (!entity.has("stats")) {

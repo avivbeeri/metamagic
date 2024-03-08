@@ -56,17 +56,19 @@ class Panel is Element {
   centerHorizontally() {
     updateSize()
     var parentSize = parent ? parent.size : Vec.new(Canvas.width, Canvas.height)
-    pos.x = (parentSize.x - size.x) / 2
+    pos.x = ((parentSize.x - size.x) / 2).floor
   }
   centerVertically() {
     updateSize()
     var parentSize = parent ? parent.size : Vec.new(Canvas.width, Canvas.height)
-    pos.y = (parentSize.y - size.y) / 2
+    pos.y = ((parentSize.y - size.y) / 2).floor
   }
   center() {
     updateSize()
     var parentSize = parent ? parent.size : Vec.new(Canvas.width, Canvas.height)
     pos = (parentSize - size) / 2
+    pos.x = pos.x.floor
+    pos.y = pos.y.floor
   }
 
   size { _size }

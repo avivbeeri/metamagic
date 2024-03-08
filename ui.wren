@@ -389,6 +389,9 @@ class HealthBar is Element {
   }
 
   updateValue() {
+    if (!_world) {
+      return
+    }
     var stats = _world.getEntityById(_entity)["stats"]
     var hp = stats.get("hp")
     var hpMax = stats.get("hpMax")

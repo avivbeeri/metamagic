@@ -236,7 +236,7 @@ class GeneratorUtils {
   }
   static findPockets(map) {
     var list = []
-    for (y in 0...32) {
+    for (y in 0...31) {
       for (x in 0...32) {
         if (map[x, y]["stairs"] || map[x, y]["solid"]) {
           continue
@@ -377,7 +377,7 @@ class RandomZoneGenerator {
     var inner = [ current ]
     for (i in 0...dist) {
       var next = null
-      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 30) {
+      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 29) {
         var dir = DIR_FOUR[RNG.int(4)]
         next = current + dir
       }

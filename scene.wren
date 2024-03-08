@@ -1,6 +1,6 @@
 import "jukebox" for Jukebox
 import "dome" for Process, Log, StringUtils
-import "graphics" for Canvas, Color
+import "graphics" for Canvas, Color, ImageData
 import "input" for Keyboard, Mouse
 import "math" for Vec
 import "parcel" for
@@ -25,6 +25,7 @@ import "./text" for TextSplitter
 import "./ui/renderer" for Renderer
 import "./ui/label" for Label
 import "./ui/textbox" for TextBox
+import "./ui/image" for ImagePanel
 import "./ui/pane" for Pane
 import "./ui/line" for Line as UiLine
 import "./ui/panel" for SizeMode, Panel
@@ -448,12 +449,38 @@ class ModalWindowState is SceneState {
     if (windowType == "history") {
       window = HistoryViewer.new(Vec.new(border, border), Vec.new(Canvas.width - border*2, Canvas.height - border*2), scene.messages)
     }
+    if (windowType == "food") {
+      var consumedFood = arg(1)
+      window = Pane.new(Vec.new(Canvas.width, Canvas.height))
+      window.center()
+      window.bg = INK["black"]
+      var image = window.addElement(ImagePanel.new(ImageData.load("res/img/campfire.png")))
+      image.center()
+      System.print("pos: %(image.pos)")
+      var pane = window.addElement(Pane.new(Vec.new()))
+      pane.sizeMode = SizeMode.auto
+      var messageLabel = pane.addElement(TextBox.new("", Canvas.width * 0.6 ))
+      var label = pane.addElement(Label.new(Vec.new(0, 24), "Press \"ENTER\" to continue" ))
+
+      label.centerHorizontally()
+      if (consumedFood) {
+        messageLabel.text = "You descend to the lower levels.\n You recover yourself with the help of some food."
+        // window = Dialog.new("You descend to the lower levels. You recover yourself with the help of some food.")
+      } else {
+        messageLabel.text = "You descend to the lower levels. \nYou have no food to bolster yourself with."
+        // window = Dialog.new("You descend to the lower levels. You have no food to bolster yourself with.")
+      }
+      messageLabel.centerHorizontally()
+      pane.alignBottom()
+      pane.centerHorizontally()
+      pane.pos.y = pane.pos.y - 48
+    }
     if (windowType == "error") {
       window = Dialog.new("Not enough MP to cast this spell.")
     }
   }
   onExit() {
-    scene.removeElement(_window)
+    scene.removeElement(window)
   }
   update() {
     if (INPUT["reject"].firing || INPUT["confirm"].firing) {
@@ -1182,6 +1209,9 @@ class GameScene is Scene {
     }
     if (event is Components.events.descend) {
       _messages.add("You descend down the stairs.", INK["text"], false)
+    }
+    if (event is Components.events.campfire) {
+      changeState(ModalWindowState.new().with(["food", event.consumedFood]))
     }
   }
 

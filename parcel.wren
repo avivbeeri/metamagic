@@ -4,7 +4,7 @@ import "graphics" for Canvas, Color, Font
 import "text" for TextSplitter
 import "collections" for PriorityQueue, Queue, Set, HashMap, Stack
 import "math" for Vec, Elegant, M
-import "json" for Json
+import "json" for Json, JsonOptions
 import "random" for Random
 import "jukebox" for Jukebox
 import "input" for Keyboard, Clipboard
@@ -1036,6 +1036,10 @@ class ParcelMain {
       Process.exit()
       return
     }
+    if (Keyboard["F10"].justPressed) {
+      Log.d("RNG Seed: %(Seed)")
+      return
+    }
     if (_nextScene) {
       _scene = _nextScene
       _nextScene = null
@@ -1588,6 +1592,7 @@ class TextUtils {
 
 
 // ==================================
+var Seed
 var RNG
 var DEBUG
 class DataFile {
@@ -1618,6 +1623,7 @@ class DataFile {
     var error = fiber.try()
     if (!optional && fiber.error) {
       Log.e("Error loading data file %(path): %(fiber.error)")
+      Fiber.abort("Error loading data file %(path): %(fiber.error)")
     }
   }
   data { _data }
@@ -1644,7 +1650,7 @@ class ConfigData is DataFile {
     Stateful.assign(data, override.data)
 
     Log.level = this["logLevel"]
-    var Seed = this["seed"]
+    Seed = this["seed"]
     Log.d("RNG Seed: %(Seed)")
     RNG = Random.new(Seed)
     DEBUG = this["debug"] || false
