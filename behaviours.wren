@@ -221,6 +221,7 @@ class CastBehaviour is Behaviour {
           "target": "area",
           "area": targetGroup["area"],
           "range": 0,
+          "exclude": 0,
           "origin": player.pos
         })
         var options = Set.new()
@@ -256,6 +257,35 @@ class CastBehaviour is Behaviour {
   }
 }
 
+#!component(id="summon", group="behaviour")
+class SummonBehaviour is Behaviour {
+
+  construct new(args) {
+    super()
+  }
+
+  update(ctx, actor) {
+    var illusions = ctx.entities().where{|entity| entity["kind"] == "illusion"}.toList
+    if (!_summoned && illusions.isEmpty) {
+      _summoned = true
+      var position = RNG.sample(ctx.zone.map.neighbours(actor.pos))
+
+      var effectSpec = ["summon",
+      {
+        "src": actor,
+        "origin": actor.pos,
+        "qty": 2,
+        "id": "illusion",
+      }]
+
+      actor.pushAction(Components.actions.effect.new().withArgs({
+        "effects": [ effectSpec ]
+      }))
+      return true
+    }
+    return false
+  }
+}
 #!component(id="boss", group="behaviour")
 class BossBehaviour is CastBehaviour {
   construct new(args) {
@@ -290,14 +320,6 @@ class BossBehaviour is CastBehaviour {
   }
 
   update(ctx, actor) {
-    // If no illusions,
-    // summon illusions
-
-    // Queue the next spell
-    // Move to a valid target spot
-    // attack the player?
-    // retreat
-    // repeat
     return super.update(ctx, actor)
   }
 }
@@ -347,6 +369,11 @@ class SeekBehaviour is Behaviour {
 class BufferBehaviour is Behaviour {
   construct new(args) {
     super()
+    if (args.count > 0) {
+      _bump = args[0]
+    } else {
+      _bump = true
+    }
   }
 
   update(ctx, actor) {
@@ -399,6 +426,14 @@ class BufferBehaviour is Behaviour {
       return false
     }
 
+    if (!_bump) {
+      if (!Behaviour.spaceAvailableWithPlayer(ctx, next)) {
+        actor.pushAction(Action.doNothing)
+        return false
+      }
+      actor.pushAction(Components.actions.simpleMove.new(dir))
+      return true
+    }
     actor.pushAction(Components.actions.bump.new(dir))
     return true
   }

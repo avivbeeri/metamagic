@@ -847,7 +847,7 @@ class BossRoomGenerator {
   static generate(args) {
     var map = TileMap8.new()
     var center = Vec.new(15, 15)
-    var range = 9
+    var range = 11
     var room = CircleRoom.new(center, range)
     for (pos in room.inner) {
       map[pos] = Tile.new({
@@ -866,9 +866,16 @@ class BossRoomGenerator {
 
     var level = args[0]
     var zone = Zone.new(map)
+    for (i in 2...RNG.int(3, 4)) {
+      GeneratorUtils.spawnGrass(zone, room)
+    }
+
+    GeneratorUtils.spawnWater(zone, room)
+
+
     zone["level"] = level
     zone["entities"] = []
-    zone["entities"].add(CreatureFactory.spawn("archmage", level, Vec.new(14, 12)))
+    zone["entities"].add(CreatureFactory.spawn("archmage", level, Vec.new(15, 12)))
 
     for (i in 0...4) {
       var pos = (center + DIR_EIGHT[4 + i] * 4)

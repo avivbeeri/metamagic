@@ -210,7 +210,7 @@ class SpellQueryState is SceneState {
     var lines = [
       _ui.addElement(Label.new(Vec.new(0, 0), "Targeting...")),
       _ui.addElement(Label.new(Vec.new(0, 12), "%(plainText)")),
-      _ui.addElement(Label.new(Vec.new(0, 20), "%(incantation)"))
+      _ui.addElement(Label.new(Vec.new(0, 22), "%(incantation)"))
     ]
 
     lines.each{|line| line.centerHorizontally() }
@@ -448,6 +448,9 @@ class ModalWindowState is SceneState {
     if (windowType == "history") {
       window = HistoryViewer.new(Vec.new(border, border), Vec.new(Canvas.width - border*2, Canvas.height - border*2), scene.messages)
     }
+    if (windowType == "error") {
+      window = Dialog.new("Not enough MP to cast this spell.")
+    }
   }
   onExit() {
     scene.removeElement(_window)
@@ -663,7 +666,7 @@ class CastState is ModalWindowState {
     window.sizeMode = SizeMode.auto
     var title = window.addElement(Label.new(Vec.new(0, 0), "Speak an incantation"))
     _costLabel = window.addElement(Label.new(Vec.new(0, 28), "[ ??? MP ]"))
-    _phraseLabel = window.addElement(Label.new(Vec.new(0, 36), ""))
+    _phraseLabel = window.addElement(Label.new(Vec.new(0, 38), ""))
     var field = window.addElement(Field.new(Vec.new(0, 14)))
     field.placeholder = "<type incantation>"
 
@@ -691,7 +694,13 @@ class CastState is ModalWindowState {
       var player = scene.world.getEntityByTag("player")
       _spell = SpellUtils.parseSpell(_incantation)
       if (_spell.valid) {
-        if (_spell.target()["target"] == "self") {
+        var cost = _spell.cost(player)
+        if (cost > player["stats"]["mp"]) {
+          return ModalWindowState.new().withArgs([
+            "error",
+            "Not enough MP to cast this spell."
+          ])
+        } else if (_spell.target()["target"] == "self") {
           player.pushAction(Components.actions.cast.new().withArgs({
             "spell": _spell
           }))
@@ -713,8 +722,14 @@ class CastState is ModalWindowState {
       var spell = SpellUtils.parseSpell(_incantation)
       var player = scene.world.getEntityByTag("player")
       if (spell.valid) {
-        _costLabel.text = "[ %(spell.cost(player)) MP ]"
+        var cost = spell.cost(player)
+        _costLabel.text = "[ %(cost) MP ]"
         _costLabel.centerHorizontally()
+        if (cost > player["stats"]["mp"]) {
+          _costLabel.color = INK["orange"]
+        } else {
+          _costLabel.color = INK["text"]
+        }
       } else {
         _costLabel.text = "[ ??? MP ]"
       }
@@ -829,7 +844,7 @@ class GameEndState is ModalWindowState {
     _restart = arg(1)
     _state = null
     if (!_restart) {
-      _pane = scene.addElement(Pane.new(Vec.new(Canvas.width, Canvas.height)))
+      // _pane = scene.addElement(Pane.new(Vec.new(Canvas.width, Canvas.height)))
     }
     window = Dialog.new(_message)
   }
@@ -1006,6 +1021,17 @@ class GameScene is Scene {
       srcName = TextSplitter.capitalize(srcName)
       var wordText = "\"%(SpellUtils.getWordFromToken(event.word))\" <%(event.word.lexeme)>"
       _messages.add("%(srcName) added %(wordText) to %(prep) lexicon.", INK["gold"], false)
+    }
+    if (event is Components.events.summon) {
+      var srcName = event.src.name
+      var targetName = event.target.name
+      var prep = "a"
+      var post = ""
+      if (event.qty > 1) {
+        prep = "%(event.qty)"
+        post = "s"
+      }
+      _messages.add("%(srcName) summons %(prep) %(targetName)%(post) illusions!", INK["text"], true)
     }
     if (event is Components.events.cast) {
       var srcName = event.src.name

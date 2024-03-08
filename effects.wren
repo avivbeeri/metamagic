@@ -1,6 +1,8 @@
 import "math" for Vec
 import "parcel" for Stateful, RNG, Line
 import "groups" for Components
+import "collections" for Set
+import "factory" for CreatureFactory
 import "combat" for Condition, Modifier, CombatProcessor, Environment, Damage, DamageType, TagModifier
 
 class Effect is Stateful {
@@ -33,6 +35,58 @@ class CureConditionEffect is Effect {
       target["conditions"][condition].cure()
       addEvent(Components.events.clearCondition.new(target, condition))
     }
+  }
+}
+
+#!component(id="summon", group="effect")
+class SummonEffect is Effect {
+  construct new(ctx, args) {
+    super(ctx, args)
+  }
+
+  origin { data["origin"] }
+  id { data["id"] }
+  qty { data["qty"] || 1 }
+  src { data["src"] }
+
+  getSpace() {
+    var queue = [ origin ]
+    var visited = Set.new()
+    visited.add(origin)
+    while (!queue.isEmpty) {
+      var node = queue.removeAt(0)
+      if (ctx.getEntitiesAtPosition(node).count == 0) {
+        return node
+      }
+      for (next in ctx.zone.map.neighbours(node)) {
+        if (!visited.contains(next)) {
+          visited.add(next)
+          queue.add(next)
+        }
+      }
+    }
+    return null
+  }
+
+  perform() {
+    var level = ctx.zone
+    var example = null
+    if (qty < 1) {
+      Fiber.abort("Must summon at least one entity")
+    }
+    for (i in 0...qty) {
+      var position = getSpace()
+      System.print(position)
+      if (position == null) {
+        Fiber.abort("There were no empty spaces on the whole map to summon in.")
+      }
+      var entity = CreatureFactory.spawn(id, level, position)
+      if (!example) {
+        example = entity
+      }
+      ctx.addEntity(entity)
+    }
+    addEvent(Components.events.summon.new(src, example, qty))
   }
 }
 

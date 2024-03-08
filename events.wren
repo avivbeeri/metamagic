@@ -26,6 +26,7 @@ var RecoverEvent = Event.create("recover", ["target", "amount"])
 var RegenEvent = Event.create("regen", ["target"])
 var LearnEvent = Event.create("learn", ["src", "word"])
 var CastEvent = Event.create("cast", ["src", "target", "spell", "origin"])
+var SummonEvent = Event.create("summon", ["src", "target", "qty" ])
 var KillEvent = Event.create("kill", ["src", "target"])
 var AttackEvent = Event.create("attack", ["src", "target", "attack", "result", "damage"])
 

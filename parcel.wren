@@ -412,7 +412,6 @@ var DoNothing = Action.new()
 class TargetGroup is Stateful {
   construct new(spec) {
     super()
-    data["exclude"] = []
     assign(spec)
   }
 
@@ -424,7 +423,8 @@ class TargetGroup is Stateful {
   src=(v) { data["src"] = v }
   mode { data["target"] }
   mode=(v) { data["target"] }
-  exclude { data["exclude"] }
+  exclude { data["exclude"] || 0 }
+  exclude=(v) { data["exclude"] = v }
   needSight { data["needSight"] || true }
 
   requireSelection { mode == "area" }
@@ -438,7 +438,9 @@ class TargetGroup is Stateful {
         var x = (origin.x + dx)
         var y = (origin.y + dy)
         var pos = Vec.new(x, y)
-        if (exclude.contains(src + Vec.new(dx, dy))) {
+        System.print("%(area) %(pos) %(origin) %(exclude)")
+        if (Line.chebychev(pos, src) < exclude) {
+//        if (exclude.contains(src + Vec.new(dx, dy))) {
           System.print("excluded")
           System.print(data)
           continue

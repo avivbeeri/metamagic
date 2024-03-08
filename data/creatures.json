@@ -48,6 +48,9 @@
     "behaviours": [
       [
         "boss"
+      ],
+      [
+        "buffer", false
       ]
     ],
     "immunities": [ ],
@@ -70,10 +73,13 @@
     "kind": "archmage",
     "behaviours": [
       [
+        "summon", "illusion", 2
+      ],
+      [
         "boss"
       ],
       [
-        "buffer"
+        "buffer", true
       ]
     ],
     "immunities": [ ],

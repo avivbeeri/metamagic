@@ -285,7 +285,7 @@ class AsciiRenderer is Element {
         if (entity["conditions"].containsKey("burning")) {
           color = INK["fireBg"]
         } else if (entity["conditions"].containsKey("frozen")) {
-          color = INK["ice"]
+          color = INK["purple"]
         }
         printEntity(symbol, space, color)
       }

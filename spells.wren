@@ -1,6 +1,6 @@
 import "io" for FileSystem
 import "json" for Json
-import "./parcel" for Stateful, RNG, GameSystem
+import "./parcel" for Stateful, RNG, GameSystem, Line
 import "collections" for Set
 import "math" for Vec
 import "combat" for Damage, DamageType
@@ -63,8 +63,8 @@ class SpellWords {
 
 var BaseTable = {
   SpellWords.self.lexeme: { "target": "self", "area": 0, "range": 0, "origin": null },
-  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": [ Vec.new(0,0) ], "needEntity": false  },
-  SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": [], "needEntity": false  },
+  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": 1, "needEntity": false  },
+  SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": 0, "needEntity": false  },
   SpellWords.big.lexeme: { "area": 1 },
   SpellWords.bigger.lexeme: { "area": 2 }
 }
