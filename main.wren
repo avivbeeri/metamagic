@@ -65,15 +65,11 @@ class StartScene is Scene {
     super.update()
   }
 
-  draw() {
-    Canvas.cls(INK["mainBg"])
-    var v = Config["version"]
-    Canvas.print(v, Canvas.width - 8 - v.count * 8, Canvas.height - 16 , INK["title"])
-    var height = _area.reduce(0) {|acc, area| acc + area.y }
-    var top = (Canvas.height - height) / 2
-    var x0 = (Canvas.width - _area[0].x) / 2
+
+  printTitle(top) {
     var thick = 4
     var i = 0
+    var x0 = (Canvas.width - _area[0].x) / 2
     for (line in TITLE) {
       for (y in -thick..thick) {
         for (x in -thick..thick) {
@@ -84,6 +80,59 @@ class StartScene is Scene {
       top = top + _area[i].y
       i = i + 1
     }
+  }
+
+  drawCircle(offset, color) {
+    var thick = 3
+    var c = Vec.new(Canvas.width, Canvas.height + 72) / 2 + offset
+
+    var d = (_t - 5 * 60).min(1 * 60) / (1 * 60)
+    var angle = Num.pi * Animation.ease(d)
+    Canvas.circlefill(c.x, c.y, (128 + thick) * d, color)
+    Canvas.circlefill(c.x, c.y, 128 * d, INK["black"])
+    for (i in 1..4) {
+      var x0 = (c.x + (angle + ((i+0.5) / 4) * 2 * Num.pi).cos * 78 * d)
+      var y0 = (c.y + (angle + ((i + 0.5) / 4)* 2 * Num.pi).sin * 78 * d)
+      var x2 = (c.x + (angle + ((i-0.5) / 4)* 2 * Num.pi).cos * 78 * d)
+      var y2 = (c.y + (angle + ((i - 0.5) / 4)* 2 * Num.pi).sin * 78 * d)
+      var x1 = (c.x + (angle + (i / 4)* 2 * Num.pi).cos * 128 * d)
+      var y1 = (c.y + (angle + (i / 4)* 2 * Num.pi).sin * 128 * d)
+      Canvas.line(x0, y0, x1, y1, color, thick)
+      Canvas.line(x2, y2, x1, y1, color, thick)
+    }
+    for (i in 1..4) {
+      var r = 32
+      var x = (c.x + (angle + (i / 4)* 2 * Num.pi).cos * 128 * d)
+      var y = (c.y + (angle + (i / 4)* 2 * Num.pi).sin * 128 * d)
+      Canvas.circlefill(x, y, r, color)
+      Canvas.circlefill(x, y, r - thick, INK["black"])
+    }
+    for (i in 1..4) {
+      var r = 24
+      var x = (c.x + (angle + ((i+0.5) / 4)* 2 * Num.pi).cos * 78 * d)
+      var y = (c.y + (angle + ((i + 0.5) / 4)* 2 * Num.pi).sin * 78 * d)
+      Canvas.circlefill(x, y, r, color)
+      Canvas.circlefill(x, y, r - thick, INK["black"])
+    }
+
+  }
+
+  draw() {
+    Canvas.cls(INK["mainBg"])
+    var v = Config["version"]
+    Canvas.print(v, Canvas.width - 8 - v.count * 8, Canvas.height - 16 , INK["title"])
+    var height = _area.reduce(0) {|acc, area| acc + area.y }
+    var top = (Canvas.height - height) / 2
+    if (_t > 3 * 60) {
+      var length = 3 * 60
+      var t = (_t - 3 * 60).clamp(0, length) / (length)
+      var diff = (top - 56)
+      top = top - diff * Animation.ease(t)
+    }
+    if (_t > 5 * 60) {
+      drawCircle(Vec.new(), INK["circle"])
+    }
+    printTitle(top)
     var x = (Canvas.width - 30 * 8)/ 2
     Canvas.print("Press SPACE or ENTER to begin", x, Canvas.height * 0.90, INK["title"])
     super.draw()

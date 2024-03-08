@@ -934,12 +934,6 @@ class PlayerInputState is SceneState {
     if (INPUT["cast"].firing) {
       player.pushAction(Components.actions.cast.new().withArgs({}))
     }
-    if (INPUT["pickup"].firing) {
-      player.pushAction(Components.actions.pickup.new())
-    }
-    if (INPUT["descend"].justPressed) {
-      player.pushAction(Components.actions.descend.new())
-    }
 
     return this
   }
