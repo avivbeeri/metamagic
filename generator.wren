@@ -701,14 +701,26 @@ class ForestLevelGenerator  {
     var start = RNG.sample(inner)
 
 
-    GeneratorUtils.spawnGrass(zone, room)
-    GeneratorUtils.spawnWater(zone, room)
+    for (i in 0...RNG.int(2, 6)) {
+      GeneratorUtils.spawnGrass(zone, room)
+    }
+    for (i in 0...RNG.int(2, 4)) {
+      GeneratorUtils.spawnWater(zone, room)
+    }
     zone["entities"] = []
     zone["level"] = level
-    // zone.map[Vec.new(15, 13)]["stairs"] = "down"
     zone["start"] = start
-    var place = RNG.sample(inner)
 
+    var place = RNG.sample(inner)
+    zone.map[Vec.new(15, 13)]["stairs"] = "down"
+    var startOptions = inner.where {|position| Line.chebychev(position, place) > 10 }.toList
+    if (startOptions.count == 0) {
+      zone["start"] = RNG.sample(inner)
+    } else {
+      zone["start"] = RNG.sample(startOptions)
+    }
+
+    place = RNG.sample(inner)
     GeneratorUtils.placeMonster(zone, place)
     place = RNG.sample(inner)
     GeneratorUtils.placeItem(zone, place)
@@ -1026,9 +1038,7 @@ class AutomataRoom {
     for (round in 0...3) {
       stepSimulation()
     }
-
     pruneBoard()
-    printBoard()
   }
   pruneBoard() {
     var regions = []
@@ -1041,7 +1051,6 @@ class AutomataRoom {
       visited.add(queue[0])
 
       while (queue.count > 0) {
-        System.print(queue)
         var node = queue.removeAt(0)
         tiles.remove(node)
         for (dir in DIR_FOUR) {
@@ -1056,14 +1065,12 @@ class AutomataRoom {
     }
     if (regions.count > 1) {
       regions.sort {|a , b| a.count < b.count }
-      System.print(regions.map {|region| region.count}.toList.join(","))
       for (region in regions.skip(1)) {
         for (cell in region) {
           setCell(cell.x, cell.y, false)
         }
       }
     }
-    System.print("Regions: %(regions.count)")
   }
   getNeighbours(x, y) {
     var count = 0
