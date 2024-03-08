@@ -12,7 +12,7 @@ if [ -z "$(git status --porcelain)" ]; then
   git tag -afm "$1" "$1"
 
   # build and deploy
-  dome nest -c res data *.wren
+  dome nest -c ui res data *.wren
   mv game.egg ../dome-builds/arcanist
   cp config.json ../dome-builds/arcanist
   cd ../dome-builds/arcanist
