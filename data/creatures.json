@@ -1,6 +1,6 @@
 {
   "sorcerer": {
-    "symbol": "A",
+    "symbol": "a",
     "kind": "sorcerer",
     "behaviours": [
       [ "cast" ],
@@ -42,24 +42,50 @@
       "spd": 0.333
     }
   },
-  "skeleton": {
-    "symbol": "s",
-    "kind": "skeleton",
+  "illusion": {
+    "symbol": "A",
+    "kind": "archmage",
     "behaviours": [
       [
-        "localSeek", 8
+        "boss"
       ]
     ],
     "immunities": [ ],
-    "vulnerabilities": [ "KINETIC" ],
-    "resistances": [ "FIRE" ],
-    "name": "Skeleton",
+    "vulnerabilities": [],
+    "resistances": [ ],
+    "name": "Archmage",
     "pronoun": "it",
     "stats": {
-      "hp": 3,
-      "hpMax": 3,
-      "atk": 2,
-      "def": 1
+      "hp": 1,
+      "hpMax": 1,
+      "mpMax": 10,
+      "mp": 10,
+      "spd": 0.8,
+      "atk": 1,
+      "def": 0
+    }
+  },
+  "archmage": {
+    "symbol": "A",
+    "kind": "archmage",
+    "behaviours": [
+      [ "cast"],
+      [
+        "boss"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [],
+    "resistances": [ ],
+    "name": "Archmage",
+    "pronoun": "it",
+    "stats": {
+      "hp": 10,
+      "hpMax": 10,
+      "mpMax": 50,
+      "mp": 50,
+      "atk": 1,
+      "def": 2
     }
   },
   "slime": {
@@ -105,7 +131,7 @@
     "kind": "rat",
     "behaviours": [
       [
-        "randomWalk"
+        "wander"
       ]
     ],
     "immunities": [ "FIRE" ],

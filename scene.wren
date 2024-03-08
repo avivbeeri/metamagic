@@ -1189,9 +1189,11 @@ class GameScene is Scene {
   }
 
   update() {
+    /*
     if (INPUT["toggleTiles"].firing) {
       _renderer.next()
     }
+    */
     if (INPUT["volUp"].firing) {
       Jukebox.volumeUp()
     }

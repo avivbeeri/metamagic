@@ -99,6 +99,17 @@ class BossBehaviour is Behaviour {
   }
   update(ctx, actor) {
     var player = ctx.getEntityByTag("player")
+    // initial setup
+    // Get spells to know
+
+    // If no illusions,
+    // summon illusions
+
+    // Queue the next spell
+    // Move to a valid target spot
+    // attack the player?
+    // retreat
+    // repeat
     if (!player) {
       return false
     }
@@ -172,10 +183,16 @@ class CastBehaviour is Behaviour {
     super()
   }
   update(ctx, actor) {
-    if (!_spell) {
-      _spell = Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellFragment.new(SpellWords.far, SpellWords.big)))
-      System.print(_spell.cost(actor))
+    if (!actor.has("spells")) {
+      actor["spells"] = []
+      actor["spells"].add(Spell.build(SpellPhrase.new(SpellWords.conjure, SpellWords.fire, SpellFragment.new(SpellWords.far, SpellWords.big))))
+      actor["spells.queue"] = []
     }
+    if (actor["spells.queue"].isEmpty) {
+      actor["spells.queue"] = RNG.shuffle(actor["spells"][0..-1])
+    }
+    var spell = actor["spells.queue"][0]
+
     var player = ctx.getEntityByTag("player")
     if (!player) {
       return false
@@ -183,19 +200,17 @@ class CastBehaviour is Behaviour {
     // TODO generate spells for this user to cast
     // TODO check if player is in range of our cast spells
     // TODO check if player is a valid target of our spells
-    var targetGroup = TargetGroup.new(_spell.target())
+    var targetGroup = TargetGroup.new(spell.target())
     targetGroup["src"] = actor.pos
     targetGroup["origin"] = actor.pos
     var maxRange = targetGroup["area"] + targetGroup["range"]
 
     var valid = false
-    System.print("%(targetGroup.distance(player)) vs %(maxRange)")
     if (targetGroup.distance(player) <= maxRange) {
       var visibleSet = Set.new()
       var vision = Vision.new(ctx.zone.map, actor.pos, targetGroup["range"])
       vision.compute()
       visibleSet.addAll(vision.result)
-      System.print("hit!")
       if (targetGroup.distance(player) <= targetGroup["range"] || targetGroup["area"] == 0) {
         targetGroup["origin"] = player.pos
         valid = true
@@ -225,16 +240,16 @@ class CastBehaviour is Behaviour {
     if (!valid) {
       return false
     }
-    if (_spell.cost(actor) > actor["stats"]["mp"]) {
+    if (spell.cost(actor) > actor["stats"]["mp"]) {
       System.print("out of mana")
       return false
     }
 
-    // TODO construct spell
     actor.pushAction(Components.actions.cast.new().withArgs({
-      "spell": _spell,
+      "spell": spell,
       "target": targetGroup
     }))
+    actor["spells.queue"].removeAt(0)
     return true
   }
 }
