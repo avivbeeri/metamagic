@@ -208,11 +208,11 @@ class GeneratorUtils {
 
   static isTileFeature(zone, position) {
     var tile = zone.map[position]
-    return !tile["grass"] && !tile["water"]
+    return !tile["grass"] && !tile["water"] && !tile["stairs"]
   }
   static isValidTileLocation(zone, position) {
     var tile = zone.map[position]
-    return !tile["solid"] && !tile["stairs"] && !tile["altar"]
+    return !tile["solid"] && !tile["stairs"]
   }
   static isValidEntityLocation(zone, position) {
     var entities = zone["entities"]
@@ -335,6 +335,13 @@ class WorldGenerator {
   }
 }
 
+class WalkerRoom {
+  construct new(inner) {
+    _inner = inner
+  }
+  inner { _inner }
+}
+
 class RandomZoneGenerator {
   static generate(args) {
     var level = args[0]
@@ -362,6 +369,7 @@ class RandomZoneGenerator {
     map[current]["solid"] = false
     map[current]["blocking"] = false
     var dist = 1000
+    var inner = [ current ]
     for (i in 0...dist) {
       var next = null
       while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 31) {
@@ -369,16 +377,28 @@ class RandomZoneGenerator {
         next = current + dir
       }
       current = next
+      inner.add(current)
       map[current]["solid"] = false
       map[current]["blocking"] = false
     }
     var exit = GeneratorUtils.findFurthestPoint(map, startPos)
     zone.map[exit]["stairs"] = "down"
-    RandomZoneGenerator.placeAltar(zone)
+
+    var room = WalkerRoom.new(inner)
+    // *Place features
+    for (i in 0...RNG.int(1, 4)) {
+      GeneratorUtils.spawnGrass(zone, room)
+    }
+    for (i in 0...RNG.int(1, 2)) {
+      GeneratorUtils.spawnWater(zone, room)
+    }
+
     // place item somewhere
     var pockets = RNG.shuffle(GeneratorUtils.findPockets(map))
     if (!pockets.isEmpty) {
-      for (i in 1..(RNG.int(2, ((level/2).floor + 1).min(pockets.count)))) {
+      var count = RNG.int(1, (pockets.count / 2).min(2))
+      // (level / 2).floor + 1).min(pockets.count)
+      for (i in 1..count) {
         var pos = pockets[0]
         var itemId = GeneratorUtils.pickItem(level) //RNG.sample(Items.findable).id
         if (itemId == null) {
@@ -413,23 +433,6 @@ class RandomZoneGenerator {
 
 
     return zone
-  }
-  static placeAltar(zone) {
-    var map = zone.map
-    var pos = Vec.new()
-
-    var valid = false
-    var attempts = 0
-    while (!valid && attempts < 30) {
-      pos.x = RNG.int(zone.map.xRange.from + 1, zone.map.xRange.to - 1)
-      pos.y = RNG.int(zone.map.yRange.from + 1, zone.map.yRange.to - 1)
-      valid = GeneratorUtils.isValidTileLocation(zone, pos) && zone.map.allNeighbours(pos).all {|tile| zone.map.isFloor(tile) }
-      attempts = attempts + 1
-    }
-    if (valid) {
-      zone.map[pos]["solid"] = true
-      zone.map[pos]["altar"] = true
-    }
   }
 }
 
@@ -507,7 +510,7 @@ class BasicZoneGenerator {
       var w = RNG.int(minSize, maxSize + 1)
       var h = RNG.int(minSize, maxSize + 1)
       var x = RNG.int(1, 32 - w - 1)
-      var y = RNG.int(1, 32 - h - 1)
+      var y = RNG.int(1, 31 - h - 1)
       if (rooms.count == 0 && startPos) {
         // ensure start position is contained in first room
         x = (startPos.x - RNG.int(1, w - 1)).max(0)
@@ -547,35 +550,26 @@ class BasicZoneGenerator {
     BasicZoneGenerator.placeStairs(zone, finalRoom)
     zone.map[startPos]["stairs"] = "up"
 
-    var altarRoom = rooms[RNG.int(rooms.count)]
-    BasicZoneGenerator.placeAltar(zone, altarRoom)
 
     for (i in 0...RNG.int(rooms.count)) {
       var statueRoom = rooms[RNG.int(rooms.count)]
       BasicZoneGenerator.placeStatue(zone, statueRoom)
     }
 
+    // *Place features
+    for (room in rooms) {
+      for (i in 0...RNG.int(0, 1)) {
+        GeneratorUtils.spawnGrass(zone, room)
+      }
+      for (i in 0...RNG.int(0, 1)) {
+        GeneratorUtils.spawnWater(zone, room)
+      }
+    }
     for (room in rooms) {
       BasicZoneGenerator.placeEntities(zone, room, monstersPerRoom, itemsPerRoom)
     }
 
     return zone
-  }
-  static placeAltar(zone, room) {
-    var pos = Vec.new()
-
-    var valid = false
-    var attempts = 0
-    while (!valid && attempts < 30) {
-      pos.x = RNG.int(room.p0.x + 1, room.p1.x - 1)
-      pos.y = RNG.int(room.p0.y + 1, room.p1.y - 1)
-      valid = GeneratorUtils.isValidTileLocation(zone, pos) && zone.map.allNeighbours(pos).all {|tile| zone.map.isFloor(tile) }
-      attempts = attempts + 1
-    }
-    if (valid) {
-      zone.map[pos]["solid"] = true
-      zone.map[pos]["altar"] = true
-    }
   }
   static placeStatue(zone, room) {
     var map = zone.map
@@ -655,8 +649,8 @@ class ForestLevelGenerator  {
     var map = TileMap8.new()
     var zone = Zone.new(map)
 
-    for (y in 0...32) {
-      for (x in 0...31) {
+    for (y in 0...31) {
+      for (x in 0...32) {
         map[x,y] = Tile.new({
           "blocking": true,
           "solid": true,
@@ -676,27 +670,30 @@ class ForestLevelGenerator  {
         "visible": false
       })
     }
+
     for (x in 0...32) {
       map[x, 0] = Tile.new({
         "blocking": false,
         "solid": false,
         "visible": false
       })
-      map[x, 31] = Tile.new({
+      map[x, 30] = Tile.new({
         "blocking": false,
         "solid": false,
         "visible": false
       })
-      map[0, x] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
-      map[31, x] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
+      if (x < 31) {
+        map[0, x] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": false
+        })
+        map[31, x] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": false
+        })
+      }
     }
     var start = RNG.sample(inner)
 
@@ -712,8 +709,8 @@ class ForestLevelGenerator  {
     zone["start"] = start
 
     var place = RNG.sample(inner)
-    zone.map[Vec.new(15, 13)]["stairs"] = "down"
-    var startOptions = inner.where {|position| Line.chebychev(position, place) > 10 }.toList
+    zone.map[place]["stairs"] = "down"
+    var startOptions = inner.where {|position| Line.chebychev(position, place) > 20 }.toList
     if (startOptions.count == 0) {
       zone["start"] = RNG.sample(inner)
     } else {
@@ -733,9 +730,9 @@ class TestRoomGenerator {
     var level = args[0]
     var map = TileMap8.new()
     var zone = Zone.new(map)
-    for (y in 0...32) {
+    for (y in 0...31) {
       for (x in 0...32) {
-        map[x,y] = Tile.new({
+        map[x , y] = Tile.new({
           "blocking": true,
           "solid": true,
         })
@@ -834,7 +831,6 @@ class StartRoomGenerator {
 
     var pos = Vec.new(12, 15)
     zone.map[pos]["solid"] = true
-    zone.map[pos]["altar"] = true
     zone.map[pos]["blocking"] = false
     return zone
   }
@@ -1056,7 +1052,7 @@ class AutomataRoom {
         for (dir in DIR_FOUR) {
           var next = node + dir
           visited.add(next)
-          if (tiles.contains(next) && getCell(next.x, next.y) && !visited.contains(next)) {
+          if (getCell(next.x, next.y) && !visited.contains(next)) {
             queue.add(next)
           }
         }

@@ -154,13 +154,13 @@ class Spell is Stateful {
         if (phrase.subject == SpellWords.water) {
           // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
           effects.add([ "cureCondition", { "condition": "burning" } ])
-          effects.add([ "push", { "distance": 2, "strong": true } ])
+          effects.add([ "push", { "distance": 3, "strong": true } ])
         }
         if (phrase.subject == SpellWords.earth) {
           effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
         }
         if (phrase.subject == SpellWords.air) {
-          effects.add([ "push", { "distance": 2 } ])
+          effects.add([ "push", { "distance": 5 } ])
         }
       }
     }
@@ -487,7 +487,7 @@ class SpellSystem is GameSystem {
       RNG.sample(AllWords.where {|word| word == SpellWords.conjure }.toList),
       // RNG.sample(AllWords.where {|word| word.category == TokenCategory.verb }.toList),
       RNG.sample(AllWords.where {|word| word.category == TokenCategory.subject }.toList),
-      RNG.sample(AllWords.where {|word| word.category == TokenCategory.object }.toList)
+      RNG.sample(AllWords.where {|word| word == SpellWords.close || word == SpellWords.far }.toList),
     ]
 
     for (word in words) {

@@ -21,6 +21,62 @@
       "hpMax": 3
     }
   },
+  "skeleton": {
+    "symbol": "s",
+    "kind": "skeleton",
+    "behaviours": [
+      [
+        "localSeek", 8
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ "EARTH" ],
+    "resistances": [ "FIRE" ],
+    "name": "Skeleton",
+    "pronoun": "it",
+    "stats": {
+      "hp": 3,
+      "hpMax": 3
+    }
+  },
+  "slime": {
+    "symbol": "S",
+    "kind": "slime",
+    "behaviours": [
+      [
+        "randomWalk"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ ],
+    "resistances": [ ],
+    "name": "Slime",
+    "pronoun": "it",
+    "stats": {
+      "hp": 3,
+      "hpMax": 3,
+      "spd": 0.5
+    }
+  },
+  "slime": {
+    "symbol": "S",
+    "kind": "slime",
+    "behaviours": [
+      [
+        "randomWalk"
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ ],
+    "resistances": [ ],
+    "name": "Slime",
+    "pronoun": "it",
+    "stats": {
+      "hp": 3,
+      "hpMax": 3,
+      "spd": 0.5
+    }
+  },
   "rat": {
     "symbol": "r",
     "kind": "rat",
