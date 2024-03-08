@@ -14,12 +14,16 @@ var ItemData = DataFile.load("items", "data/items.json")
 class CreatureFactory {
   static spawn(kindId, zoneIndex, position) {
     var data = CreatureData[kindId]
+    if (!data) {
+      Fiber.abort("Tried to construct creature with id \"%(kindId)\" which couldn't be found.")
+    }
     var creature = Creature.new(data["stats"])
     creature["pronoun"] = Reflect.get(Pronoun, data["pronoun"])
     creature["name"] = data["name"]
     creature["boss"] = data["boss"]
     creature["kind"] = data["kind"]
     creature["symbol"] = data["symbol"]
+    creature["tags"].addAll(data["tags"] || [])
     creature["resistances"].addAll(data["resistances"] || [])
     creature["vulnerabilities"].addAll(data["vulnerabilities"] || [])
     creature["immunities"].addAll(data["immunities"] || [])

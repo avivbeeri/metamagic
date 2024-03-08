@@ -178,6 +178,10 @@ class AsciiRenderer is Element {
             printSymbol(map[x, y]["cost"].toString, x, y, color)
           }
         }
+        if (map[x, y]["stone"]) {
+          printSymbolBg("^", x, y, INK["forest.floorStone"])
+        }
+
         if (map[x, y]["void"]) {
         } else if (map[x, y]["solid"]) {
           if (map[x, y]["altar"]) {
@@ -217,7 +221,7 @@ class AsciiRenderer is Element {
           }
           printSymbol("~", x, y, color)
         } else {
-          printSymbolBg(".", x, y, INK["floorStone"])
+          // printSymbolBg(".", x, y, INK["floorStone"])
           if (_world.zone["theme"] == "forest") {
             printSymbol(".", x, y, color)
           } else {

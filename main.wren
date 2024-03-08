@@ -87,7 +87,7 @@ class StartScene is Scene {
     var c = Vec.new(Canvas.width, Canvas.height + 72) / 2 + offset
 
     var d = (_t - 5 * 60).min(1 * 60) / (1 * 60)
-    var angle = Num.pi * Animation.ease(d)
+    var angle = -Num.pi * Animation.ease(d)
     Canvas.circlefill(c.x, c.y, (128 + thick) * d, color)
     Canvas.circlefill(c.x, c.y, 128 * d, INK["black"])
     for (i in 1..4) {
@@ -130,7 +130,15 @@ class StartScene is Scene {
       top = top - diff * Animation.ease(t)
     }
     if (_t > 5 * 60) {
+      var thick = 5
+      thick = 2
+      for (y in -thick..thick) {
+        for (x in -thick..thick) {
+          drawCircle(Vec.new(x, y), INK["circleBorder"])
+        }
+      }
       drawCircle(Vec.new(), INK["circle"])
+
     }
     printTitle(top)
     var x = (Canvas.width - 30 * 8)/ 2

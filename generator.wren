@@ -663,9 +663,8 @@ class ForestLevelGenerator  {
       }
     }
 
-    var center = Vec.new(15, 15)
     var range = 5
-    var room = AutomataRoom.new(0, 0, 32, 31)
+    var room = AutomataRoom.new(2, 2, 30, 29)
     var inner = room.inner
     for (pos in inner) {
       map[pos] = Tile.new({
@@ -681,6 +680,16 @@ class ForestLevelGenerator  {
         "solid": false,
         "visible": false
       })
+      map[x, 1] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
+      map[x, 29] = Tile.new({
+        "blocking": false,
+        "solid": false,
+        "visible": false
+      })
       map[x, 30] = Tile.new({
         "blocking": false,
         "solid": false,
@@ -692,7 +701,17 @@ class ForestLevelGenerator  {
           "solid": false,
           "visible": false
         })
+        map[1, x] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": false
+        })
         map[31, x] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": false
+        })
+        map[30, x] = Tile.new({
           "blocking": false,
           "solid": false,
           "visible": false
@@ -713,6 +732,11 @@ class ForestLevelGenerator  {
     zone["start"] = start
 
     var place = RNG.sample(inner)
+    for (dy in -1..1) {
+      for (dx in -1..1) {
+        zone.map[place]["stone"] = true
+      }
+    }
     zone.map[place]["stairs"] = "down"
     var startOptions = inner.where {|position|
       return Line.chebychev(position, place) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
@@ -723,12 +747,26 @@ class ForestLevelGenerator  {
       zone["start"] = RNG.sample(startOptions)
     }
 
-    place = RNG.sample(inner)
-    GeneratorUtils.placeMonster(zone, place)
-    place = RNG.sample(inner)
+    for (i in 0...RNG.int(1, 5)) {
+      place = RNG.sample(inner)
+      GeneratorUtils.placeMonster(zone, place)
+    }
+
+    var treeOptions = inner.where {|position|
+      return Line.chebychev(position, zone["start"]) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
+    }.toList
+    if (treeOptions.count == 0) {
+      place = RNG.sample(inner)
+    } else {
+      place = RNG.sample(treeOptions)
+    }
+
     GeneratorUtils.placeMonster(zone, place, "treant")
-    place = RNG.sample(inner)
-    GeneratorUtils.placeItem(zone, place)
+
+    for (i in 0...RNG.int(1, 4)) {
+      place = RNG.sample(inner)
+      GeneratorUtils.placeItem(zone, place)
+    }
     return zone
   }
 }

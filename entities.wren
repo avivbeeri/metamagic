@@ -8,6 +8,7 @@ class Creature is BehaviourEntity {
     super()
     this["symbol"] = "?"
     this["solid"] = true
+    this["tags"] = TagGroup.new([])
     this["resistances"] = TagGroup.new([])
     this["vulnerabilities"] = TagGroup.new([])
     this["immunities"] = TagGroup.new([])

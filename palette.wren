@@ -22,6 +22,7 @@ INK.addColor("purpleTransparent", Color.hex("#4F3A5460"))
 INK.addColor("bronze", Color.hex("#855504"))
 INK.addColor("gold", Color.hex("#D19B11"))
 
+INK.addColor("deepgreen", Color.hex("#081606"))
 INK.addColor("darkgreen", Color.hex("#284722"))
 INK.addColor("green", Color.hex("#239617"))
 
@@ -61,6 +62,7 @@ INK.setPurpose("titleFg", "pastelpurple")
 INK.setPurpose("titleBg", "deeppurple")
 INK.setPurpose("mainBg", "black")
 INK.setPurpose("circle", "pastelpurple")
+INK.setPurpose("circleBorder", "deeppurple")
 
 INK.setPurpose("welcome", "white")
 INK.setPurpose("text", "white")
@@ -78,6 +80,7 @@ INK.setPurpose("manaBarEmpty", "darkblue")
 
 INK.setPurpose("blood", "red")
 INK.setPurpose("floorStone", "black")
+INK.setPurpose("forest.floorStone", "violet")
 
 INK.setPurpose("creature", "white")
 INK.setPurpose("altar", "orange")

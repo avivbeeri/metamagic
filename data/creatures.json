@@ -21,7 +21,29 @@
       "hpMax": 3
     }
   },
+  "skeleton": {
+    "symbol": "s",
+    "kind": "skeleton",
+    "behaviours": [
+      [
+        "localSeek", 7
+      ]
+    ],
+    "immunities": [ ],
+    "vulnerabilities": [ "KINETIC" ],
+    "resistances": [ "ICE" ],
+    "name": "Skeleton",
+    "pronoun": "it",
+    "stats": {
+      "hp": 2,
+      "hpMax": 2,
+      "str": 2,
+      "dex": 1,
+      "spd": 0.75
+    }
+  },
   "treant": {
+    "tags": [ "flammable" ],
     "symbol": "T",
     "kind": "treant",
     "behaviours": [
@@ -35,10 +57,10 @@
     "name": "Treant",
     "pronoun": "it",
     "stats": {
-      "hp": 5,
-      "hpMax": 5,
-      "atk": 2,
-      "def": 2,
+      "hp": 7,
+      "hpMax": 7,
+      "str": 2,
+      "dex": 2,
       "spd": 0.333
     }
   },
@@ -64,8 +86,8 @@
       "mpMax": 10,
       "mp": 10,
       "spd": 0.8,
-      "atk": 1,
-      "def": 0
+      "str": 1,
+      "dex": 0
     }
   },
   "archmage": {
@@ -93,8 +115,8 @@
       "hpMax": 10,
       "mpMax": 10,
       "mp": 0,
-      "atk": 1,
-      "def": 1
+      "str": 1,
+      "dex": 1
     }
   },
   "slime": {

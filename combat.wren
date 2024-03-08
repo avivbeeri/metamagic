@@ -357,20 +357,26 @@ class CombatProcessor {
     var targetStats = target["stats"]
     var def = targetStats.get("def")
 
-    var damage = Damage.calculate(incoming.amount, def)
-    if (damage == 0) {
-      result = AttackResult.blocked
-    }
+    var amount = incoming.amount
+
+    var damage = Damage.calculate(amount, def)
     if (target.has("vulnerabilities")) {
       if (target["vulnerabilities"].contains(incoming.type)) {
         damage = damage * 2
-        System.print("vulnerable")
       }
     }
     if (target.has("resistances")) {
       if (target["resistances"].contains(incoming.type)) {
-        damage = (damage / 2).floor.max(1)
+        if (incoming.amount > def) {
+          damage = (damage / 2).floor.max(1)
+        } else {
+          damage = (damage / 2).floor
+        }
       }
+    }
+
+    if (damage == 0) {
+      result = AttackResult.blocked
     }
 
     ctx.addEvent(Components.events.attack.new(src, target, "area", result, Damage.new(damage, incoming.type)))

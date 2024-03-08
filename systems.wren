@@ -199,6 +199,11 @@ class FireSystem is GameSystem {
           if (tile["grass"]) {
             setFire(ctx, space)
           }
+          for (entity in ctx.getEntitiesAtPosition(space)) {
+            if (entity["tags"].contains("flammable")) {
+              applyBurningTo(ctx, entity)
+            }
+          }
         }
       }
     }
