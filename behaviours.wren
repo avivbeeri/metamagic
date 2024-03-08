@@ -204,6 +204,7 @@ class CastBehaviour is Behaviour {
     targetGroup["src"] = actor.pos
     targetGroup["origin"] = actor.pos
     var maxRange = targetGroup["area"] + (targetGroup["range"] - 1).max(0)
+    actor["targetRange"] = maxRange
 
     var valid = false
     if (targetGroup.distance(player) <= maxRange) {
@@ -238,6 +239,7 @@ class CastBehaviour is Behaviour {
     }
 
     if (!valid) {
+      System.print("not valid?")
       return false
     }
     if (spell.cost(actor) > actor["stats"]["mp"]) {
@@ -352,7 +354,7 @@ class BufferBehaviour is Behaviour {
     if (!player) {
       return false
     }
-    var minRange = 4
+    var minRange = actor["targetRange"] || 1
 
     var dMap = player["map"]
     var costMap = dMap[0]
@@ -397,7 +399,7 @@ class BufferBehaviour is Behaviour {
       return false
     }
 
-      actor.pushAction(Components.actions.bump.new(dir))
+    actor.pushAction(Components.actions.bump.new(dir))
     return true
   }
 }

@@ -17,6 +17,7 @@ class CreatureFactory {
     var creature = Creature.new(data["stats"])
     creature["pronoun"] = Reflect.get(Pronoun, data["pronoun"])
     creature["name"] = data["name"]
+    creature["boss"] = data["boss"]
     creature["kind"] = data["kind"]
     creature["symbol"] = data["symbol"]
     creature["resistances"].addAll(data["resistances"] || [])

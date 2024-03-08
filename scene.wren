@@ -829,7 +829,7 @@ class GameEndState is ModalWindowState {
     _restart = arg(1)
     _state = null
     if (!_restart) {
-      _pane = scene.addElement(Vec.new(Canvas.width, Canvas.height))
+      _pane = scene.addElement(Pane.new(Vec.new(Canvas.width, Canvas.height)))
     }
     window = Dialog.new(_message)
   }
@@ -976,9 +976,9 @@ class GameScene is Scene {
       var restart = true
       if (event.win) {
         restart = false
-        message = "You have succeeded where others have failed. Return to your home, and reflect on your deeds."
+        message = "You have defeated the archmage, who hoards secrets in this place. You leave with your treasure and go out into the world. But that is a tale for another time."
       } else {
-        message = "You have fallen, but perhaps others will take up your cause."
+        message = "You have perished, but your descendants may yet succeed."
       }
       _messages.add(message, INK["playerDie"], false)
       changeState(GameEndState.new().with([ [ message, "", "Press 'ENTER' to try again" ], restart ]))

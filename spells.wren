@@ -154,13 +154,13 @@ class Spell is Stateful {
         if (phrase.subject == SpellWords.water) {
           // effects.add([ "damage", { "damage": Damage.new(1, DamageType.kinetic) } ])
           effects.add([ "cureCondition", { "condition": "burning" } ])
-          effects.add([ "push", { "distance": 2, "strong": true } ])
+          effects.add([ "push", { "distance": 3, "strong": true } ])
         }
         if (phrase.subject == SpellWords.earth) {
           effects.add([ "damage", { "damage": Damage.new(2, DamageType.kinetic) } ])
         }
         if (phrase.subject == SpellWords.air) {
-          effects.add([ "push", { "distance": 3 } ])
+          effects.add([ "push", { "distance": 4 } ])
         }
       }
     }
