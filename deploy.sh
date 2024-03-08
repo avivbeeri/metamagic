@@ -15,7 +15,7 @@ if [ -z "$(git status --porcelain)" ]; then
   dome nest -c res data *.wren
   mv game.egg ../dome-builds/arcanist
   cp config.json ../dome-builds/arcanist
-  cd ../dome-builds/brazier
+  cd ../dome-builds/arcanist
   ./upload-all.sh $1 $2
 else 
   echo "There are uncommitted changes, please commit first."

@@ -1,7 +1,7 @@
 {
   "title": "MetaMagic",
   "logLevel": "INFO",
-  "version": "0.0.1.0",
+  "version": "",
   "scale": 2,
   "integer": false,
   "tiles": false
