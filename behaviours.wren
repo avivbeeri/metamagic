@@ -215,7 +215,6 @@ class CastBehaviour is Behaviour {
     var vision = Vision.new(ctx.zone.map, actor.pos, spec["range"])
     visibleSet.addAll(vision.compute().result)
 
-
     var playerScan = TargetGroup.new({
       "src": player.pos,
       "target": "area",
@@ -225,12 +224,6 @@ class CastBehaviour is Behaviour {
     })
     var options = Set.new()
     options.addAll(playerScan.spaces(ctx))
-    System.print("--- Attempt ---")
-    System.print("Actor: %(actor.pos)")
-    System.print("Player: %(player.pos)")
-    System.print("Attack: %(spell.target())")
-    System.print("Source Spaces: %(originalOptions)")
-    System.print("Target Spaces: %(options.join())")
 
     var intersection = originalOptions.where {|space| visibleSet.contains(space) && options.contains(space) }.toList
     var found = false
@@ -246,58 +239,6 @@ class CastBehaviour is Behaviour {
       srcGroup["origin"] = RNG.sample(intersection)
       valid = true
     }
-    System.print("Intersect: %(intersection)")
-    System.print("Valid: %(valid)")
-    // TODO generate spells for this user to cast
-    // TODO check if player is in range of our cast spells
-    // TODO check if player is a valid target of our spells
-    /*
-    var targetGroup = TargetGroup.new(spell.target())
-    targetGroup["src"] = actor.pos
-    targetGroup["origin"] = actor.pos
-    targetGroup["exclude"] = 0
-    var maxRange = targetGroup["area"] + (targetGroup["range"]).max(1)
-    targetGroup["range"] = maxRange
-    targetGroup["area"] = 0
-
-    actor["targetRange"] = maxRange - 1
-
-    var valid = false
-    System.print("%(targetGroup.distance(player)) %(maxRange)")
-    if (targetGroup.distance(player) <= maxRange) {
-      var visibleSet = Set.new()
-      var vision = Vision.new(ctx.zone.map, actor.pos, targetGroup["range"])
-      vision.compute()
-      visibleSet.addAll(vision.result)
-      /*
-      if (targetGroup.distance(player) <= targetGroup["range"] || targetGroup["area"] == 0) {
-        targetGroup["origin"] = player.pos
-        valid = true
-      } else {
-        */
-        var playerScan = TargetGroup.new({
-          "src": player.pos,
-          "target": "area",
-          "area": targetGroup["area"],
-          "range": 0,
-          "exclude": 0,
-          "origin": player.pos
-        })
-        var options = Set.new()
-        options.addAll(playerScan.spaces(ctx))
-
-        var originalOptions = targetGroup.spaces(ctx)
-        var intersection = originalOptions.where {|space| visibleSet.contains(space) && options.contains(space) }.toList
-        if (intersection.count > 0) {
-          targetGroup["origin"] = RNG.sample(intersection)
-          valid = true
-        }
-      // }
-      if (!visibleSet.contains(targetGroup["origin"])) {
-        valid = false
-      }
-    }
-    */
 
     if (!valid) {
       System.print("not valid?")
