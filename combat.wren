@@ -354,9 +354,10 @@ class CombatProcessor {
   static calculate(src, target, incoming) {
     var ctx = target.ctx
     var result = AttackResult.success
+    var events = []
     if (target["conditions"].containsKey("invulnerable") || (target.has("immunities") && target["immunities"].contains(incoming.type))) {
-      ctx.addEvent(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
-      return [false, false, 0]
+      events.add(Components.events.attack.new(src, target, "area", AttackResult.invulnerable, 0))
+      return events
     }
 
     var targetStats = target["stats"]
@@ -384,13 +385,14 @@ class CombatProcessor {
       result = AttackResult.blocked
     }
 
-    ctx.addEvent(Components.events.attack.new(src, target, "area", result, Damage.new(damage, incoming.type)))
+    events.add(Components.events.attack.new(src, target, "area", result, Damage.new(damage, incoming.type)))
     target["stats"].decrease("hp", damage)
     if (target["stats"].get("hp") <= 0) {
       ctx.zone.map[target.pos]["blood"] = true
-      ctx.addEvent(Components.events.kill.new(src, target))
+      events.add(Components.events.kill.new(src, target))
       ctx.removeEntity(target)
     }
+    return events
   }
 }
 

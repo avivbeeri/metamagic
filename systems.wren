@@ -78,7 +78,8 @@ class AirSystem is GameSystem {
 
   process(ctx, event) {
     if (event is Components.events.clearCondition && event.condition == "frozen") {
-      CombatProcessor.calculate(Environment.ice, event.target, Damage.new(1, DamageType.ice))
+      var events = CombatProcessor.calculate(Environment.ice, event.target, Damage.new(1, DamageType.ice))
+      ctx.addEvents(events)
     }
     if (event is Components.events.turn) {
       var map = ctx.zone.map
@@ -184,7 +185,8 @@ class FireSystem is GameSystem {
         cureBurning(ctx, actor)
       }
       if (!actor["conditions"]["burning"].done) {
-        CombatProcessor.calculate(Environment.fire, actor, Damage.new(1, DamageType.fire))
+        var events = CombatProcessor.calculate(Environment.fire, actor, Damage.new(1, DamageType.fire))
+        ctx.addEvents(events)
       }
     }
     if (tile["burning"] && tile["burning"] > 0) {

@@ -122,13 +122,6 @@ class PushEffect is Effect {
         // TODO: if the space is occupied already?
         // TODO: if hit a wall, stun? extra damage?
       } else {
-        var damageEffect = Components.effects.damage.new(ctx, {
-          "damage": Damage.new(((distance - i) / 0.75).ceil.min(1), DamageType.kinetic),
-          "target": target,
-          "src": Environment.wall
-        })
-        damageEffect.perform()
-        addEvents(damageEffect.events)
         break
       }
       current = next
@@ -138,6 +131,17 @@ class PushEffect is Effect {
     if (finalDistance > 0) {
       addEvent(Components.events.push.new(src, target))
       addEvent(Components.events.move.new(target, origin))
+    }
+
+    // TODO: this was pulled out of the loop and needs testing
+    if (finalDistance < distance) {
+      var damageEffect = Components.effects.damage.new(ctx, {
+        "damage": Damage.new(((distance - finalDistance - 1) / 0.75).ceil.min(1), DamageType.kinetic),
+        "target": target,
+        "src": Environment.wall
+      })
+      damageEffect.perform()
+      addEvents(damageEffect.events)
     }
   }
 }
@@ -153,11 +157,13 @@ class DamageEffect is Effect {
   src { data["src"] }
 
   perform() {
+    var events = []
     if (damage) {
-      CombatProcessor.calculate(src, target, damage)
+      events = CombatProcessor.calculate(src, target, damage)
     } else {
-      CombatProcessor.calculate(src, target)
+      events = CombatProcessor.calculate(src, target)
     }
+    addEvents(events)
   }
 }
 

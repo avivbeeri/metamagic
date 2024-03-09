@@ -1,7 +1,7 @@
 import "math" for Vec
 import "collections" for HashMap
 import "parcel" for Action, ActionResult, MAX_TURN_SIZE, Line, RNG, TargetGroup, Reflect, Stateful
-import "./combat" for Damage, Condition, CombatProcessor, Modifier
+import "./combat" for Damage, Condition, Modifier
 import "./spells" for Spell
 
 #!component(id="cast", group="action")
