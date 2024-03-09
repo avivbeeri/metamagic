@@ -439,7 +439,7 @@ class TargetGroup is Stateful {
         var y = (origin.y + dy)
         var pos = Vec.new(x, y)
         System.print("%(area) %(pos) %(origin) %(exclude)")
-        if (Line.chebychev(pos, src) < exclude) {
+        if (exclude > 0 && Line.chebychev(pos, src) < exclude) {
 //        if (exclude.contains(src + Vec.new(dx, dy))) {
           System.print("excluded")
           System.print(data)

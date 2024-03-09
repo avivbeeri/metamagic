@@ -29,6 +29,7 @@ class Vision {
     for (i in 0...8) {
       scan(1, 0, 1, Transforms[i])
     }
+    return this
   }
 
   scan(y, start, end, transform) {

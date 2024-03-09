@@ -199,25 +199,82 @@ class CastBehaviour is Behaviour {
     if (!player) {
       return false
     }
+
+    var spec = spell.target()
+
+    var valid = false
+    var srcGroup = TargetGroup.new(spell.target())
+    srcGroup["src"] = actor.pos
+    srcGroup["origin"] = actor.pos
+    srcGroup["exclude"] = 0
+    var maxRange = spec["area"] + (spec["range"]).max(1)
+    srcGroup["area"] = maxRange
+    var originalOptions = srcGroup.spaces(ctx)
+    // maximum hittable area
+    var visibleSet = Set.new()
+    var vision = Vision.new(ctx.zone.map, actor.pos, spec["range"])
+    visibleSet.addAll(vision.compute().result)
+
+
+    var playerScan = TargetGroup.new({
+      "src": player.pos,
+      "target": "area",
+      "area": spec["area"],
+      "exclude": 0,
+      "origin": player.pos
+    })
+    var options = Set.new()
+    options.addAll(playerScan.spaces(ctx))
+    System.print("--- Attempt ---")
+    System.print("Actor: %(actor.pos)")
+    System.print("Player: %(player.pos)")
+    System.print("Attack: %(spell.target())")
+    System.print("Source Spaces: %(originalOptions)")
+    System.print("Target Spaces: %(options.join())")
+
+    var intersection = originalOptions.where {|space| visibleSet.contains(space) && options.contains(space) }.toList
+    var found = false
+    for (space in RNG.shuffle(intersection)) {
+      srcGroup["origin"] = space
+      var entities = srcGroup.entities(ctx, actor)
+      if (!entities.isEmpty && !entities.any {|entity| entity["kind"] == "illusion" || entity["kind"] == "archmage" }) {
+        found = true
+        break
+      }
+    }
+    if (!found && !intersection.isEmpty) {
+      srcGroup["origin"] = RNG.sample(intersection)
+      valid = true
+    }
+    System.print("Intersect: %(intersection)")
+    System.print("Valid: %(valid)")
     // TODO generate spells for this user to cast
     // TODO check if player is in range of our cast spells
     // TODO check if player is a valid target of our spells
+    /*
     var targetGroup = TargetGroup.new(spell.target())
     targetGroup["src"] = actor.pos
     targetGroup["origin"] = actor.pos
-    var maxRange = targetGroup["area"] + (targetGroup["range"] - 1).max(0)
-    actor["targetRange"] = maxRange
+    targetGroup["exclude"] = 0
+    var maxRange = targetGroup["area"] + (targetGroup["range"]).max(1)
+    targetGroup["range"] = maxRange
+    targetGroup["area"] = 0
+
+    actor["targetRange"] = maxRange - 1
 
     var valid = false
+    System.print("%(targetGroup.distance(player)) %(maxRange)")
     if (targetGroup.distance(player) <= maxRange) {
       var visibleSet = Set.new()
       var vision = Vision.new(ctx.zone.map, actor.pos, targetGroup["range"])
       vision.compute()
       visibleSet.addAll(vision.result)
+      /*
       if (targetGroup.distance(player) <= targetGroup["range"] || targetGroup["area"] == 0) {
         targetGroup["origin"] = player.pos
         valid = true
       } else {
+        */
         var playerScan = TargetGroup.new({
           "src": player.pos,
           "target": "area",
@@ -235,11 +292,12 @@ class CastBehaviour is Behaviour {
           targetGroup["origin"] = RNG.sample(intersection)
           valid = true
         }
-      }
+      // }
       if (!visibleSet.contains(targetGroup["origin"])) {
         valid = false
       }
     }
+    */
 
     if (!valid) {
       System.print("not valid?")
@@ -252,7 +310,7 @@ class CastBehaviour is Behaviour {
 
     actor.pushAction(Components.actions.cast.new().withArgs({
       "spell": spell,
-      "target": targetGroup
+      "target": srcGroup
     }))
     actor["spells.queue"].removeAt(0)
     return true
@@ -264,12 +322,13 @@ class SummonBehaviour is Behaviour {
 
   construct new(args) {
     super()
+    _summonCount = 0
   }
 
   update(ctx, actor) {
     var illusions = ctx.entities().where{|entity| entity["kind"] == "illusion"}.toList
-    if (!_summoned && illusions.isEmpty) {
-      _summoned = true
+    if (_summonCount == 0  && illusions.isEmpty) {
+      _summonCount = 50
       var position = RNG.sample(ctx.zone.map.neighbours(actor.pos))
 
       var effectSpec = ["summon",
@@ -285,6 +344,7 @@ class SummonBehaviour is Behaviour {
       }))
       return true
     }
+    _summonCount = _summonCount - 1
     return false
   }
 }
