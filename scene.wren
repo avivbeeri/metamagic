@@ -749,7 +749,7 @@ class CastState is ModalWindowState {
     _reader.update()
     if (_reader.changed) {
       scene.process(TextInputEvent.new(_reader.text, _reader.pos))
-      _incantation = StringUtils.toLowercase(_reader.text)
+      _incantation = StringUtils.toLowercase(_reader.text.trim())
       var spell = SpellUtils.parseSpell(_incantation)
       var player = scene.world.getEntityByTag("player")
       if (spell.valid) {
