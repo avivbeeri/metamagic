@@ -373,7 +373,9 @@ class RandomZoneGenerator {
         })
       }
     }
-    var current = Vec.new(RNG.int(1, 31), RNG.int(1, 30))
+    var width = 32
+    var height = 31
+    var current = Vec.new(RNG.int(1, width - 1), RNG.int(1, height - 1))
     if (startPos) {
       current = startPos
     }
@@ -519,15 +521,17 @@ class BasicZoneGenerator {
     }
 
     var rooms = []
+    var width = 32
+    var height = 31
     for (i in 0...maxRooms) {
       var w = RNG.int(minSize, maxSize + 1)
       var h = RNG.int(minSize, maxSize + 1)
-      var x = RNG.int(1, 31 - w - 1)
-      var y = RNG.int(1, 30 - h - 1)
+      var x = RNG.int(1, width - w - 1)
+      var y = RNG.int(1, height - h - 1)
       if (rooms.count == 0 && startPos) {
         // ensure start position is contained in first room
-        x = (startPos.x - RNG.int(1, w - 1)).max(0)
-        y = (startPos.y - RNG.int(1, h - 1)).max(0)
+        x = (startPos.x - RNG.int(1, w - 1)).clamp(0, width - w - 1)
+        y = (startPos.y - RNG.int(1, h - 1)).clamp(0, height - h - 1)
       }
 
       //var room = RNG.float() < 0.5 ? RectangularRoom.new(x, y, w, h) : DiamondRoom.new(Vec.new(x, y), (w.min(h) / 2).ceil)
@@ -662,18 +666,21 @@ class ForestLevelGenerator  {
     var map = TileMap8.new()
     var zone = Zone.new(map)
 
-    for (y in 0...31) {
-      for (x in 0...32) {
+    var width = 32
+    var height = 31
+    for (y in 0...height) {
+      for (x in 0...width) {
         map[x,y] = Tile.new({
           "blocking": true,
           "solid": true,
-          "visible": DEBUG
+          "visible": false
         })
       }
     }
 
     var range = 5
-    var room = AutomataRoom.new(2, 2, 29, 28)
+    var border = 2
+    var room = AutomataRoom.new(border, border, width - border * 2, height - border * 2)
     var inner = room.inner
     for (pos in inner) {
       map[pos] = Tile.new({
@@ -683,72 +690,24 @@ class ForestLevelGenerator  {
       })
     }
 
-    for (x in 0...32) {
-      for (i in [0, 1, 30]) {
+    for (x in 0...width) {
+      for (i in [0, 1, 29, 30]) {
         map[x, i] = Tile.new({
           "blocking": false,
           "solid": false,
-          "visible": DEBUG
+          "visible": false
         })
       }
-    }
-    for (x in 0...31) {
-      for (i in [0, 1, 31]) {
+      for (i in [0, 1, 30, 31]) {
         map[i, x] = Tile.new({
           "blocking": false,
           "solid": false,
-          "visible": DEBUG
-        })
-      }
-    }
-    /*
-    for (x in 0...32) {
-      map[x, 0] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
-      map[x, 1] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
-      map[x, 29] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
-      map[x, 30] = Tile.new({
-        "blocking": false,
-        "solid": false,
-        "visible": false
-      })
-      if (x < 31) {
-        map[0, x] = Tile.new({
-          "blocking": false,
-          "solid": false,
-          "visible": false
-        })
-        map[1, x] = Tile.new({
-          "blocking": false,
-          "solid": false,
-          "visible": false
-        })
-        map[31, x] = Tile.new({
-          "blocking": false,
-          "solid": false,
-          "visible": false
-        })
-        map[30, x] = Tile.new({
-          "blocking": false,
-          "solid": false,
           "visible": false
         })
       }
     }
-    */
-    var start = RNG.sample(inner)
 
+    var start = RNG.sample(inner)
     var place = RNG.sample(inner)
     for (dy in -1..1) {
       for (dx in -1..1) {
@@ -769,7 +728,8 @@ class ForestLevelGenerator  {
     zone["start"] = start
 
     var startOptions = inner.where {|position|
-      return Line.chebychev(position, place) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
+      return Line.chebychev(position, place) > 20 &&
+        (position.x > border && position.x < (width - border)) && (position.y > border && position.y < (height - border))
     }.toList
     if (startOptions.count == 0) {
       zone["start"] = RNG.sample(inner)
@@ -783,7 +743,8 @@ class ForestLevelGenerator  {
     }
 
     var treeOptions = inner.where {|position|
-      return Line.chebychev(position, zone["start"]) > 20 && (position.x > 2 && position.x < 30) && (position.y > 2 && position.y < 29)
+      return Line.chebychev(position, zone["start"]) > 20 &&
+        (position.x > border && position.x < (width - border)) && (position.y > border && position.y < (height - border))
     }.toList
     if (treeOptions.count == 0) {
       place = RNG.sample(inner)

@@ -66,7 +66,7 @@ class Vision {
       return
     }
     _result.add(Vec.new(x.floor, y.floor))
-    _map[x.floor, y.floor]["visible"] = true
+    // _map[x.floor, y.floor]["visible"] = true
   }
 
   result { _result }

@@ -145,9 +145,7 @@ class FireSystem is GameSystem {
     tile["grass"] = false
     tile["burning"] = 3
     for (entity in ctx.getEntitiesAtPosition(position)) {
-      if (!entity["immunities"].contains("FIRE")) {
-        applyBurningTo(ctx, entity)
-      }
+      applyBurningTo(ctx, entity)
     }
     _burning.add(position)
   }
@@ -160,6 +158,9 @@ class FireSystem is GameSystem {
     ctx.addEvents(effect.events)
   }
   applyBurningTo(ctx, actor) {
+    if (entity["immunities"].contains("FIRE")) {
+      return
+    }
     var burning = actor.has("conditions") && actor["conditions"].containsKey("burning")
     var effect = Components.effects.applyCondition.new(ctx, {
       "target": actor,

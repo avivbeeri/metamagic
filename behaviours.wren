@@ -203,7 +203,6 @@ class CastBehaviour is Behaviour {
 
     var spec = spell.target()
 
-    var valid = false
     var srcGroup = TargetGroup.new(spell.target())
     srcGroup["src"] = actor.pos
     srcGroup["origin"] = actor.pos
@@ -227,16 +226,19 @@ class CastBehaviour is Behaviour {
     options.addAll(playerScan.spaces(ctx))
 
     var intersection = originalOptions.where {|space| visibleSet.contains(space) && options.contains(space) }.toList
-    var found = false
+    System.print(intersection)
+
+    var valid = false
     for (space in RNG.shuffle(intersection)) {
       srcGroup["origin"] = space
       var entities = srcGroup.entities(ctx, actor)
-      if (!entities.isEmpty && !entities.any {|entity| entity["kind"] == "illusion" || entity["kind"] == "archmage" }) {
-        found = true
+      if (!entities.isEmpty && !entities.any {|entity| entity.id == actor.id || entity["kind"] == "illusion" || entity["kind"] == "archmage" }) {
+        valid = true
+        System.print("hit")
         break
       }
     }
-    if (!found && !intersection.isEmpty) {
+    if (!valid && !intersection.isEmpty) {
       srcGroup["origin"] = RNG.sample(intersection)
       valid = true
     }
