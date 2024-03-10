@@ -142,7 +142,8 @@ class WanderBehaviour is RandomWalkBehaviour {
       i = i + 1
     }
     if (!fine) {
-      dir = RNG.sample(DIR_EIGHT)
+      return false
+      // dir = RNG.sample(DIR_EIGHT)
     }
     actor["previousDir"] = dir
     actor["previousPosition"] = actor.pos
@@ -241,11 +242,11 @@ class CastBehaviour is Behaviour {
     }
 
     if (!valid) {
-      System.print("not valid?")
+      // System.print("not valid?")
       return false
     }
     if (spell.cost(actor) > actor["stats"]["mp"]) {
-      System.print("out of mana")
+      // System.print("out of mana")
       return false
     }
 
@@ -306,14 +307,13 @@ class BossBehaviour is CastBehaviour {
         actor["words"].add(word)
       }
     }
-    System.print(actor["words"])
   }
   buildSpell(actor) {
     var spell = super.buildSpell(actor)
     var mp = actor["stats"]["mp"]
     var mpMax = actor["stats"]["mpMax"]
     var cost = spell.cost(actor)
-    System.print("MP: %(mp)/%(mpMax) - spell: %(cost)")
+    // System.print("MP: %(mp)/%(mpMax) - spell: %(cost)")
     actor["stats"].set("mpMax", cost)
     if (actor["stats"]["mp"] > cost) {
       actor["stats"].set("mp", cost)
@@ -358,7 +358,6 @@ class SeekBehaviour is Behaviour {
       return false
     }
     if (!_bump) {
-      System.print("nobump")
       if (!Behaviour.spaceAvailableWithPlayer(ctx, next)) {
         actor.pushAction(Action.doNothing)
         return false
@@ -366,7 +365,6 @@ class SeekBehaviour is Behaviour {
       actor.pushAction(Components.actions.simpleMove.new(dir))
       return true
     }
-    System.print("bump")
     actor.pushAction(Components.actions.bump.new(dir))
     return true
   }
@@ -462,7 +460,6 @@ class LocalSeekBehaviour is SeekBehaviour {
     }
     var dpath = player["map"][0]
     if (!dpath[actor.pos] || (_range && dpath[actor.pos] > _range)) {
-      System.print("ignoring localseek")
       return false
     }
     return super.update(ctx, actor)

@@ -4,6 +4,7 @@ import "graphics" for Canvas, Color, ImageData
 import "input" for Keyboard, Mouse
 import "math" for Vec
 import "parcel" for
+  DEBUG,
   Stateful,
   DIR_EIGHT,
   Scene,
@@ -39,7 +40,7 @@ import "./ui" for
   HoverText,
   HintText
 
-import "./generator" for WorldGenerator
+import "./generator" for WorldGenerator, Seed
 import "./combat" for AttackResult, DamageType
 import "./spells" for SpellUtils, AllWords
 
@@ -989,6 +990,9 @@ class GameScene is Scene {
     }
     addElement(HoverText.new(Vec.new(Canvas.width - 8, 8)))
     addElement(LogViewer.new(Vec.new(4, Canvas.height - 5 * 10), _messages, true))
+    if (DEBUG) {
+      addElement(Label.new(Vec.new(0, 0), Seed))
+    }
 
     _conditionLabels = {}
     //addElement(LogViewer.new(Vec.new(0, Canvas.height - 12 * 7), _messages))

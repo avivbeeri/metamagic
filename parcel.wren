@@ -438,11 +438,10 @@ class TargetGroup is Stateful {
         var x = (origin.x + dx)
         var y = (origin.y + dy)
         var pos = Vec.new(x, y)
-        System.print("%(area) %(pos) %(origin) %(exclude)")
+        // System.print("%(area) %(pos) %(origin) %(exclude)")
         if (exclude > 0 && Line.chebychev(pos, src) < exclude) {
-//        if (exclude.contains(src + Vec.new(dx, dy))) {
-          System.print("excluded")
-          System.print(data)
+          //System.print("excluded")
+          // System.print(data)
           continue
         }
         if (needSight && !ctx.zone.map[pos]["visible"]) {

@@ -2,6 +2,7 @@ import "json" for Json
 import "collections" for Set
 import "math" for Vec, Elegant
 import "parcel" for
+  DEBUG,
   DIR_FOUR,
   DIR_EIGHT,
   DataFile,
@@ -10,17 +11,24 @@ import "parcel" for
   Tile,
   Zone,
   Entity,
-  RNG,
   Line,
   Dijkstra,
   Config
 
 import "factory" for CreatureFactory, ItemFactory
 import "spells" for SpellUtils
+import "random" for Random
+import "dome" for Platform
 
 var GeneratorData = DataFile.load("floorData", "data/tiers.json")
 var TierData = GeneratorData["floors"]
 var Distribution = GeneratorData["distribution"]
+
+var Seed = Platform.time
+var RNG = Random.new(Seed)
+System.print("GENERATOR SEED: %(Seed)")
+
+
 
 class GeneratorUtils {
   static placeItem(zone, pos) {
@@ -377,7 +385,7 @@ class RandomZoneGenerator {
     var inner = [ current ]
     for (i in 0...dist) {
       var next = null
-      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y == 29) {
+      while (next == null || next.x == 0 || next.y == 0 || next.x == 31 || next.y >= 29) {
         var dir = DIR_FOUR[RNG.int(4)]
         next = current + dir
       }
@@ -659,13 +667,13 @@ class ForestLevelGenerator  {
         map[x,y] = Tile.new({
           "blocking": true,
           "solid": true,
-          "visible": false
+          "visible": DEBUG
         })
       }
     }
 
     var range = 5
-    var room = AutomataRoom.new(2, 2, 30, 29)
+    var room = AutomataRoom.new(2, 2, 29, 28)
     var inner = room.inner
     for (pos in inner) {
       map[pos] = Tile.new({
@@ -675,6 +683,25 @@ class ForestLevelGenerator  {
       })
     }
 
+    for (x in 0...32) {
+      for (i in [0, 1, 30]) {
+        map[x, i] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": DEBUG
+        })
+      }
+    }
+    for (x in 0...31) {
+      for (i in [0, 1, 31]) {
+        map[i, x] = Tile.new({
+          "blocking": false,
+          "solid": false,
+          "visible": DEBUG
+        })
+      }
+    }
+    /*
     for (x in 0...32) {
       map[x, 0] = Tile.new({
         "blocking": false,
@@ -719,6 +746,7 @@ class ForestLevelGenerator  {
         })
       }
     }
+    */
     var start = RNG.sample(inner)
 
     var place = RNG.sample(inner)
@@ -728,6 +756,7 @@ class ForestLevelGenerator  {
       }
     }
     zone.map[place]["stairs"] = "down"
+    System.print(zone["start"])
 
     for (i in 0...RNG.int(2, 6)) {
       GeneratorUtils.spawnGrass(zone, room)

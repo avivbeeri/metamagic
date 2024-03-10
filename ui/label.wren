@@ -12,10 +12,8 @@ class Label is Panel {
 
   construct new(pos, t) {
     // TODO: handle font size
-    _text = t
-    size = Vec.new(_text.count * 8, 8)
-
     super(size, pos)
+    text = t
   }
 
   color=(v) { _color = v }
