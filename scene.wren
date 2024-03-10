@@ -450,7 +450,8 @@ class ModalWindowState is SceneState {
       window = HistoryViewer.new(Vec.new(border, border), Vec.new(Canvas.width - border*2, Canvas.height - border*2), scene.messages)
     }
     if (windowType == "food") {
-      var consumedFood = arg(1)
+      var injured = arg(1)
+      var consumedFood = arg(2)
       window = Pane.new(Vec.new(Canvas.width, Canvas.height))
       window.center()
       window.bg = INK["black"]
@@ -463,11 +464,13 @@ class ModalWindowState is SceneState {
       var label = pane.addElement(Label.new(Vec.new(0, 24), "Press \"ENTER\" to continue" ))
 
       label.centerHorizontally()
-      if (consumedFood) {
+      if (injured && consumedFood) {
+        messageLabel.text = "You descend to the lower levels.\n You recover yourself with the help of some food."
+      } else if (injured && !consumedFood) {
         messageLabel.text = "You descend to the lower levels.\n You recover yourself with the help of some food."
         // window = Dialog.new("You descend to the lower levels. You recover yourself with the help of some food.")
       } else {
-        messageLabel.text = "You descend to the lower levels. \nYou have no food to bolster yourself with."
+        messageLabel.text = "You descend to the lower levels, resting inbetween."
         // window = Dialog.new("You descend to the lower levels. You have no food to bolster yourself with.")
       }
       messageLabel.centerHorizontally()
@@ -1211,7 +1214,7 @@ class GameScene is Scene {
       _messages.add("You descend down the stairs.", INK["text"], false)
     }
     if (event is Components.events.campfire) {
-      changeState(ModalWindowState.new().with(["food", event.consumedFood]))
+      changeState(ModalWindowState.new().with(["food", event.injured, event.consumedFood]))
     }
   }
 

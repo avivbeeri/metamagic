@@ -268,13 +268,14 @@ class ManaRegenSystem is GameSystem {
       var inventory = player["inventory"]
 
       var entries = player["inventory"].where {|entry| entry.id == "food" }
+      var injured = (player["stats"]["hp"] < player["stats"]["hpMax"])
       if (entries.count <= 0) {
-        ctx.addEvent(Components.events.campfire.new(false))
+        ctx.addEvent(Components.events.campfire.new(injured, false))
         return
       }
       var entry = entries.toList[0]
       if (entry.qty <= 0) {
-        ctx.addEvent(Components.events.campfire.new(false))
+        ctx.addEvent(Components.events.campfire.new(injured, false))
         return
       }
       if (player["stats"]["hp"] < player["stats"]["hpMax"]) {
@@ -283,9 +284,9 @@ class ManaRegenSystem is GameSystem {
         player["stats"].maximize("mp", "mpMax")
         ctx.addEvent(Components.events.heal.new(player, amount))
         ctx.addEvent(Components.events.regen.new(player))
-        ctx.addEvent(Components.events.campfire.new(true))
+        ctx.addEvent(Components.events.campfire.new(injured, true))
       } else {
-        ctx.addEvent(Components.events.campfire.new(false))
+        ctx.addEvent(Components.events.campfire.new(injured, false))
       }
     }
     if (event is Components.events.turn) {
