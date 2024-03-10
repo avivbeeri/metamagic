@@ -84,8 +84,8 @@
     "stats": {
       "hp": 7,
       "hpMax": 7,
-      "str": 2,
-      "dex": 2,
+      "str": 4,
+      "dex": 4,
       "spd": 0.333
     }
   },
@@ -112,7 +112,7 @@
       "mp": 10,
       "spd": 0.8,
       "str": 1,
-      "dex": 0
+      "dex": 1
     }
   },
   "archmage": {
@@ -197,7 +197,9 @@
     "pronoun": "it",
     "stats": {
       "hp": 3,
-      "hpMax": 3
+      "hpMax": 3,
+      "str": 1,
+      "dex": 0
     }
   }
 }

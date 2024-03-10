@@ -19,7 +19,7 @@ class Damage is Stateful {
   static calculateLow(atk, def) {
     var o1 = atk * 2 - def
     var o2 = (atk * atk) / def
-    if (atk > def) {
+    if (atk >= def) {
       return o1.floor
     }
     if (!o2.isNan) {
@@ -30,7 +30,7 @@ class Damage is Stateful {
   static calculateHigh(atk, def) {
     var o1 = atk * 2 - def
     var o2 = (atk * atk) / def
-    if (atk > def) {
+    if (atk >= def) {
       return o1.ceil
     }
     if (!o2.isNan) {
@@ -42,7 +42,8 @@ class Damage is Stateful {
   static calculate(atk, def) {
     var low = calculateLow(atk, def)
     var high = calculateHigh(atk, def)
-    return RNG.float() < 0.3 ? low : high
+    System.print("Daamge: %(low) or %(high)")
+    return ((RNG.float() < 0.3 ? low : high) / 2).ceil
   }
 
   construct new(amount, type) {
@@ -373,11 +374,7 @@ class CombatProcessor {
     }
     if (target.has("resistances")) {
       if (target["resistances"].contains(incoming.type)) {
-        if (incoming.amount > def) {
-          damage = (damage / 2).floor.max(1)
-        } else {
-          damage = (damage / 2).floor
-        }
+        damage = (damage / 2).floor.max(1)
       }
     }
 

@@ -367,6 +367,13 @@ class ActionResult {
   succeeded { _success }
   invalid { _invalid }
   toString { "ActionResult [%(succeeded), %(alternate)]"}
+  != (other) { !(this == other) }
+  == (other) {
+    if (other is ActionResult) {
+      return _success == other.succeeded && _invalid == other.invalid
+    }
+    return false
+  }
 }
 // ==================================
 

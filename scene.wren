@@ -1039,6 +1039,15 @@ class GameScene is Scene {
       var target = event.target.name
       _messages.add("%(srcName) pushed %(target) away.", INK["text"], true)
     }
+    if (event is Components.events.failedMove) {
+      var srcName = event.src.name
+      if (event.src is Player) {
+        srcName = Pronoun.you.subject
+      }
+      srcName = TextSplitter.capitalize(srcName)
+      _messages.add("%(srcName) bumped into the wall.", INK["gray"], true)
+
+    }
     if (event is Components.events.learn) {
       var srcName = event.src.name
       var prep = "their"

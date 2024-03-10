@@ -278,7 +278,13 @@ class PlayerBumpAction is Action {
   }
   evaluate() {
     _action = SimpleMoveAction.new(_dir).bind(src)
-    return _action.evaluate()
+    var result = _action.evaluate()
+    System.print(result)
+    if (result.invalid) {
+      System.print("invalid move")
+      ctx.addEvent(Components.events.failedMove.new(src))
+    }
+    return result
   }
   perform() {
     var moveResult = _action.perform()
