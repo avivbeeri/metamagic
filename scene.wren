@@ -231,7 +231,7 @@ class SpellQueryState is SceneState {
     _allowSolid = query.containsKey("allowSolid") ? query["allowSolid"] : false
     _needEntity = query.containsKey("needEntity") ? query["needEntity"] : true
     _needSight = query.containsKey("needSight") ? query["needSight"] : true
-    scene.process(TargetBeginEvent.new(_cursorPos, _area, _range))
+    scene.process(TargetBeginEvent.new(_cursorPos, _area, _range, query["exclude"]))
   }
   onExit() {
     if (_ui) {

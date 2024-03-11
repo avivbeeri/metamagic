@@ -14,6 +14,7 @@ import "groups" for Components
 import "./items" for Item, EquipmentSlot
 
 import "./palette" for INK
+import "./ui/animation" for Animation
 import "./ui/gauge" for Gauge
 import "./ui/pane" for Pane
 import "./ui/panel" for SizeMode
@@ -310,12 +311,17 @@ class MapZone is Element {
     _cursor = cursor
     _area = area
     _range = range
+    _t = 0
   }
 
   process(event) {
     if (event is TargetEndEvent) {
       removeSelf()
     }
+  }
+  update() {
+    _t = _t + 1
+    super.update()
   }
   draw() {
     var offset = Canvas.offset
@@ -332,11 +338,13 @@ class MapZone is Element {
 
 }
 class Cursor is Element {
-  construct new(pos, cursor, area) {
+  construct new(pos, cursor, area, exclude) {
     super()
     _pos = pos
     _cursor = cursor
     _area = area
+    _exclude = exclude
+    _t = 0
   }
 
   process(event) {
@@ -347,21 +355,24 @@ class Cursor is Element {
     }
   }
 
+  update() {
+    _t = _t + 1
+    super.update()
+  }
+
   draw() {
     var offset = Canvas.offset
     Canvas.offset(_pos.x,_pos.y)
+
+    var areaColor = INK["targetArea"] * 1
+    areaColor.a = 16 + ((_t / 15)).sin.abs * 80
 
     var dist = _area
     for (dy in (-dist)..(dist)) {
       for (dx in (-dist)..(dist)) {
         var x = (_cursor.x + dx) * 16
         var y = (_cursor.y + dy) * 16
-        if (dx == dy && dx == 0) {
-          Canvas.rectfill(x, y, 16, 16, INK["targetCursor"])
-          Canvas.rect(x, y, 16, 16, INK["targetBorder"])
-          continue
-        }
-        Canvas.rectfill(x, y, 16, 16, INK["targetArea"])
+        Canvas.rectfill(x, y, 16, 16, areaColor)
         Canvas.rect(x, y, 16, 16, INK["targetBorder"])
       }
     }

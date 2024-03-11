@@ -60,7 +60,7 @@ class AsciiRenderer is Element {
   }
   process(event) {
     if (event is TargetBeginEvent) {
-      addElement(Cursor.new(_pos, event.pos, event.area))
+      addElement(Cursor.new(_pos, event.pos, event.area, event.exclude))
       var player = _world.getEntityByTag("player")
       if (player) {
         addElement(MapZone.new(_pos, player.pos, event.area, event.range))
@@ -130,6 +130,7 @@ class AsciiRenderer is Element {
     if (!found) {
       top.process(HoverEvent.new(null))
     }
+    super.update()
   }
 
   world { _world }
