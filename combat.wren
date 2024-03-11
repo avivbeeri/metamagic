@@ -42,7 +42,6 @@ class Damage is Stateful {
   static calculate(atk, def) {
     var low = calculateLow(atk, def)
     var high = calculateHigh(atk, def)
-    System.print("Daamge: %(low) or %(high)")
     return ((RNG.float() < 0.3 ? low : high) / 2).ceil
   }
 
