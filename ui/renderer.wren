@@ -110,6 +110,10 @@ class AsciiRenderer is Element {
         found = true
         top.process(HoverEvent.new("Pool of blood"))
       }
+      if (!found && tile["burned"]) {
+        found = true
+        top.process(HoverEvent.new("Scorched Grass"))
+      }
       if (!found && tile["grass"]) {
         found = true
         top.process(HoverEvent.new("Grass"))
@@ -159,6 +163,9 @@ class AsciiRenderer is Element {
         }
         if (map[x, y]["grass"]) {
           color = INK["grass"]
+        }
+        if (map[x, y]["burned"]) {
+          color = INK["burned"]
         }
         if (map[x, y]["water"]) {
           if (map[x,y]["chilled"] && map[x,y]["chilled"] > 0) {

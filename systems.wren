@@ -137,17 +137,20 @@ class FireSystem is GameSystem {
     super()
     _burning = Set.new()
   }
-  setFire(ctx, position) {
+  setFireOnTile(ctx, position) {
     if (_burning.contains(position)) {
       return
     }
     var tile = ctx.zone.map[position]
     tile["grass"] = false
     tile["burning"] = 3
+    _burning.add(position)
+  }
+  setFire(ctx, position) {
+    setFireOnTile(ctx, position)
     for (entity in ctx.getEntitiesAtPosition(position)) {
       applyBurningTo(ctx, entity)
     }
-    _burning.add(position)
   }
   cureBurning(ctx, actor) {
     var effect = Components.effects.cureCondition.new(ctx, {
@@ -158,7 +161,7 @@ class FireSystem is GameSystem {
     ctx.addEvents(effect.events)
   }
   applyBurningTo(ctx, actor) {
-    if (entity["immunities"].contains("FIRE")) {
+    if (actor["immunities"].contains("FIRE")) {
       return
     }
     var burning = actor.has("conditions") && actor["conditions"].containsKey("burning")
@@ -195,6 +198,18 @@ class FireSystem is GameSystem {
     }
   }
   process(ctx, event) {
+    if (event is Components.events.move) {
+      var entity = event.src
+      var tile = ctx.zone.map[entity.pos]
+      if (tile["grass"]) {
+        if (entity.has("conditions") && entity["conditions"].containsKey("burning")) {
+          var condition = entity["conditions"]["burning"]
+          if (!condition.done) {
+            setFireOnTile(ctx, entity.pos)
+          }
+        }
+      }
+    }
     if (event is Components.events.turn) {
       var hyperspace = []
       var map = ctx.zone.map
@@ -216,6 +231,8 @@ class FireSystem is GameSystem {
           }
           for (pos in removals) {
             _burning.remove(pos)
+            var tile = map[pos]
+            tile["burned"] = true
           }
         }
       }
