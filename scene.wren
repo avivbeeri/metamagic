@@ -785,12 +785,12 @@ class HelpState is ModalWindowState {
 
   onEnter() {
     var message = [
-      "'Confirm' - Enter",
+      "'Confirm' - Enter, Numpad Enter",
       "'Reject' - Escape",
       "",
       "Move - HJKLYUNB, WASDQECZ, Arrow Keys, Numpad",
-      "Cast a spell - Space",
-      "View your lexicon - 'l'",
+      "Cast a spell - Space, Numpad 5",
+      "View your lexicon - 'g'",
       "",
       "Other commands",
       "Inventory - 'i', press number to use",
