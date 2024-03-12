@@ -54,16 +54,16 @@ class SpellWords {
 
   // object
   static self { SpellToken.new("SELF", TokenCategory.object, "Myself", 2) }
-  static close { SpellToken.new("CLOSE", TokenCategory.object, "Nearby to me", 3) }
-  static far { SpellToken.new("FAR", TokenCategory.object, "Distant from here", 4) }
+  static close { SpellToken.new("CLOSE", TokenCategory.object, "Nearby to me", 4) }
+  static far { SpellToken.new("FAR", TokenCategory.object, "Distant from here", 6) }
 
-  static big { SpellToken.new("BIG", TokenCategory.modifier, "...in a broad area", 1) }
-  static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, "...in an enormous area", 2) }
+  static big { SpellToken.new("BIG", TokenCategory.modifier, "...in a broad area", 3) }
+  static bigger { SpellToken.new("BIGGER", TokenCategory.modifier, "...in an enormous area", 6) }
 }
 
 var BaseTable = {
   SpellWords.self.lexeme: { "target": "self", "area": 0, "range": 0, "origin": null },
-  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": 1, "needEntity": false  },
+  SpellWords.close.lexeme: { "target": "area", "area": 0, "range": 1, "origin": null, "exclude": 0, "needEntity": false  },
   SpellWords.far.lexeme: { "target": "area", "area": 0, "range": 4, "origin": null, "exclude": 0, "needEntity": false  },
   SpellWords.big.lexeme: { "area": 1 },
   SpellWords.bigger.lexeme: { "area": 2 }
@@ -204,9 +204,10 @@ class Spell is Stateful {
           }
         }
         var success = entry["success"]
-        var wordCost = 0
-        wordCost = (entry["discovered"] ? 0 : 2)
-        wordCost = wordCost + (word.maxCost - success).max(word.minCost)
+        var wordCost = (word.maxCost - success).max(word.minCost)
+        if (!entry["discovered"]) {
+          wordCost = (wordCost * 1.5).floor
+        }
         cost = cost + wordCost
         System.print("%(word) [ %(wordCost) MP ]: %(entry)")
       }
@@ -238,6 +239,7 @@ class Spell is Stateful {
       Stateful.assign(result, BaseTable[modifier.lexeme])
       if (object == SpellWords.close) {
         result["range"] = 0
+        result["exclude"] = 1
       }
     }
     return result
